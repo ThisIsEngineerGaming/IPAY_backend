@@ -1,0 +1,12 @@
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\bin\Debug\net10.0\ExamTest.Application.deps.json
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\bin\Debug\net10.0\ExamTest.Application.dll
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\bin\Debug\net10.0\ExamTest.Application.pdb
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\obj\Debug\net10.0\ExamTest.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\obj\Debug\net10.0\ExamTest.Application.AssemblyInfoInputs.cache
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\obj\Debug\net10.0\ExamTest.Application.AssemblyInfo.cs
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\obj\Debug\net10.0\ExamTest.Application.csproj.CoreCompileInputs.cache
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\obj\Debug\net10.0\ExamTest.Application.sourcelink.json
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\obj\Debug\net10.0\ExamTest.Application.dll
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\obj\Debug\net10.0\refint\ExamTest.Application.dll
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\obj\Debug\net10.0\ExamTest.Application.pdb
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.Application\obj\Debug\net10.0\ref\ExamTest.Application.dll

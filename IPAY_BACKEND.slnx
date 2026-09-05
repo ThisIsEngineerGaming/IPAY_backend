@@ -1,8 +1,8 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="../ASPNET_AMAZON_CLONE/src/ExamTest.Application/ExamTest.Application.csproj" />
-    <Project Path="../ASPNET_AMAZON_CLONE/src/ExamTest.Domain/ExamTest.Domain.csproj" />
-    <Project Path="../ASPNET_AMAZON_CLONE/src/ExamTest.Infastructure/ExamTest.Infastructure.csproj" />
-    <Project Path="../ASPNET_AMAZON_CLONE/src/ExamTest.WebApi/ExamTest.WebApi.csproj" />
+    <Project Path="src/ExamTest.Application/ExamTest.Application.csproj" />
+    <Project Path="src/ExamTest.Domain/ExamTest.Domain.csproj" />
+    <Project Path="src/ExamTest.Infastructure/ExamTest.Infastructure.csproj" />
+    <Project Path="src/ExamTest.WebApi/ExamTest.WebApi.csproj" />
   </Folder>
 </Solution>
