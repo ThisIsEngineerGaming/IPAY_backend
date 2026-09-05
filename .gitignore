@@ -1,0 +1,16 @@
+# Firebase Admin SDK credential downloaded from Firebase Console
+firebase-service-account.json
+**/firebase-service-account.json
+
+# Build output
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Rider / ReSharper
+.idea/
+*.DotSettings.user

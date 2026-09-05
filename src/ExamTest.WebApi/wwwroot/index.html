@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IPAY API Playground</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #101827; color: #e5e7eb; }
+    body { max-width: 1060px; margin: 0 auto; padding: 32px 20px 64px; }
+    h1 { margin: 0 0 6px; } p { color: #aebbd0; }
+    .card { background: #182235; border: 1px solid #2c3a53; border-radius: 10px; padding: 20px; margin-top: 20px; }
+    form { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; align-items: end; }
+    label { display: grid; gap: 5px; color: #b8c4d8; font-size: .9rem; }
+    input, select, button { box-sizing: border-box; width: 100%; border-radius: 6px; padding: 9px; font: inherit; }
+    input, select { border: 1px solid #3b4d6d; background: #0f1726; color: inherit; }
+    button { cursor: pointer; border: 0; background: #4f7cff; color: white; font-weight: 650; }
+    button.danger { background: #c13e54; width: auto; padding: 6px 10px; }
+    .toolbar { display: flex; gap: 12px; align-items: end; flex-wrap: wrap; }
+    .toolbar label { min-width: 180px; } .toolbar button { width: auto; }
+    #status { min-height: 1.5em; margin: 14px 0 0; color: #aebbd0; } #status.error { color: #ff98a8; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: .9rem; }
+    th, td { padding: 10px; border-bottom: 1px solid #2c3a53; text-align: left; vertical-align: top; }
+    th { color: #b8c4d8; } .empty { color: #aebbd0; text-align: center; }
+    code { white-space: pre-wrap; word-break: break-word; }
+    img.thumb { width: 74px; height: 74px; object-fit: cover; border-radius: 5px; background: #0f1726; }
+  </style>
+</head>
+<body>
+  <h1>IPAY API Playground</h1>
+  <p>A lightweight way to try the Firebase-backed API. This page uses the same API host you opened it from.</p>
+
+  <section class="card">
+    <div class="toolbar">
+      <label>Collection
+        <select id="resource">
+          <option value="series">Series</option>
+          <option value="episodes">Episodes</option>
+          <option value="genres">Genres</option>
+          <option value="films">Films</option>
+          <option value="categories">Categories</option>
+          <option value="products">Products</option>
+        </select>
+      </label>
+      <button id="refresh" type="button">Refresh list</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 id="formTitle">Add series</h2>
+    <form id="createForm"></form>
+    <div id="status" role="status"></div>
+  </section>
+
+  <section class="card">
+    <h2 id="listTitle">Series</h2>
+    <table><thead id="head"></thead><tbody id="rows"></tbody></table>
+  </section>
+
+  <script>
+    const schemas = {
+      series: [ ['name', 'Name'], ['description', 'Description'], ['year', 'Year', 'number'], ['rating', 'Rating', 'number'], ['director', 'Director'], ['ageRating', 'Age rating'], ['posterUrl', 'Poster URL'] ],
+      episodes: [ ['name', 'Name'], ['description', 'Description'], ['rating', 'Rating', 'number'], ['director', 'Director'], ['posterUrl', 'Poster URL'], ['videoUrl', 'Video URL'], ['serialId', 'Series ID', 'number'] ],
+      genres: [ ['name', 'Name'] ],
+      films: [ ['name', 'Name'], ['description', 'Description'], ['year', 'Year', 'number'], ['rating', 'Rating', 'number'], ['director', 'Director'], ['ageRating', 'Age rating'], ['posterUrl', 'Poster URL'], ['videoUrl', 'Video URL'] ],
+      categories: [ ['name', 'Name'] ],
+      products: [ ['name', 'Name'], ['price', 'Price', 'number'], ['rating', 'Rating', 'number'], ['discountedPrice', 'Discounted price', 'number'], ['imageUrl', 'Image URL'], ['manufacturer', 'Manufacturer'], ['categoryId', 'Category ID', 'number'] ]
+    };
+    const resource = document.querySelector('#resource');
+    const form = document.querySelector('#createForm');
+    const status = document.querySelector('#status');
+    const labelFor = value => value.replace(/\b\w/g, c => c.toUpperCase());
+    let editingId = null;
+    let currentItems = [];
+
+    function showStatus(message, isError = false) {
+      status.textContent = message;
+      status.className = isError ? 'error' : '';
+    }
+    function renderForm() {
+      const type = resource.value;
+      document.querySelector('#formTitle').textContent = editingId ? `Edit ${type.slice(0, -1)}` : `Add ${type.slice(0, -1)}`;
+      document.querySelector('#listTitle').textContent = labelFor(type);
+      const imageField = schemas[type].find(([key]) => key === 'posterUrl' || key === 'imageUrl');
+      form.innerHTML = schemas[type].map(([key, label, inputType]) => `
+        <label>${label}<input name="${key}" type="${inputType || 'text'}" ${key === 'name' ? 'required' : ''}></label>`).join('') +
+        (imageField ? `<label>Upload image<input id="imageFile" type="file" accept="image/jpeg,image/png,image/gif,image/webp"></label>` : '') +
+        `<button type="submit">${editingId ? 'Save changes' : 'Add item'}</button>` +
+        (editingId ? `<button type="button" id="cancelEdit">Cancel</button>` : '');
+    }
+    function startEdit(item) {
+      editingId = item.id;
+      renderForm();
+      for (const [key] of schemas[resource.value]) {
+        if (form.elements[key]) form.elements[key].value = item[key] ?? '';
+      }
+      showStatus(`Editing item ${item.id}.`);
+    }
+    async function refresh() {
+      const type = resource.value;
+      showStatus('Loading…');
+      try {
+        const response = await fetch(`/api/${type}`);
+        if (!response.ok) throw new Error(await response.text());
+        currentItems = await response.json();
+        renderRows(currentItems);
+        showStatus('');
+      } catch (error) { showStatus(`Could not load items: ${error.message}`, true); }
+    }
+    function renderRows(items) {
+      const columns = ['id', ...schemas[resource.value].map(x => x[0])];
+      document.querySelector('#head').innerHTML = `<tr>${columns.map(c => `<th>${labelFor(c)}</th>`).join('')}<th></th></tr>`;
+      document.querySelector('#rows').innerHTML = items.length ? items.map(item => `<tr>${columns.map(c => `<td>${renderCell(c, item[c])}</td>`).join('')}<td><button class="edit" data-id="${item.id}">Edit</button> <button class="danger" data-id="${item.id}">Delete</button></td></tr>`).join('') : `<tr><td class="empty" colspan="${columns.length + 1}">No items yet.</td></tr>`;
+    }
+    function renderCell(column, value) {
+      if ((column === 'posterUrl' || column === 'imageUrl') && value) return `<img class="thumb" src="${escapeHtml(value)}" alt="Uploaded image">`;
+      return `<code>${escapeHtml(format(value))}</code>`;
+    }
+    function format(value) { return Array.isArray(value) ? value.join(', ') : (value ?? ''); }
+    function escapeHtml(value) { const e = document.createElement('span'); e.textContent = value; return e.innerHTML; }
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const payload = Object.fromEntries(new FormData(form));
+      for (const [key, value] of Object.entries(payload)) {
+        if (schemas[resource.value].find(x => x[0] === key)?.[2] === 'number') payload[key] = Number(value || 0);
+      }
+      const isEdit = editingId !== null;
+      const url = isEdit ? `/api/${resource.value}/${editingId}` : `/api/${resource.value}`;
+      try {
+        const response = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!response.ok) throw new Error(await response.text());
+        form.reset(); showStatus(isEdit ? 'Item updated.' : 'Item added.'); editingId = null; renderForm(); await refresh();
+      } catch (error) { showStatus(`Could not ${isEdit ? 'update' : 'add'} item: ${error.message}`, true); }
+    });
+    form.addEventListener('click', event => {
+      if (event.target.id === 'cancelEdit') { editingId = null; form.reset(); renderForm(); showStatus(''); }
+    });
+    form.addEventListener('change', async event => {
+      if (event.target.id !== 'imageFile' || !event.target.files[0]) return;
+      const file = event.target.files[0];
+      const upload = new FormData();
+      upload.append('file', file);
+      showStatus('Uploading image…');
+      try {
+        const response = await fetch('/api/images', { method: 'POST', body: upload });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Upload failed.');
+        const destination = form.querySelector('[name="posterUrl"], [name="imageUrl"]');
+        destination.value = result.url;
+        showStatus('Image uploaded. It will be attached when you add the item.');
+      } catch (error) { showStatus(`Could not upload image: ${error.message}`, true); }
+    });
+    document.querySelector('#rows').addEventListener('click', async event => {
+      const id = event.target.dataset.id;
+      if (!id) return;
+      if (event.target.classList.contains('edit')) {
+        const item = currentItems.find(i => String(i.id) === id);
+        if (item) startEdit(item);
+        return;
+      }
+      if (!confirm(`Delete item ${id}?`)) return;
+      try {
+        const response = await fetch(`/api/${resource.value}/${id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error(await response.text());
+        showStatus('Item deleted.'); await refresh();
+      } catch (error) { showStatus(`Could not delete item: ${error.message}`, true); }
+    });
+    resource.addEventListener('change', () => { editingId = null; renderForm(); refresh(); });
+    document.querySelector('#refresh').addEventListener('click', refresh);
+    renderForm(); refresh();
+  </script>
+</body>
+</html>
