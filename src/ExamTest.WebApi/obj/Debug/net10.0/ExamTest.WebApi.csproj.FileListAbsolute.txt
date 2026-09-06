@@ -1,4 +1,3 @@
-C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\spa.proxy.json
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\appsettings.Development.json
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\appsettings.json
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\ExamTest.WebApi.staticwebassets.endpoints.json
@@ -8,10 +7,8 @@ C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\E
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\ExamTest.WebApi.dll
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\ExamTest.WebApi.pdb
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
-C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\Microsoft.AspNetCore.SpaProxy.dll
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\Microsoft.OpenApi.dll
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\obj\Debug\net10.0\ExamTest.WebApi.csproj.AssemblyReference.cache
-C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\obj\Debug\net10.0\spa.proxy.json
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\obj\Debug\net10.0\rpswa.dswa.cache.json
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\obj\Debug\net10.0\ExamTest.WebApi.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\obj\Debug\net10.0\ExamTest.WebApi.AssemblyInfoInputs.cache
@@ -36,3 +33,6 @@ C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\obj\Debug\net10.0\r
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\obj\Debug\net10.0\ExamTest.WebApi.pdb
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\obj\Debug\net10.0\ExamTest.WebApi.genruntimeconfig.cache
 C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\obj\Debug\net10.0\ref\ExamTest.WebApi.dll
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\PC\Desktop\ASP-NET\IPAY_BACKEND\src\ExamTest.WebApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll

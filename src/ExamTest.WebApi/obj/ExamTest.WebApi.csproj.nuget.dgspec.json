@@ -56,9 +56,9 @@
               "target": "Package",
               "version": "[10.0.11, )"
             },
-            "Microsoft.AspNetCore.SpaProxy": {
+            "Swashbuckle.AspNetCore": {
               "target": "Package",
-              "version": "[10.*-*, )"
+              "version": "[10.2.3, )"
             }
           },
           "imports": [
