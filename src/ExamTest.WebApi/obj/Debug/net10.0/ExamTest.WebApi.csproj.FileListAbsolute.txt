@@ -66,15 +66,12 @@ C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Ex
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Api.CommonProtos.dll
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Api.Gax.dll
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Api.Gax.Grpc.dll
-C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Api.Gax.Rest.dll
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Apis.dll
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Apis.Auth.dll
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Apis.Core.dll
-C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Apis.Storage.v1.dll
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Cloud.Firestore.dll
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Cloud.Firestore.V1.dll
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Cloud.Location.dll
-C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Cloud.Storage.V1.dll
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.LongRunning.dll
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Google.Protobuf.dll
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\Grpc.Auth.dll
@@ -107,7 +104,6 @@ C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\rj
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\scopedcss\bundle\ExamTest.WebApi.styles.css
-C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\compressed\e7gg159hc1-{0}-cmmcvnqc4y-cmmcvnqc4y.gz
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\staticwebassets.build.json
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\staticwebassets.build.json.cache
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\staticwebassets.development.json
@@ -120,3 +116,6 @@ C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\re
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\ExamTest.WebApi.pdb
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\ExamTest.WebApi.genruntimeconfig.cache
 C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\ref\ExamTest.WebApi.dll
+C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\firebase-service-account.example.json
+C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\obj\Debug\net10.0\compressed\e7gg159hc1-{0}-lah5k407th-lah5k407th.gz
+C:\Users\User\source\repos\IPAY_backend\src\ExamTest.WebApi\bin\Debug\net10.0\CloudinaryDotNet.dll

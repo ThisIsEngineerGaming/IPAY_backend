@@ -17,6 +17,17 @@
           "ExamTest.WebApi.dll": {}
         }
       },
+      "CloudinaryDotNet/1.29.3": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.4"
+        },
+        "runtime": {
+          "lib/netstandard2.0/CloudinaryDotNet.dll": {
+            "assemblyVersion": "1.29.3.0",
+            "fileVersion": "1.29.3.0"
+          }
+        }
+      },
       "Google.Api.CommonProtos/2.17.0": {
         "dependencies": {
           "Google.Protobuf": "3.31.1"
@@ -51,18 +62,6 @@
         },
         "runtime": {
           "lib/netstandard2.0/Google.Api.Gax.Grpc.dll": {
-            "assemblyVersion": "4.13.1.0",
-            "fileVersion": "4.13.1.0"
-          }
-        }
-      },
-      "Google.Api.Gax.Rest/4.13.1": {
-        "dependencies": {
-          "Google.Api.Gax": "4.13.1",
-          "Google.Apis.Auth": "1.76.0"
-        },
-        "runtime": {
-          "lib/netstandard2.0/Google.Api.Gax.Rest.dll": {
             "assemblyVersion": "4.13.1.0",
             "fileVersion": "4.13.1.0"
           }
@@ -103,18 +102,6 @@
           }
         }
       },
-      "Google.Apis.Storage.v1/1.74.0.4115": {
-        "dependencies": {
-          "Google.Apis": "1.76.0",
-          "Google.Apis.Auth": "1.76.0"
-        },
-        "runtime": {
-          "lib/net6.0/Google.Apis.Storage.v1.dll": {
-            "assemblyVersion": "1.74.0.4115",
-            "fileVersion": "1.74.0.4115"
-          }
-        }
-      },
       "Google.Cloud.Firestore/4.4.0": {
         "dependencies": {
           "Google.Cloud.Firestore.V1": "4.4.0",
@@ -148,18 +135,6 @@
           "lib/netstandard2.0/Google.Cloud.Location.dll": {
             "assemblyVersion": "2.4.0.0",
             "fileVersion": "2.4.0.0"
-          }
-        }
-      },
-      "Google.Cloud.Storage.V1/4.15.0": {
-        "dependencies": {
-          "Google.Api.Gax.Rest": "4.13.1",
-          "Google.Apis.Storage.v1": "1.74.0.4115"
-        },
-        "runtime": {
-          "lib/netstandard2.0/Google.Cloud.Storage.V1.dll": {
-            "assemblyVersion": "4.15.0.0",
-            "fileVersion": "4.15.0.0"
           }
         }
       },
@@ -310,10 +285,10 @@
       },
       "ExamTest.Infastructure/1.0.0": {
         "dependencies": {
+          "CloudinaryDotNet": "1.29.3",
           "ExamTest.Domain": "1.0.0",
           "Google.Apis.Auth": "1.76.0",
-          "Google.Cloud.Firestore": "4.4.0",
-          "Google.Cloud.Storage.V1": "4.15.0"
+          "Google.Cloud.Firestore": "4.4.0"
         },
         "runtime": {
           "ExamTest.Infastructure.dll": {
@@ -329,6 +304,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "CloudinaryDotNet/1.29.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-C9UpTh7YoOrfeUXcdjnsEloTaWKTNeDgvMpWoGAOTkC6HOxPIbcQAiSGhoqPPT8scAKAFjrPzf89nyZkGvtoCg==",
+      "path": "cloudinarydotnet/1.29.3",
+      "hashPath": "cloudinarydotnet.1.29.3.nupkg.sha512"
     },
     "Google.Api.CommonProtos/2.17.0": {
       "type": "package",
@@ -351,13 +333,6 @@
       "path": "google.api.gax.grpc/4.13.1",
       "hashPath": "google.api.gax.grpc.4.13.1.nupkg.sha512"
     },
-    "Google.Api.Gax.Rest/4.13.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-wDfFZXKoHC6sy+Yfub/4cLQOb5ozBVPqDOrxCUAeTfku4d96ILqgzulJSdkPHbiT3oWB3hlYTdJgUwNSJjyo+A==",
-      "path": "google.api.gax.rest/4.13.1",
-      "hashPath": "google.api.gax.rest.4.13.1.nupkg.sha512"
-    },
     "Google.Apis/1.76.0": {
       "type": "package",
       "serviceable": true,
@@ -379,13 +354,6 @@
       "path": "google.apis.core/1.76.0",
       "hashPath": "google.apis.core.1.76.0.nupkg.sha512"
     },
-    "Google.Apis.Storage.v1/1.74.0.4115": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-9J3YPPSG53xwQLzdQ304dI+DMtVxJDpEazA2QQ2LA8IJoM4VUu4DpIxyhTGxpnAK4Db7s4LwzeNi6NkPKM3HzQ==",
-      "path": "google.apis.storage.v1/1.74.0.4115",
-      "hashPath": "google.apis.storage.v1.1.74.0.4115.nupkg.sha512"
-    },
     "Google.Cloud.Firestore/4.4.0": {
       "type": "package",
       "serviceable": true,
@@ -406,13 +374,6 @@
       "sha512": "sha512-ZFChsp6OYVPBAzpoEWFMf/W9lfOgPj5BY+75/VjGV6EoirhA3YNlSKta3fX2MPaWH6RqJ9ZtNJT4vmdxhxbkbQ==",
       "path": "google.cloud.location/2.4.0",
       "hashPath": "google.cloud.location.2.4.0.nupkg.sha512"
-    },
-    "Google.Cloud.Storage.V1/4.15.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-TVlJsaIkMDwHbZPCcLFFKduFcFD0yJL1jsZmV/V/FMjv5iok/eoC0oy8/VHjxfmWmNGkJLPLMAe5MrFLtY7hzg==",
-      "path": "google.cloud.storage.v1/4.15.0",
-      "hashPath": "google.cloud.storage.v1.4.15.0.nupkg.sha512"
     },
     "Google.LongRunning/3.5.0": {
       "type": "package",

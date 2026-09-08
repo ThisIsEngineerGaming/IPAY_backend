@@ -12,8 +12,11 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// Firebase Realtime Database (admin, service-account authenticated) - see ExamTest.Infastructure/Firebase.
+// Firestore (admin, service-account authenticated) - see ExamTest.Infastructure/Firebase.
 builder.Services.AddFirebaseInfrastructure(builder.Configuration);
+
+// Cloudinary - used only for image uploads (Firebase Storage is paid; Cloudinary's free tier isn't).
+builder.Services.AddCloudinaryInfrastructure(builder.Configuration);
 
 // Application services
 builder.Services.AddScoped<ISeriesService, SeriesService>();

@@ -1,10 +1,10 @@
 using ExamTest.Domain.Entities.Media;
 using ExamTest.Domain.Entities.Shop;
 using ExamTest.Domain.Interfaces.ForRepos;
+using ExamTest.Infastructure.Cloudinary;
 using ExamTest.Infastructure.Firebase;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
-using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -29,15 +29,6 @@ namespace ExamTest.Infastructure
                 }.Build();
             });
 
-            services.AddSingleton(sp =>
-            {
-                var options = sp.GetRequiredService<IOptions<FirebaseOptions>>().Value;
-                var credential = GoogleCredential.FromFile(options.ServiceAccountKeyPath);
-                return StorageClient.Create(credential);
-            });
-
-            services.AddSingleton<FirebaseStorageService>();
-
             // One Firestore collection per entity type - add a line here for any new entity.
             services.AddScoped<IRepository<Series>>(sp =>
                 new FirestoreRepository<Series>(sp.GetRequiredService<FirestoreDb>(), "series"));
@@ -52,6 +43,14 @@ namespace ExamTest.Infastructure
             services.AddScoped<IRepository<Product>>(sp =>
                 new FirestoreRepository<Product>(sp.GetRequiredService<FirestoreDb>(), "products"));
 
+            return services;
+        }
+
+        public static IServiceCollection AddCloudinaryInfrastructure(
+            this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<CloudinaryOptions>(configuration.GetSection(CloudinaryOptions.SectionName));
+            services.AddSingleton<CloudinaryImageService>();
             return services;
         }
     }

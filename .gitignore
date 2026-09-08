@@ -2,6 +2,10 @@
 firebase-service-account.json
 **/firebase-service-account.json
 
+# Local secrets (Cloudinary keys, etc.) - keep only appsettings.json (placeholders) in source control
+appsettings.Development.json
+**/appsettings.Development.json
+
 # Build output
 [Bb]in/
 [Oo]bj/

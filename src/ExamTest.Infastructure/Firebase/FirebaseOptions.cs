@@ -11,9 +11,6 @@ namespace ExamTest.Infastructure.Firebase
         /// <summary>The Google Cloud/Firebase project ID, e.g. ipaygroup.</summary>
         public string ProjectId { get; set; } = string.Empty;
 
-        /// <summary>The Firebase Storage bucket used for uploaded images.</summary>
-        public string StorageBucket { get; set; } = string.Empty;
-
         /// <summary>
         /// Path to the downloaded service-account JSON (Project settings > Service accounts
         /// > Generate new private key). Relative paths are resolved from the content root.

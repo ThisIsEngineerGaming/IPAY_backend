@@ -5,6 +5,18 @@
     {
       "AbsoluteMoniker": "D:0:0:{EF60CA2C-9283-FA10-B7FE-488847A461F9}|src\\ExamTest.WebApi\\ExamTest.WebApi.csproj|c:\\users\\user\\source\\repos\\ipay_backend\\src\\examtest.webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{EF60CA2C-9283-FA10-B7FE-488847A461F9}|src\\ExamTest.WebApi\\ExamTest.WebApi.csproj|solutionrelative:src\\examtest.webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EF60CA2C-9283-FA10-B7FE-488847A461F9}|src\\ExamTest.WebApi\\ExamTest.WebApi.csproj|c:\\users\\user\\source\\repos\\ipay_backend\\src\\examtest.webapi\\firebase-service-account.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{EF60CA2C-9283-FA10-B7FE-488847A461F9}|src\\ExamTest.WebApi\\ExamTest.WebApi.csproj|solutionrelative:src\\examtest.webapi\\firebase-service-account.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EF60CA2C-9283-FA10-B7FE-488847A461F9}|src\\ExamTest.WebApi\\ExamTest.WebApi.csproj|c:\\users\\user\\source\\repos\\ipay_backend\\src\\examtest.webapi\\firebase-service-account.example.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{EF60CA2C-9283-FA10-B7FE-488847A461F9}|src\\ExamTest.WebApi\\ExamTest.WebApi.csproj|solutionrelative:src\\examtest.webapi\\firebase-service-account.example.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EF60CA2C-9283-FA10-B7FE-488847A461F9}|src\\ExamTest.WebApi\\ExamTest.WebApi.csproj|c:\\users\\user\\source\\repos\\ipay_backend\\src\\examtest.webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{EF60CA2C-9283-FA10-B7FE-488847A461F9}|src\\ExamTest.WebApi\\ExamTest.WebApi.csproj|solutionrelative:src\\examtest.webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,7 +26,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -30,13 +42,52 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "firebase-service-account.example.json",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\IPAY_backend\\src\\ExamTest.WebApi\\firebase-service-account.example.json",
+              "RelativeDocumentMoniker": "src\\ExamTest.WebApi\\firebase-service-account.example.json",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\IPAY_backend\\src\\ExamTest.WebApi\\firebase-service-account.example.json",
+              "RelativeToolTip": "src\\ExamTest.WebApi\\firebase-service-account.example.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-09-08T16:58:51.903Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\IPAY_backend\\src\\ExamTest.WebApi\\appsettings.json",
+              "RelativeDocumentMoniker": "src\\ExamTest.WebApi\\appsettings.json",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\IPAY_backend\\src\\ExamTest.WebApi\\appsettings.json",
+              "RelativeToolTip": "src\\ExamTest.WebApi\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-09-08T16:50:03.224Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "firebase-service-account.json",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\IPAY_backend\\src\\ExamTest.WebApi\\firebase-service-account.json",
+              "RelativeDocumentMoniker": "src\\ExamTest.WebApi\\firebase-service-account.json",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\IPAY_backend\\src\\ExamTest.WebApi\\firebase-service-account.json",
+              "RelativeToolTip": "src\\ExamTest.WebApi\\firebase-service-account.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-09-08T16:48:17.984Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\User\\source\\repos\\IPAY_backend\\src\\ExamTest.WebApi\\Program.cs",
               "RelativeDocumentMoniker": "src\\ExamTest.WebApi\\Program.cs",
               "ToolTip": "C:\\Users\\User\\source\\repos\\IPAY_backend\\src\\ExamTest.WebApi\\Program.cs",
               "RelativeToolTip": "src\\ExamTest.WebApi\\Program.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-05T15:28:26.539Z",
               "EditorCaption": ""
