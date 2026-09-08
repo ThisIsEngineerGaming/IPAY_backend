@@ -1,9 +1,31 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Gives access to Microsoft.AspNetCore.Http (IFormFile, etc.) used in FirebaseStorageService.
+         Only the entry-point Web SDK project gets this automatically; class libraries need it explicitly. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Pinned to match/exceed what Domain and the transitive Storage->Apis.Storage.v1 chain
+         require, to avoid NU1605 "package downgrade" errors. -->
+    <PackageReference Include="Google.Cloud.Firestore" Version="4.4.0" />
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.*" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.*" />
+
+    <!-- Microsoft.Extensions.Configuration.Abstractions, DependencyInjection.Abstractions, and
+         Options.ConfigurationExtensions are NOT listed here on purpose: the FrameworkReference
+         above already supplies them, and NuGet's pruning will warn (NU1510) if you add them back. -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExamTest.Domain\ExamTest.Domain.csproj" />
+  </ItemGroup>
 
 </Project>

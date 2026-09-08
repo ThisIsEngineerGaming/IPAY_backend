@@ -4,25 +4,32 @@
     "http": {
       "commandName": "Project",
       "dotnetRunMessages": true,
+<<<<<<< HEAD
       "launchBrowser": true, // змінили на true
       "launchUrl": "swagger", // відкриває безпосередньо сторінку Swagger
+=======
+      "launchBrowser": true,
+>>>>>>> origin/admin_test
       "applicationUrl": "http://localhost:5278",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
+        "_disabled_ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
       }
     },
     "https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
+<<<<<<< HEAD
       "launchBrowser": true, // змінили на true
       "launchUrl": "swagger", // відкриває безпосередньо сторінку Swagger
+=======
+      "launchBrowser": true,
+>>>>>>> origin/admin_test
       "applicationUrl": "https://localhost:7137;http://localhost:5278",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
+        "_disabled_ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
       }
     }
   }
 }
-
