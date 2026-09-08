@@ -9,7 +9,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
-<<<<<<< HEAD
+
 builder.Services.AddEndpointsApiExplorer(); // сканує ендпоінти для генерації OpenAPI-документу
 builder.Services.AddSwaggerGen(); // генерує OpenAPI-документ на основі відсканованих ендпоінтів
 builder.Services.AddCors(options =>
@@ -21,7 +21,7 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
-=======
+
 // Firebase Realtime Database (admin, service-account authenticated) - see ExamTest.Infastructure/Firebase.
 builder.Services.AddFirebaseInfrastructure(builder.Configuration);
 
@@ -32,7 +32,7 @@ builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IFilmService, FilmService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
->>>>>>> origin/admin_test
+
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
