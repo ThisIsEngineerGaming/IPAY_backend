@@ -3,7 +3,7 @@
 "ServerUrl": "https://localhost:53883",
 "RedirectUrl": "",
 "LaunchCommand": "npm run dev",
-"WorkingDirectory": "C:\\Users\\PC\\Desktop\\ASP-NET\\IPAY_BACKEND\\src\\ExamTest.WebApi\\..\\examtest.client",
+"WorkingDirectory": "C:\\Users\\Admin\\Desktop\\coding and step\\asp.net core\\backend\\src\\ExamTest.WebApi\\..\\examtest.client",
 "MaxTimeoutInSeconds": "120",
 "KeepRunning": "false"
 }

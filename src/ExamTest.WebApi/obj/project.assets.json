@@ -24,21 +24,6 @@
           "build/Microsoft.AspNetCore.OpenApi.targets": {}
         }
       },
-      "Microsoft.AspNetCore.SpaProxy/10.0.11": {
-        "type": "package",
-        "compile": {
-          "lib/net10.0/Microsoft.AspNetCore.SpaProxy.dll": {}
-        },
-        "runtime": {
-          "lib/net10.0/Microsoft.AspNetCore.SpaProxy.dll": {}
-        },
-        "frameworkReferences": [
-          "Microsoft.AspNetCore.App"
-        ],
-        "build": {
-          "build/Microsoft.AspNetCore.SpaProxy.targets": {}
-        }
-      },
       "Microsoft.OpenApi/2.7.5": {
         "type": "package",
         "compile": {
@@ -50,6 +35,16 @@
           "lib/net8.0/Microsoft.OpenApi.dll": {
             "related": ".pdb;.xml"
           }
+        }
+      },
+      "ExamTest.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/ExamTest.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ExamTest.Application.dll": {}
         }
       }
     }
@@ -73,21 +68,6 @@
         "microsoft.aspnetcore.openapi.nuspec"
       ]
     },
-    "Microsoft.AspNetCore.SpaProxy/10.0.11": {
-      "sha512": "bu1oRqZVuvBXTXFMciLm57Gledjv6Y8veHmXtayLOjkoHm/2hNd35dZOA9hko6VQhmbQuPIQQNerbpJHyibzVw==",
-      "type": "package",
-      "path": "microsoft.aspnetcore.spaproxy/10.0.11",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "THIRD-PARTY-NOTICES.TXT",
-        "build/Microsoft.AspNetCore.SpaProxy.targets",
-        "lib/net10.0/Microsoft.AspNetCore.SpaProxy.dll",
-        "microsoft.aspnetcore.spaproxy.10.0.11.nupkg.sha512",
-        "microsoft.aspnetcore.spaproxy.nuspec"
-      ]
-    },
     "Microsoft.OpenApi/2.7.5": {
       "sha512": "0FA67RSnRM4tcBKqiqVu/HPdZ9+QOKbmeRjxRUGTCjPU4C0bmUhd97Dso7Yild5P7nOV6GxJ2xrK0Kv/O9xp0w==",
       "type": "package",
@@ -105,32 +85,37 @@
         "microsoft.openapi.2.7.5.nupkg.sha512",
         "microsoft.openapi.nuspec"
       ]
+    },
+    "ExamTest.Application/1.0.0": {
+      "type": "project",
+      "path": "../ExamTest.Application/ExamTest.Application.csproj",
+      "msbuildProject": "../ExamTest.Application/ExamTest.Application.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "Microsoft.AspNetCore.OpenApi >= 10.0.11",
-      "Microsoft.AspNetCore.SpaProxy >= 10.*-*"
+      "ExamTest.Application >= 1.0.0",
+      "Microsoft.AspNetCore.OpenApi >= 10.0.11"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\PC\\.nuget\\packages\\": {},
+    "C:\\Users\\Admin\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\PC\\Desktop\\ASP-NET\\IPAY_BACKEND\\src\\ExamTest.WebApi\\ExamTest.WebApi.csproj",
+      "projectUniqueName": "C:\\Users\\Admin\\Desktop\\coding and step\\asp.net core\\backend\\src\\ExamTest.WebApi\\ExamTest.WebApi.csproj",
       "projectName": "ExamTest.WebApi",
-      "projectPath": "C:\\Users\\PC\\Desktop\\ASP-NET\\IPAY_BACKEND\\src\\ExamTest.WebApi\\ExamTest.WebApi.csproj",
-      "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\PC\\Desktop\\ASP-NET\\IPAY_BACKEND\\src\\ExamTest.WebApi\\obj\\",
+      "projectPath": "C:\\Users\\Admin\\Desktop\\coding and step\\asp.net core\\backend\\src\\ExamTest.WebApi\\ExamTest.WebApi.csproj",
+      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Admin\\Desktop\\coding and step\\asp.net core\\backend\\src\\ExamTest.WebApi\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -145,7 +130,11 @@
         "net10.0": {
           "framework": "net10.0",
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\Admin\\Desktop\\coding and step\\asp.net core\\backend\\src\\ExamTest.Application\\ExamTest.Application.csproj": {
+              "projectPath": "C:\\Users\\Admin\\Desktop\\coding and step\\asp.net core\\backend\\src\\ExamTest.Application\\ExamTest.Application.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -158,7 +147,7 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.400"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net10.0": {
@@ -168,10 +157,6 @@
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
             "version": "[10.0.11, )"
-          },
-          "Microsoft.AspNetCore.SpaProxy": {
-            "target": "Package",
-            "version": "[10.*-*, )"
           }
         },
         "imports": [
@@ -193,7 +178,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

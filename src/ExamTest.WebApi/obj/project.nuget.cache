@@ -1,12 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "PN1VFytWF4Y=",
+  "dgSpecHash": "mJ/XAGnGYzk=",
   "success": true,
-  "projectFilePath": "C:\\Users\\PC\\Desktop\\ASP-NET\\IPAY_BACKEND\\src\\ExamTest.WebApi\\ExamTest.WebApi.csproj",
+  "projectFilePath": "C:\\Users\\Admin\\Desktop\\coding and step\\asp.net core\\backend\\src\\ExamTest.WebApi\\ExamTest.WebApi.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\PC\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.11\\microsoft.aspnetcore.openapi.10.0.11.nupkg.sha512",
-    "C:\\Users\\PC\\.nuget\\packages\\microsoft.aspnetcore.spaproxy\\10.0.11\\microsoft.aspnetcore.spaproxy.10.0.11.nupkg.sha512",
-    "C:\\Users\\PC\\.nuget\\packages\\microsoft.openapi\\2.7.5\\microsoft.openapi.2.7.5.nupkg.sha512"
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.11\\microsoft.aspnetcore.openapi.10.0.11.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.openapi\\2.7.5\\microsoft.openapi.2.7.5.nupkg.sha512"
   ],
   "logs": []
 }
