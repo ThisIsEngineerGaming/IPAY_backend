@@ -47,11 +47,4 @@ app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-<<<<<<< HEAD
 app.Run();
-=======
-
-app.MapFallbackToFile("/index.html");
-
-app.Run();
->>>>>>> master
