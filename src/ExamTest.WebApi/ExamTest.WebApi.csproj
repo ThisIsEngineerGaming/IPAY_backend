@@ -3,16 +3,20 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+<<<<<<< HEAD
     <!-- SPA proxy disabled: examtest.client project not present on disk.
          Uncomment once the client project exists at ..\examtest.client
     <SpaRoot>..\examtest.client</SpaRoot>
     <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
     <SpaProxyServerUrl>https://localhost:53883</SpaProxyServerUrl>
     -->
+=======
+>>>>>>> master
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+<<<<<<< HEAD
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
     <!--
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy">
@@ -32,6 +36,12 @@
     <ProjectReference Include="..\examtest.client\examtest.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+=======
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExamTest.Application\ExamTest.Application.csproj" />
+>>>>>>> master
   </ItemGroup>
   -->
 </Project>
