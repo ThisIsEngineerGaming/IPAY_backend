@@ -1,8 +1,14 @@
+using ExamTest.Application.DTOs.Auth;
+using ExamTest.Application.Interfaces.Auth;
 using ExamTest.Application.Interfaces.Media;
 using ExamTest.Application.Interfaces.Shop;
+using ExamTest.Application.Options;
+using ExamTest.Application.Services.Auth;
 using ExamTest.Application.Services.Media;
 using ExamTest.Application.Services.Shop;
+using ExamTest.Application.Validators.Auth;
 using ExamTest.Infastructure;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -32,6 +38,21 @@ builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IFilmService, FilmService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
+builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
+
+// Реєструємо сервіси
+builder.Services.AddScoped<IAuth<RegisterDto>, RegisterService>();
+builder.Services.AddScoped<IAuth<LoginDto>, LoginService>();
+builder.Services.Configure<OmdbOptions>(
+    builder.Configuration.GetSection(OmdbOptions.SectionName));
+
+builder.Services.AddHttpClient<IOmdbService, OmdbService>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<OmdbOptions>>().Value;
+
+    client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
+});
 
 
 var app = builder.Build();
