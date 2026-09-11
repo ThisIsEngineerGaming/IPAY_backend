@@ -1,3 +1,4 @@
+using ExamTest.Domain.Entities.Auth;
 using ExamTest.Domain.Entities.Media;
 using ExamTest.Domain.Entities.Shop;
 using ExamTest.Domain.Interfaces.ForRepos;
@@ -51,6 +52,8 @@ namespace ExamTest.Infastructure
                 new FirestoreRepository<Category>(sp.GetRequiredService<FirestoreDb>(), "categories"));
             services.AddScoped<IRepository<Product>>(sp =>
                 new FirestoreRepository<Product>(sp.GetRequiredService<FirestoreDb>(), "products"));
+            services.AddScoped<IRepository<Seller>>(sp =>
+               new FirestoreRepository<Seller>(sp.GetRequiredService<FirestoreDb>(), "sellers"));
 
             return services;
         }

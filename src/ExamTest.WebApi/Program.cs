@@ -7,6 +7,7 @@ using ExamTest.Application.Services.Auth;
 using ExamTest.Application.Services.Media;
 using ExamTest.Application.Services.Shop;
 using ExamTest.Application.Validators.Auth;
+using ExamTest.Domain.Entities.Auth;
 using ExamTest.Infastructure;
 using FluentValidation;
 
@@ -40,6 +41,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
+builder.Services.AddScoped<IUser<Seller>, SellerService>();
 
 // Реєструємо сервіси
 builder.Services.AddScoped<IAuth<RegisterDto>, RegisterService>();

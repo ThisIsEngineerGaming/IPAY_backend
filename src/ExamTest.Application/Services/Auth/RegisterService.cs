@@ -1,5 +1,6 @@
 ﻿using ExamTest.Application.DTOs.Auth;
 using ExamTest.Application.Interfaces.Auth;
+using ExamTest.Domain.Interfaces.ForRepos;
 using FluentValidation;
 using System.Threading.Tasks;
 
