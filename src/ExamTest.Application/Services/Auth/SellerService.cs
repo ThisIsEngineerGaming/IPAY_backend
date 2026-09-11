@@ -28,29 +28,18 @@ namespace ExamTest.Application.Services.Auth
             return all.Where(e => e.Id == sellerId).ToList();
         }
 
-        public async Task<Seller> CreateAsync(Seller seller) {
+        public async Task<Seller?> CreateAsync(Seller seller)
+        {
+            var all = await _sellerRepository.GetAllAsync();
 
-            var checklist = await _sellerRepository.GetAllAsync();
-            bool isDuplicated = false;
-            foreach (var a in checklist)
-            {
-                if (a.Equals(seller))
-                {
-                    isDuplicated = true;
-                   
-                }
+            bool emailTaken = all.Any(s =>
+                !string.IsNullOrEmpty(s.Email) &&
+                s.Email.Equals(seller.Email, StringComparison.OrdinalIgnoreCase));
 
-            }
-            if (isDuplicated)
-            {
+            if (emailTaken)
                 return null;
-            }
-            else
-            {
-                return await _sellerRepository.AddAsync(seller);
-            }
 
-           
+            return await _sellerRepository.AddAsync(seller);
         }
 
         public Task UpdateAsync(int id, Seller seller) => _sellerRepository.UpdateAsync(id, seller);
