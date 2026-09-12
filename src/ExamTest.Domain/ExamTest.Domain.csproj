@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Folder Include="Interfaces\ForRepos\" />
+    <InternalsVisibleTo Include="ExamTest.Tests" />
   </ItemGroup>
 
 </Project>
