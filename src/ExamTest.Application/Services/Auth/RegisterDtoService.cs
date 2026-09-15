@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ExamTest.Application.Services.Auth
 {
-    public class RegisterService : IAuth<RegisterDto>
+    public class RegisterDtoService : IAuth<RegisterDto>
     {
         private readonly IValidator<RegisterDto> _validator;
 
-        public RegisterService(IValidator<RegisterDto> validator)
+        public RegisterDtoService(IValidator<RegisterDto> validator)
         {
             _validator = validator;
         }

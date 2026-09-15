@@ -1,49 +1,44 @@
 ﻿using ExamTest.Application.DTOs.Auth;
 using ExamTest.Application.Interfaces.Auth;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamTest.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/register")]
-    public class AuthController:ControllerBase
+    [Route("api/auth")]
+    public class AuthController : ControllerBase
     {
-
         private readonly IAuth<RegisterDto> _register;
-        private readonly IAuth<LoginDto> _login;
+        private readonly ILogin _login;
 
-        public AuthController(IAuth<RegisterDto> register, IAuth<LoginDto> login) 
+        public AuthController(IAuth<RegisterDto> register, ILogin login)
         {
             _register = register;
             _login = login;
         }
+
         [HttpPost("register")]
-        public async Task<ActionResult<RegisterDto>> Registration(RegisterDto register)
+        public async Task<IActionResult> Registration([FromBody] RegisterDto register)
         {
             if (!await _register.Register(register))
             {
                 return BadRequest("Неправильно введені дані!");
             }
-            else
-            {
-                return Ok("Реєстрація пройшла успішно!");
-            }
+
+            return Ok("Реєстрація пройшла успішно!");
         }
+
         [HttpPost("login")]
-        public async Task<ActionResult<LoginDto>> Loginn(LoginDto login)
+        public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginDto login)
         {
-            if (!await _login.Register(login))
+            var result = await _login.LoginAsync(login);
+
+            if (result == null)
             {
-                return BadRequest("Неправильно введені дані!");
+                return BadRequest("Неверный email или пароль");
             }
-            else
-            {
-                return Ok("Реєстрація пройшла успішно!");
-            }
+
+            return Ok(result);
         }
-
-
-
     }
 }

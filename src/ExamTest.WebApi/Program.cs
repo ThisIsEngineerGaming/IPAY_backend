@@ -10,6 +10,9 @@ using ExamTest.Application.Validators.Auth;
 using ExamTest.Domain.Entities.Auth;
 using ExamTest.Infastructure;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -44,8 +47,9 @@ builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
 builder.Services.AddScoped<IUser<Seller>, SellerService>();
 
 // Реєструємо сервіси
-builder.Services.AddScoped<IAuth<RegisterDto>, RegisterService>();
-builder.Services.AddScoped<IAuth<LoginDto>, LoginService>();
+builder.Services.AddScoped<IAuth<RegisterDto>, RegisterDtoService>();
+builder.Services.AddScoped<ILogin, LoginDtoService>();
+builder.Services.AddScoped<IJWT,JwtService>();
 builder.Services.Configure<OmdbOptions>(
     builder.Configuration.GetSection(OmdbOptions.SectionName));
 
@@ -55,6 +59,28 @@ builder.Services.AddHttpClient<IOmdbService, OmdbService>((sp, client) =>
 
     client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
 });
+// JWT
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
+});
+
+builder.Services.AddAuthorization();
 
 
 var app = builder.Build();

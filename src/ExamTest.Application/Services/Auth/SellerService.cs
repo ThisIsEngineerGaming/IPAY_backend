@@ -22,6 +22,21 @@ namespace ExamTest.Application.Services.Auth
 
         public Task<Seller?> GetByIdAsync(int id) => _sellerRepository.GetByIdAsync(id);
 
+        public async Task<Seller?> GetByEmail(string email)
+        {
+            var sellers = await _sellerRepository.GetAllAsync();
+            foreach (var seller in sellers) { 
+                if(seller.Email == email)
+                {
+                    return seller;
+                  
+                    
+                }
+                
+            }
+            return null;
+        }
+
         public async Task<IReadOnlyList<Seller>> GetBySellersIdAsync(int sellerId)
         {
             var all = await _sellerRepository.GetAllAsync();

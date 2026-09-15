@@ -1,4 +1,5 @@
-﻿using ExamTest.Domain.Entities.Shop;
+﻿using ExamTest.Domain.Entities.Auth;
+using ExamTest.Domain.Entities.Shop;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,5 +13,7 @@ namespace ExamTest.Application.Interfaces.Auth
         Task<T> CreateAsync(T user);
         Task UpdateAsync(int id, T user);
         Task DeleteAsync(int id);
+
+         Task<Seller?> GetByEmail(string email);
     }
 }
