@@ -16,12 +16,18 @@ namespace ExamTest.Application.Services.Auth
         private readonly IUser<Seller> _seller;
 
         private readonly IJWT _jwt;
+        private readonly IPasswordHashingService _passwordHasher;
 
-        public LoginDtoService(IValidator<LoginDto> validator,IJWT jwt,IUser<Seller> seller)
+        public LoginDtoService(
+            IValidator<LoginDto> validator,
+            IJWT jwt,
+            IUser<Seller> seller,
+            IPasswordHashingService passwordHasher)
         {
             _validator = validator;
             _jwt = jwt;
             _seller= seller;
+            _passwordHasher = passwordHasher;
 
         }
         public async Task<bool> Login(LoginDto loginDto)
@@ -29,7 +35,7 @@ namespace ExamTest.Application.Services.Auth
             var result = await _validator.ValidateAsync(loginDto);
             return result.IsValid;
         }
-        public async Task<AuthResponse> LoginAsync(LoginDto loginDto)
+        public async Task<AuthResponse?> LoginAsync(LoginDto loginDto)
         {
             var result = await Login(loginDto);
 
@@ -45,13 +51,17 @@ namespace ExamTest.Application.Services.Auth
                 if (user == null)
                     return null; // пользователь не найден
 
+                if (user.Id is null || string.IsNullOrWhiteSpace(user.Email))
+                    return null;
+
                 // 3. Проверить пароль
                 // (пока просто для примера)
-                if (user.Password != loginDto.Password)  // потом будет хеш!
+                if (string.IsNullOrEmpty(user.Password) ||
+                    !_passwordHasher.Verify(loginDto.Password, user.Password))
                     return null;
 
                 // 4. Теперь у тебя есть user.Id → передаёшь его в JWT
-                var token = _jwt.GenerateToken(user.Id.ToString(), user.Email);
+                var token = _jwt.GenerateToken(user.Id.Value.ToString(), user.Email);
 
                 // 5. Возвращаешь AuthResponse
                 return new AuthResponse
@@ -59,7 +69,7 @@ namespace ExamTest.Application.Services.Auth
                     AccessToken = token,
                     TokenType = "Bearer",
                     ExpiresAt = DateTime.UtcNow.AddHours(2),
-                    User=loginDto
+                    User = new LoginDto { Email = user.Email ?? string.Empty }
                 };
             }
         }

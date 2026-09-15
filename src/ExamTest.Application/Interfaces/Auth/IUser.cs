@@ -10,7 +10,7 @@ namespace ExamTest.Application.Interfaces.Auth
     {
         Task<IReadOnlyList<T>> GetAllAsync();
         Task<T?> GetByIdAsync(int id);
-        Task<T> CreateAsync(T user);
+        Task<T?> CreateAsync(T user);
         Task UpdateAsync(int id, T user);
         Task DeleteAsync(int id);
 

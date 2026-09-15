@@ -10,6 +10,6 @@ namespace ExamTest.Application.DTOs.Auth
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string ConfirmPassword {  get; set; } = string.Empty;
-        public string Name = "guest";
+        public string Name { get; set; } = "guest";
     }
 }

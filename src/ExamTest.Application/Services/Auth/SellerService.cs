@@ -26,7 +26,8 @@ namespace ExamTest.Application.Services.Auth
         {
             var sellers = await _sellerRepository.GetAllAsync();
             foreach (var seller in sellers) { 
-                if(seller.Email == email)
+                if (!string.IsNullOrEmpty(seller.Email) &&
+                    seller.Email.Equals(email.Trim(), StringComparison.OrdinalIgnoreCase))
                 {
                     return seller;
                   

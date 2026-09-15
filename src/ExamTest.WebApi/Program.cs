@@ -45,6 +45,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
 builder.Services.AddScoped<IUser<Seller>, SellerService>();
+builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>();
 
 // Реєструємо сервіси
 builder.Services.AddScoped<IAuth<RegisterDto>, RegisterDtoService>();
@@ -94,6 +95,8 @@ if (app.Environment.IsDevelopment())
 }
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
