@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ExamTest.Application.Services.Auth
 {
-    public class RegisterDtoService : IAuth<RegisterDto>
+    public class RegisterDtoService : IAuthDto<RegisterDto>
     {
         private readonly IValidator<RegisterDto> _validator;
         private readonly IUser<Seller> _sellerService;

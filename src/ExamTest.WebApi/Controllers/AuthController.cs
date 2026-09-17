@@ -8,10 +8,10 @@ namespace ExamTest.WebApi.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuth<RegisterDto> _register;
+        private readonly IAuthDto<RegisterDto> _register;
         private readonly ILogin _login;
 
-        public AuthController(IAuth<RegisterDto> register, ILogin login)
+        public AuthController(IAuthDto<RegisterDto> register, ILogin login)
         {
             _register = register;
             _login = login;

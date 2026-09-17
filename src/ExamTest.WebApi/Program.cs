@@ -48,7 +48,7 @@ builder.Services.AddScoped<IUser<Seller>, SellerService>();
 builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>();
 
 // Реєструємо сервіси
-builder.Services.AddScoped<IAuth<RegisterDto>, RegisterDtoService>();
+builder.Services.AddScoped<IAuthDto<RegisterDto>, RegisterDtoService>();
 builder.Services.AddScoped<ILogin, LoginDtoService>();
 builder.Services.AddScoped<IJWT,JwtService>();
 builder.Services.Configure<OmdbOptions>(
