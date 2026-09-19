@@ -42,10 +42,10 @@ namespace ExamTest.Application.Services.Shop
 
         public Task DeleteAsync(int id) => _repository.DeleteProductAsync(id);
 
-        public async Task<IReadOnlyList<ProductDto>> GetLimitAsync(int limit, string? lastDocId) {
+        public async Task<List<ProductDto>> GetLimitAsync(int limit, string? lastDocId) {
 
             var products = await _repository.GetLimitedProduct(limit, lastDocId ?? null);
-            return _productMapper.Map<IReadOnlyList<ProductDto>>(products);
+            return _productMapper.Map<List<ProductDto>>(products);
 
         }
     }
