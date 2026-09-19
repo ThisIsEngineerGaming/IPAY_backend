@@ -21,13 +21,24 @@ namespace ExamTest.Application.Services.Shop
             _productMapper = productMapper;
         }
 
-        public Task<IReadOnlyList<Product>> GetAllAsync() => _repository.GetAllProductsAsync();
+        public async Task<IReadOnlyList<ProductDto>> GetAllAsync() {
+            var products = await _repository.GetAllProductsAsync();
+            return _productMapper.Map<IReadOnlyList<ProductDto>>(products); 
+        }
 
-        public Task<Product?> GetByIdAsync(int id) => _repository.GetProductByIdAsync(id);
+        public async Task<ProductDto?> GetByIdAsync(int id) { 
+            var products = await _repository.GetProductByIdAsync(id);
+            return _productMapper.Map<ProductDto>(products);
+        }
 
-        public Task<Product> CreateAsync(Product product) => _repository.AddProductAsync(product);
+        public Task<Product> CreateAsync(Product product) {
+            return _repository.AddProductAsync(product);
+        }
 
-        public Task UpdateAsync(int id, Product product) => _repository.UpdateProductAsync(id, product);
+        public Task UpdateAsync(int id, Product product) {
+           
+            return _repository.UpdateProductAsync(id, product);
+        }
 
         public Task DeleteAsync(int id) => _repository.DeleteProductAsync(id);
 

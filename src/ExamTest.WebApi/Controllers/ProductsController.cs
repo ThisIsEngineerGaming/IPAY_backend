@@ -10,7 +10,7 @@ namespace ExamTest.WebApi.Controllers;
 public class ProductsController(IProductService service) : ControllerBase
 {
     [HttpGet("all")]
-    public Task<IReadOnlyList<Product>> GetAll() => service.GetAllAsync();
+    public Task<IReadOnlyList<ProductDto>> GetAll() => service.GetAllAsync();
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<Product>> GetById(int id) =>

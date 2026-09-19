@@ -1,5 +1,4 @@
-﻿using ExamTest.Application.DTOs.Shop;
-using ExamTest.Domain.Entities.Shop;
+﻿using ExamTest.Domain.Entities.Shop;
 using ExamTest.Domain.Interfaces.ForRepos.Shop;
 using Google.Cloud.Firestore;
 using Google.Cloud.Firestore.V1;
