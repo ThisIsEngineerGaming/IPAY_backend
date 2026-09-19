@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ExamTest.Application.DTOs.Shop;
 using ExamTest.Domain.Entities.Shop;
 
 namespace ExamTest.Application.Interfaces.Shop
@@ -11,6 +12,8 @@ namespace ExamTest.Application.Interfaces.Shop
         Task<Product> CreateAsync(Product product);
         Task UpdateAsync(int id, Product product);
         Task DeleteAsync(int id);
+
+        Task<IReadOnlyList<ProductDto>> GetLimitAsync(int limit, string? lastDocid);
 
         // "createCard(container:div)" on the diagram is a DOM/UI concern for the
         // frontend to implement - there's nothing meaningful for a backend to do there,

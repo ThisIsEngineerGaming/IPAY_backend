@@ -2,7 +2,9 @@ using ExamTest.Domain.Entities.Auth;
 using ExamTest.Domain.Entities.Media;
 using ExamTest.Domain.Entities.Shop;
 using ExamTest.Domain.Interfaces.ForRepos;
+using ExamTest.Domain.Interfaces.ForRepos.Shop;
 using ExamTest.Infastructure.Firebase;
+using ExamTest.Infastructure.Repositories.Shop;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
 using Google.Cloud.Storage.V1;
@@ -50,8 +52,10 @@ namespace ExamTest.Infastructure
                 new FirestoreRepository<Film>(sp.GetRequiredService<FirestoreDb>(), "films"));
             services.AddScoped<IRepository<Category>>(sp =>
                 new FirestoreRepository<Category>(sp.GetRequiredService<FirestoreDb>(), "categories"));
-            services.AddScoped<IRepository<Product>>(sp =>
-                new FirestoreRepository<Product>(sp.GetRequiredService<FirestoreDb>(), "products"));
+            services.AddScoped<IProductRepo>(sp =>
+              new ProductRepo(
+                  sp.GetRequiredService<FirestoreDb>(),
+                  "products"));
             services.AddScoped<IRepository<Seller>>(sp =>
                new FirestoreRepository<Seller>(sp.GetRequiredService<FirestoreDb>(), "sellers"));
 

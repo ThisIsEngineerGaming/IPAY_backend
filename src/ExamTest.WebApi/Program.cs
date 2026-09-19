@@ -2,6 +2,7 @@ using ExamTest.Application.DTOs.Auth;
 using ExamTest.Application.Interfaces.Auth;
 using ExamTest.Application.Interfaces.Media;
 using ExamTest.Application.Interfaces.Shop;
+using ExamTest.Application.Mappings.Shop;
 using ExamTest.Application.Options;
 using ExamTest.Application.Services.Auth;
 using ExamTest.Application.Services.Media;
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
 builder.Services.AddScoped<IUser<Seller>, SellerService>();
 builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>();
 
+
 // Реєструємо сервіси
 builder.Services.AddScoped<IAuthDto<RegisterDto>, RegisterDtoService>();
 builder.Services.AddScoped<ILogin, LoginDtoService>();
@@ -60,6 +62,8 @@ builder.Services.AddHttpClient<IOmdbService, OmdbService>((sp, client) =>
 
     client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
 });
+//Mappers
+builder.Services.AddAutoMapper(typeof(ProductMapping));
 // JWT
 builder.Services.AddAuthentication(options =>
 {

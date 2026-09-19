@@ -1,3 +1,4 @@
+using ExamTest.Application.DTOs.Shop;
 using ExamTest.Application.Interfaces.Shop;
 using ExamTest.Domain.Entities.Shop;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ namespace ExamTest.WebApi.Controllers;
 [Route("api/products")]
 public class ProductsController(IProductService service) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("all")]
     public Task<IReadOnlyList<Product>> GetAll() => service.GetAllAsync();
 
     [HttpGet("{id:int}")]
@@ -36,5 +37,14 @@ public class ProductsController(IProductService service) : ControllerBase
         if (await service.GetByIdAsync(id) is null) return NotFound();
         await service.DeleteAsync(id);
         return NoContent();
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<ProductDto>>> GetLimitProduct(
+        [FromQuery] int limit = 12,
+        [FromQuery] string? lastDocId = null)
+    {
+        var result = await service.GetLimitAsync(limit, lastDocId);
+        return Ok(result);
     }
 }
