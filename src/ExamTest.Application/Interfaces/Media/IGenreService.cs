@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ExamTest.Domain.Entities.Media;
+using ExamTest.Application.DTOs.Media;
 
 namespace ExamTest.Application.Interfaces.Media
 {
     public interface IGenreService
     {
-        Task<IReadOnlyList<Genre>> GetAllAsync();
-        Task<Genre?> GetByIdAsync(int id);
-        Task<Genre> CreateAsync(Genre genre);
-        Task UpdateAsync(int id, Genre genre);
+        Task<IReadOnlyList<GenreDto>> GetAllAsync();
+        Task<GenreDto?> GetByIdAsync(int id);
+        Task<GenreDto> CreateAsync(SaveGenreDto genre);
+        Task UpdateAsync(int id, SaveGenreDto genre);
         Task DeleteAsync(int id);
 
         // Matches the overloaded addToGenre(serialId) / addToGenre(filmId) on the diagram.

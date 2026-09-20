@@ -15,6 +15,6 @@ namespace ExamTest.Domain.Interfaces.ForRepos.Shop
         Task UpdateProductAsync(int id, Product entity);
         Task DeleteProductAsync(int id);
 
-        Task<IReadOnlyList<Product>> GetLimitedProduct(int limit, string lastDocId);
+        Task<IReadOnlyList<Product>> GetLimitedProduct(int limit, string? lastDocId);
     }
 }

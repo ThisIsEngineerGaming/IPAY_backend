@@ -1,5 +1,5 @@
+using ExamTest.Application.DTOs.Shop;
 using ExamTest.Application.Interfaces.Shop;
-using ExamTest.Domain.Entities.Shop;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamTest.WebApi.Controllers;
@@ -9,21 +9,21 @@ namespace ExamTest.WebApi.Controllers;
 public class CategoriesController(ICategoryService service) : ControllerBase
 {
     [HttpGet]
-    public Task<IReadOnlyList<Category>> GetAll() => service.GetAllAsync();
+    public Task<IReadOnlyList<CategoryDto>> GetAll() => service.GetAllAsync();
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Category>> GetById(int id) =>
+    public async Task<ActionResult<CategoryDto>> GetById(int id) =>
         await service.GetByIdAsync(id) is { } category ? Ok(category) : NotFound();
 
     [HttpPost]
-    public async Task<ActionResult<Category>> Create(Category category)
+    public async Task<ActionResult<CategoryDto>> Create(SaveCategoryDto category)
     {
         var created = await service.CreateAsync(category);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, Category category)
+    public async Task<IActionResult> Update(int id, SaveCategoryDto category)
     {
         if (await service.GetByIdAsync(id) is null) return NotFound();
         await service.UpdateCategoryAsync(id, category);

@@ -1,6 +1,5 @@
 using ExamTest.Application.DTOs.Shop;
 using ExamTest.Application.Interfaces.Shop;
-using ExamTest.Domain.Entities.Shop;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamTest.WebApi.Controllers;
@@ -13,7 +12,7 @@ public class ProductsController(IProductService service) : ControllerBase
     public Task<IReadOnlyList<ProductDto>> GetAll() => service.GetAllAsync();
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Product>> GetById(int id) =>
+    public async Task<ActionResult<ProductDto>> GetById(int id) =>
         await service.GetByIdAsync(id) is { } product ? Ok(product) : NotFound();
 
     [HttpPost]

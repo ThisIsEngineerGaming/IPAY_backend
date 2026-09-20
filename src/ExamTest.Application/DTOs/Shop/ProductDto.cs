@@ -1,14 +1,8 @@
-﻿using Google.Cloud.Firestore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace ExamTest.Application.DTOs.Shop
 {
-    public  class ProductDto
+    public class ProductDto
     {
-
-        public int Id { get; set; }                    // ← обязательно добавить
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public double Price { get; set; }
         public double Rating { get; set; }
@@ -17,7 +11,6 @@ namespace ExamTest.Application.DTOs.Shop
         public string Manufacturer { get; set; } = string.Empty;
         public int CategoryId { get; set; }
 
-        // вместо метода — просто свойство
         public double DiscountPercent { get; set; }
     }
 }

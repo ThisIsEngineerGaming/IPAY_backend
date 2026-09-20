@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -6,8 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Google.Cloud.Firestore" Version="4.4.0" />
-  </ItemGroup>
+  <!-- Domain is dependency-free on purpose: persistence types (Firestore) live in ExamTest.Infastructure. -->
 
 </Project>

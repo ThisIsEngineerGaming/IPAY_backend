@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ExamTest.Domain.Entities.Media;
+using ExamTest.Application.DTOs.Media;
 
 namespace ExamTest.Application.Interfaces.Media
 {
     public interface ISeriesService
     {
-        Task<IReadOnlyList<Series>> GetAllAsync();
-        Task<Series?> GetByIdAsync(int id);
-        Task<Series> CreateAsync(Series series);
-        Task UpdateAsync(int id, Series series);
+        Task<IReadOnlyList<SeriesDto>> GetAllAsync();
+        Task<SeriesDto?> GetByIdAsync(int id);
+        Task<SeriesDto> CreateAsync(SaveSeriesDto series);
+        Task UpdateAsync(int id, SaveSeriesDto series);
         Task DeleteAsync(int id);
     }
 }

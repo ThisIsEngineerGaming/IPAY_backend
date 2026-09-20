@@ -1,45 +1,39 @@
-﻿using ExamTest.Domain.Entities.Shop;
+using ExamTest.Domain.Entities.Shop;
 using ExamTest.Domain.Interfaces.ForRepos.Shop;
+using ExamTest.Infastructure.Firebase.Documents;
 using Google.Cloud.Firestore;
-using Google.Cloud.Firestore.V1;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 
 namespace ExamTest.Infastructure.Repositories.Shop
 {
     public class ProductRepo(FirestoreDb database, string collectionName) : IProductRepo
     {
         private readonly CollectionReference _collection = database.Collection(collectionName);
-        private static readonly PropertyInfo IdProperty = typeof(Product).GetProperty("Id")
-            ?? throw new InvalidOperationException($"{typeof(Product).Name} must have a public 'Id' property.");
 
         public async Task<IReadOnlyList<Product>> GetAllProductsAsync()
         {
             var snapshot = await _collection.GetSnapshotAsync();
-            return snapshot.Documents.Select(document => document.ConvertTo<Product>()).ToList();
+            return snapshot.Documents
+                .Select(document => document.ConvertTo<ProductDocument>().ToEntity())
+                .ToList();
         }
 
         public async Task<Product?> GetProductByIdAsync(int id)
         {
             var snapshot = await _collection.Document(id.ToString()).GetSnapshotAsync();
-            return snapshot.Exists ? snapshot.ConvertTo<Product>() : null;
+            return snapshot.Exists ? snapshot.ConvertTo<ProductDocument>().ToEntity() : null;
         }
 
         public async Task<Product> AddProductAsync(Product entity)
         {
-            var nextId = await GetNextIdAsync();
-            IdProperty.SetValue(entity, nextId);
-            await _collection.Document(nextId.ToString()).SetAsync(entity);
+            entity.Id = await GetNextIdAsync();
+            await _collection.Document(entity.Id.ToString()).SetAsync(ProductDocument.FromEntity(entity));
             return entity;
         }
 
         public async Task UpdateProductAsync(int id, Product entity)
         {
-            IdProperty.SetValue(entity, id);
-            await _collection.Document(id.ToString()).SetAsync(entity);
+            entity.Id = id;
+            await _collection.Document(id.ToString()).SetAsync(ProductDocument.FromEntity(entity));
         }
 
         public Task DeleteProductAsync(int id) => _collection.Document(id.ToString()).DeleteAsync();
@@ -47,16 +41,16 @@ namespace ExamTest.Infastructure.Repositories.Shop
         private async Task<int> GetNextIdAsync()
         {
             var all = await GetAllProductsAsync();
-            return all.Count == 0 ? 1 : all.Max(entity => (int)IdProperty.GetValue(entity)!) + 1;
+            return all.Count == 0 ? 1 : all.Max(product => product.Id) + 1;
         }
 
         public async Task<IReadOnlyList<Product>> GetLimitedProduct(int limit, string? lastDocId)
         {
             Query query = _collection
-                .OrderBy(FieldPath.DocumentId)  // или OrderBy("Id") — главное, чтобы был порядок
+                .OrderBy(FieldPath.DocumentId)  // stable order is required for cursor paging
                 .Limit(limit);
 
-            // Если передан курсор — начинаем после него
+            // A cursor was passed - continue after that document.
             if (!string.IsNullOrEmpty(lastDocId))
             {
                 var lastDocSnapshot = await _collection
@@ -72,7 +66,7 @@ namespace ExamTest.Infastructure.Repositories.Shop
             var snapshot = await query.GetSnapshotAsync();
 
             return snapshot.Documents
-                .Select(doc => doc.ConvertTo<Product>())
+                .Select(doc => doc.ConvertTo<ProductDocument>().ToEntity())
                 .ToList();
         }
     }

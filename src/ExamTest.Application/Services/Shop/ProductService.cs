@@ -43,11 +43,13 @@ namespace ExamTest.Application.Services.Shop
             return _productMapper.Map<ProductDto>(created);
         }
 
-        public async Task<ProductDto> UpdateAsync(int id, UpdateAdminProductDto adminProduct) {
+        public async Task<ProductDto?> UpdateAsync(int id, UpdateAdminProductDto adminProduct) {
 
-            var product= _productMapper.Map<Product>(adminProduct);
-            var created = _repository.UpdateProductAsync(id, product);
-            return _productMapper.Map<ProductDto>(created);
+            var product = _productMapper.Map<Product>(adminProduct);
+            await _repository.UpdateProductAsync(id, product);
+
+            var updated = await _repository.GetProductByIdAsync(id);
+            return updated is null ? null : _productMapper.Map<ProductDto>(updated);
         }
 
         public Task DeleteAsync(int id) => _repository.DeleteProductAsync(id);

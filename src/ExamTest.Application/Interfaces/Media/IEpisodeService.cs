@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ExamTest.Domain.Entities.Media;
+using ExamTest.Application.DTOs.Media;
 
 namespace ExamTest.Application.Interfaces.Media
 {
     public interface IEpisodeService
     {
-        Task<IReadOnlyList<Episode>> GetAllAsync();
-        Task<Episode?> GetByIdAsync(int id);
-        Task<IReadOnlyList<Episode>> GetBySeriesIdAsync(int seriesId);
-        Task<Episode> CreateAsync(Episode episode);
-        Task UpdateAsync(int id, Episode episode);
+        Task<IReadOnlyList<EpisodeDto>> GetAllAsync();
+        Task<EpisodeDto?> GetByIdAsync(int id);
+        Task<IReadOnlyList<EpisodeDto>> GetBySeriesIdAsync(int seriesId);
+        Task<EpisodeDto> CreateAsync(SaveEpisodeDto episode);
+        Task UpdateAsync(int id, SaveEpisodeDto episode);
         Task DeleteAsync(int id);
     }
 }

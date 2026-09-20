@@ -4,6 +4,7 @@ using ExamTest.Domain.Entities.Shop;
 using ExamTest.Domain.Interfaces.ForRepos;
 using ExamTest.Domain.Interfaces.ForRepos.Shop;
 using ExamTest.Infastructure.Firebase;
+using ExamTest.Infastructure.Firebase.Documents;
 using ExamTest.Infastructure.Repositories.Shop;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
@@ -41,25 +42,43 @@ namespace ExamTest.Infastructure
 
             services.AddSingleton<FirebaseStorageService>();
 
-            // One Firestore collection per entity type - add a line here for any new entity.
-            services.AddScoped<IRepository<Series>>(sp =>
-                new FirestoreRepository<Series>(sp.GetRequiredService<FirestoreDb>(), "series"));
-            services.AddScoped<IRepository<Episode>>(sp =>
-                new FirestoreRepository<Episode>(sp.GetRequiredService<FirestoreDb>(), "episodes"));
-            services.AddScoped<IRepository<Genre>>(sp =>
-                new FirestoreRepository<Genre>(sp.GetRequiredService<FirestoreDb>(), "genres"));
-            services.AddScoped<IRepository<Film>>(sp =>
-                new FirestoreRepository<Film>(sp.GetRequiredService<FirestoreDb>(), "films"));
-            services.AddScoped<IRepository<Category>>(sp =>
-                new FirestoreRepository<Category>(sp.GetRequiredService<FirestoreDb>(), "categories"));
+            // One Firestore collection per entity type - add a line here for any new entity
+            // (plus a matching *Document class in Firebase/Documents).
+            services.AddDocumentRepository<Series, SeriesDocument>(
+                "series", SeriesDocument.FromEntity, document => document.ToEntity());
+            services.AddDocumentRepository<Episode, EpisodeDocument>(
+                "episodes", EpisodeDocument.FromEntity, document => document.ToEntity());
+            services.AddDocumentRepository<Genre, GenreDocument>(
+                "genres", GenreDocument.FromEntity, document => document.ToEntity());
+            services.AddDocumentRepository<Film, FilmDocument>(
+                "films", FilmDocument.FromEntity, document => document.ToEntity());
+            services.AddDocumentRepository<Category, CategoryDocument>(
+                "categories", CategoryDocument.FromEntity, document => document.ToEntity());
+            services.AddDocumentRepository<Seller, SellerDocument>(
+                "sellers", SellerDocument.FromEntity, document => document.ToEntity());
+
             services.AddScoped<IProductRepo>(sp =>
               new ProductRepo(
                   sp.GetRequiredService<FirestoreDb>(),
                   "products"));
-            services.AddScoped<IRepository<Seller>>(sp =>
-               new FirestoreRepository<Seller>(sp.GetRequiredService<FirestoreDb>(), "sellers"));
 
             return services;
+        }
+
+        private static IServiceCollection AddDocumentRepository<TEntity, TDocument>(
+            this IServiceCollection services,
+            string collectionName,
+            Func<TEntity, TDocument> toDocument,
+            Func<TDocument, TEntity> toEntity)
+            where TEntity : class
+            where TDocument : class, new()
+        {
+            return services.AddScoped<IRepository<TEntity>>(sp =>
+                new FirestoreRepository<TEntity, TDocument>(
+                    sp.GetRequiredService<FirestoreDb>(),
+                    collectionName,
+                    toDocument,
+                    toEntity));
         }
     }
 }

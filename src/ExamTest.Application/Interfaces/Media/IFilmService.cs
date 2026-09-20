@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ExamTest.Domain.Entities.Media;
+using ExamTest.Application.DTOs.Media;
 
 namespace ExamTest.Application.Interfaces.Media
 {
     public interface IFilmService
     {
-        Task<IReadOnlyList<Film>> GetAllAsync();
-        Task<Film?> GetByIdAsync(int id);
-        Task<Film> CreateAsync(Film film);
-        Task UpdateAsync(int id, Film film);
+        Task<IReadOnlyList<FilmDto>> GetAllAsync();
+        Task<FilmDto?> GetByIdAsync(int id);
+        Task<FilmDto> CreateAsync(SaveFilmDto film);
+        Task UpdateAsync(int id, SaveFilmDto film);
         Task DeleteAsync(int id);
     }
 }
