@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A simple guide for shopping with IPAY.">
+  <title>IPAY | User Guide</title>
+  <style>
+    :root { --ink:#17213a; --muted:#61708d; --paper:#ffffff; --canvas:#f5f7fc; --brand:#3957e8; --brand-dark:#273eb6; --mint:#dff8ee; --line:#e5e9f3; --shadow:0 16px 45px rgba(30,48,103,.10); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:var(--canvas); color:var(--ink); line-height:1.6; }
+    a { color:inherit; }
+    .progress { position:fixed; inset:0 auto auto 0; z-index:30; height:4px; width:0; background:linear-gradient(90deg,#53c5a2,var(--brand)); }
+    .topbar { position:sticky; top:0; z-index:20; background:rgba(255,255,255,.92); backdrop-filter:blur(14px); border-bottom:1px solid var(--line); }
+    .bar { max-width:1180px; min-height:70px; margin:auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .logo { font-weight:900; text-decoration:none; letter-spacing:-.06em; font-size:1.45rem; color:var(--brand); }
+    .logo span { color:var(--ink); }
+    .nav { display:flex; gap:6px; align-items:center; }
+    .nav a { text-decoration:none; color:var(--muted); font-size:.91rem; font-weight:700; padding:9px 11px; border-radius:9px; }
+    .nav a:hover, .nav a.active { color:var(--brand); background:#edf0ff; }
+    .menu { display:none; border:0; background:#edf0ff; color:var(--brand); border-radius:9px; padding:9px 12px; font-weight:800; cursor:pointer; }
+    main { overflow:hidden; }
+    .hero { background:radial-gradient(circle at 85% 15%,#d7e5ff 0,transparent 27%), linear-gradient(135deg,#f9fbff 0%,#eef2ff 100%); border-bottom:1px solid var(--line); }
+    .hero-inner { max-width:1180px; min-height:440px; margin:auto; padding:76px 24px 64px; display:grid; grid-template-columns:1.15fr .85fr; align-items:center; gap:54px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; color:var(--brand); font-weight:800; font-size:.82rem; letter-spacing:.08em; text-transform:uppercase; }
+    .eyebrow::before { content:""; width:22px; height:2px; background:currentColor; }
+    h1 { font-size:clamp(2.5rem,5vw,4.5rem); line-height:1.04; letter-spacing:-.055em; margin:14px 0 19px; max-width:700px; }
+    .lead { font-size:1.14rem; color:var(--muted); max-width:590px; margin:0 0 30px; }
+    .button { display:inline-flex; align-items:center; gap:9px; padding:13px 19px; background:var(--brand); color:#fff; border-radius:10px; font-weight:800; text-decoration:none; box-shadow:0 8px 22px rgba(57,87,232,.27); transition:transform .2s, background .2s; }
+    .button:hover { background:var(--brand-dark); transform:translateY(-2px); }
+    .hero-card { background:var(--paper); border:1px solid rgba(255,255,255,.75); border-radius:22px; padding:26px; box-shadow:var(--shadow); transform:rotate(2deg); }
+    .hero-card h2 { font-size:1rem; margin:0 0 18px; }
+    .quick { display:grid; gap:11px; }
+    .quick div { display:flex; align-items:center; gap:12px; padding:12px; border-radius:11px; background:#f6f8ff; font-weight:700; font-size:.92rem; }
+    .icon { flex:0 0 30px; width:30px; height:30px; border-radius:9px; display:grid; place-items:center; background:var(--mint); font-size:1rem; }
+    .section { max-width:1180px; margin:auto; padding:88px 24px; scroll-margin-top:72px; }
+    .section-head { max-width:650px; margin-bottom:34px; }
+    h2 { font-size:clamp(1.85rem,3vw,2.65rem); letter-spacing:-.04em; line-height:1.12; margin:9px 0 12px; }
+    .section-head p { color:var(--muted); margin:0; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .card { background:var(--paper); border:1px solid var(--line); padding:25px; border-radius:16px; box-shadow:0 4px 14px rgba(23,33,58,.025); }
+    .card .icon { margin-bottom:19px; }
+    .card h3 { margin:0 0 7px; font-size:1.08rem; letter-spacing:-.015em; }
+    .card p { color:var(--muted); margin:0; font-size:.94rem; }
+    .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:0; background:var(--paper); border:1px solid var(--line); border-radius:17px; overflow:hidden; }
+    .step { padding:26px 23px; border-right:1px solid var(--line); position:relative; }
+    .step:last-child { border:0; }
+    .num { display:grid; place-items:center; width:29px; height:29px; border-radius:50%; color:#fff; background:var(--brand); font-size:.78rem; font-weight:900; margin-bottom:15px; }
+    .step h3 { font-size:1rem; margin:0 0 7px; }
+    .step p { color:var(--muted); font-size:.91rem; margin:0; }
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:25px; align-items:start; }
+    .panel { background:var(--paper); padding:30px; border:1px solid var(--line); border-radius:17px; }
+    .panel h3 { margin-top:0; font-size:1.2rem; }
+    .checklist { list-style:none; padding:0; margin:18px 0 0; display:grid; gap:13px; }
+    .checklist li { position:relative; padding-left:29px; color:var(--muted); }
+    .checklist li::before { content:"✓"; position:absolute; left:0; top:1px; display:grid; place-items:center; width:19px; height:19px; background:var(--mint); color:#127453; border-radius:50%; font-size:.76rem; font-weight:900; }
+    .notice { margin-top:20px; padding:15px 17px; border-radius:11px; background:#fff8e6; color:#765600; font-size:.91rem; }
+    .faq { display:grid; gap:11px; }
+    details { background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:0 18px; }
+    summary { cursor:pointer; padding:18px 27px 18px 0; list-style:none; font-weight:800; position:relative; }
+    summary::-webkit-details-marker { display:none; }
+    summary::after { content:"+"; position:absolute; right:0; color:var(--brand); font-size:1.3rem; font-weight:500; transition:transform .2s; }
+    details[open] summary::after { transform:rotate(45deg); }
+    details p { color:var(--muted); font-size:.94rem; margin:0 0 18px; }
+    .callout { background:linear-gradient(135deg,#293fbd,#4569ed); color:#fff; border-radius:20px; padding:37px; display:flex; justify-content:space-between; gap:24px; align-items:center; }
+    .callout h2 { margin:0 0 8px; }
+    .callout p { margin:0; color:#dfe6ff; max-width:590px; }
+    .callout .button { white-space:nowrap; background:#fff; color:var(--brand); box-shadow:none; }
+    footer { padding:29px 24px; text-align:center; color:var(--muted); font-size:.86rem; }
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease, transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+    @media (max-width:800px) { .hero-inner { grid-template-columns:1fr; min-height:auto; padding-top:58px; gap:30px; } .hero-card { max-width:430px; transform:none; } .grid { grid-template-columns:1fr 1fr; } .steps { grid-template-columns:1fr 1fr; } .step:nth-child(2) { border-right:0; } .step:nth-child(-n+2) { border-bottom:1px solid var(--line); } .two-col { grid-template-columns:1fr; } .nav { display:none; position:absolute; top:70px; left:0; right:0; padding:10px 20px 15px; background:#fff; border-bottom:1px solid var(--line); flex-direction:column; align-items:stretch; } .nav.open { display:flex; } .menu { display:block; } .nav a { padding:10px; } }
+    @media (max-width:520px) { .bar,.section,.hero-inner { padding-left:18px; padding-right:18px; } .hero-inner { padding-top:47px; } .section { padding-top:62px; padding-bottom:62px; } .grid,.steps { grid-template-columns:1fr; } .step { border-right:0; border-bottom:1px solid var(--line); } .step:nth-child(2) { border-bottom:1px solid var(--line); } .callout { align-items:flex-start; flex-direction:column; padding:28px; } }
+    @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="bar">
+      <a class="logo" href="#top" aria-label="IPAY guide home">I<span>PAY</span></a>
+      <button class="menu" type="button" aria-expanded="false" aria-controls="guide-nav">Menu</button>
+      <nav class="nav" id="guide-nav" aria-label="Guide sections">
+        <a href="#start">Getting started</a><a href="#shop">Shopping</a><a href="#order">Your order</a><a href="#account">Account</a><a href="#help">Help</a>
+      </nav>
+    </div>
+  </header>
+  <main id="top">
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="reveal">
+          <span class="eyebrow">Customer guide</span>
+          <h1>Everything you need to shop with IPAY.</h1>
+          <p class="lead">Find products, save them for later, place an order, and follow its progress — all in one simple place.</p>
+          <a class="button" href="#start">Explore the guide <span aria-hidden="true">↓</span></a>
+        </div>
+        <aside class="hero-card reveal" aria-label="Guide highlights">
+          <h2>What you can do</h2>
+          <div class="quick"><div><span class="icon">⌕</span>Find products that suit you</div><div><span class="icon">🛒</span>Build and review your basket</div><div><span class="icon">⌂</span>Choose delivery details</div><div><span class="icon">✓</span>Track your purchases</div></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="start">
+      <div class="section-head reveal"><span class="eyebrow">Getting started</span><h2>Browse first. Sign in when you are ready.</h2><p>You may explore products, use search, and narrow the results before creating an account.</p></div>
+      <div class="grid">
+        <article class="card reveal"><span class="icon">⌕</span><h3>Explore the catalogue</h3><p>Browse categories or use the search box to look for a product by name.</p></article>
+        <article class="card reveal"><span class="icon">⇆</span><h3>Refine your results</h3><p>Choose a category, price range, brand, or rating. You can also sort results to see what matters most to you.</p></article>
+        <article class="card reveal"><span class="icon">◎</span><h3>Open a product page</h3><p>See the product description, price, pictures, available quantity, rating, and customer feedback.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="shop">
+      <div class="section-head reveal"><span class="eyebrow">Shopping</span><h2>Add items and keep your choices in one place.</h2><p>Use the product page to decide what to buy, then manage everything from your basket.</p></div>
+      <div class="steps reveal">
+        <article class="step"><span class="num">1</span><h3>Choose a product</h3><p>Check its details and select the quantity you want.</p></article>
+        <article class="step"><span class="num">2</span><h3>Add to basket</h3><p>Select “Add to basket”. Your running total updates as you shop.</p></article>
+        <article class="step"><span class="num">3</span><h3>Review your basket</h3><p>Change quantities or remove products before continuing.</p></article>
+        <article class="step"><span class="num">4</span><h3>Continue to checkout</h3><p>When everything looks right, choose “Checkout”.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="order">
+      <div class="section-head reveal"><span class="eyebrow">Your order</span><h2>Checkout in a few clear steps.</h2><p>Sign in to complete an order and keep its details in your account.</p></div>
+      <div class="two-col">
+        <article class="panel reveal"><h3>At checkout</h3><ol class="checklist"><li>Confirm the products and quantities in your basket.</li><li>Enter your name, phone number, city, and delivery address.</li><li>Choose an available payment option and confirm your order.</li><li>Keep the order number shown on the confirmation screen.</li></ol><p class="notice"><strong>Payment didn’t go through?</strong> Your order will not be charged. Return to the payment step and try again or choose another available option.</p></article>
+        <article class="panel reveal"><h3>Order progress</h3><ul class="checklist"><li><strong>Pending</strong> — your order has been received and is awaiting payment or review.</li><li><strong>Paid</strong> — payment was successful.</li><li><strong>Shipped</strong> — the order is on its way.</li><li><strong>Delivered</strong> — the order has arrived.</li><li><strong>Cancelled</strong> — the order will not be completed.</li></ul></article>
+      </div>
+    </section>
+
+    <section class="section" id="account">
+      <div class="section-head reveal"><span class="eyebrow">Your account</span><h2>Your personal space for purchases and preferences.</h2><p>Creating an account makes checkout quicker and keeps your information and orders together.</p></div>
+      <div class="grid">
+        <article class="card reveal"><span class="icon">♙</span><h3>Profile</h3><p>Update your name, email address, phone number, delivery address, and profile picture whenever they change.</p></article>
+        <article class="card reveal"><span class="icon">▤</span><h3>Order history</h3><p>Open previous orders to see their products, totals, and current progress.</p></article>
+        <article class="card reveal"><span class="icon">♡</span><h3>Saved items</h3><p>Save products you like for later, then move them to your basket when you are ready.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="help">
+      <div class="section-head reveal"><span class="eyebrow">Help</span><h2>Common questions</h2><p>Short answers to the things shoppers ask most often.</p></div>
+      <div class="faq reveal">
+        <details><summary>Do I need an account to look at products?</summary><p>No. You can browse the catalogue, search, and view product details as a visitor. Sign in when you want to place an order, see your order history, or save items.</p></details>
+        <details><summary>How do I change my basket?</summary><p>Open the basket from the shopping-bag icon. Use the quantity controls to add or remove units, or select remove next to a product you no longer want.</p></details>
+        <details><summary>Where can I see my order?</summary><p>After signing in, open your account and choose order history. Select an order to see its products and its current progress.</p></details>
+        <details><summary>Can I leave a product review?</summary><p>After purchasing a product, you may be able to give it a one-to-five-star rating and share your experience. This helps other shoppers make informed choices.</p></details>
+        <details><summary>What should I do if I cannot sign in?</summary><p>First check that your email address and password are correct. If the sign-in page offers password recovery, use it to receive instructions at your email address.</p></details>
+      </div>
+    </section>
+
+    <section class="section"><div class="callout reveal"><div><h2>Ready to start shopping?</h2><p>Use the catalogue to discover products, then add your favourites to the basket.</p></div><a class="button" href="#start">Back to the top ↑</a></div></section>
+  </main>
+  <footer>IPAY customer guide · Designed for desktop, tablet, and mobile screens.</footer>
+  <script>
+    const menu = document.querySelector('.menu'), nav = document.querySelector('.nav'), links = [...document.querySelectorAll('.nav a')];
+    menu.addEventListener('click', () => { const open = nav.classList.toggle('open'); menu.setAttribute('aria-expanded', open); menu.textContent = open ? 'Close' : 'Menu'; });
+    links.forEach(link => link.addEventListener('click', () => { nav.classList.remove('open'); menu.setAttribute('aria-expanded', 'false'); menu.textContent = 'Menu'; }));
+    const reveal = new IntersectionObserver(items => items.forEach(item => { if (item.isIntersecting) { item.target.classList.add('visible'); reveal.unobserve(item.target); } }), { threshold: .12 });
+    document.querySelectorAll('.reveal').forEach(item => reveal.observe(item));
+    const sections = [...document.querySelectorAll('main section[id]')];
+    const setActive = () => { const y = window.scrollY + 110; const current = sections.filter(s => s.offsetTop <= y).at(-1)?.id; links.forEach(link => link.classList.toggle('active', link.getAttribute('href') === '#' + current)); const height = document.documentElement.scrollHeight - innerHeight; document.querySelector('.progress').style.width = height > 0 ? (scrollY / height * 100) + '%' : '0'; };
+    addEventListener('scroll', setActive, { passive:true }); setActive();
+  </script>
+</body>
+</html>
