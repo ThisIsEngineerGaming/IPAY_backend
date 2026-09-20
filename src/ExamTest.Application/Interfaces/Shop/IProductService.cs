@@ -9,11 +9,11 @@ namespace ExamTest.Application.Interfaces.Shop
     {
         Task<IReadOnlyList<ProductDto>> GetAllAsync();
         Task<ProductDto?> GetByIdAsync(int id);
-        Task<Product> CreateAsync(Product product);
-        Task UpdateAsync(int id, Product product);
+        Task<ProductDto> CreateAsync(CreateAdminProductDto adminProduct);
+        Task<ProductDto?> UpdateAsync(int id, UpdateAdminProductDto adminProduct);
         Task DeleteAsync(int id);
 
-        Task<List<ProductDto>> GetLimitAsync(int limit, string? lastDocid);
+        Task<IReadOnlyList<ProductDto>> GetLimitAsync(int limit, string? lastDocid);
 
         // "createCard(container:div)" on the diagram is a DOM/UI concern for the
         // frontend to implement - there's nothing meaningful for a backend to do there,

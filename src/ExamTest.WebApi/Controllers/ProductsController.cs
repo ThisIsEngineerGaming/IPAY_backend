@@ -17,17 +17,17 @@ public class ProductsController(IProductService service) : ControllerBase
         await service.GetByIdAsync(id) is { } product ? Ok(product) : NotFound();
 
     [HttpPost]
-    public async Task<ActionResult<Product>> Create(Product product)
+    public async Task<ActionResult<ProductDto>> Create(CreateAdminProductDto adminProduct)
     {
-        var created = await service.CreateAsync(product);
+        var created = await service.CreateAsync(adminProduct);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, Product product)
+    public async Task<ActionResult<ProductDto>> Update(int id, UpdateAdminProductDto adminProduct)
     {
         if (await service.GetByIdAsync(id) is null) return NotFound();
-        await service.UpdateAsync(id, product);
+        await service.UpdateAsync(id, adminProduct);
         return NoContent();
     }
 

@@ -31,18 +31,28 @@ namespace ExamTest.Application.Services.Shop
             return _productMapper.Map<ProductDto>(products);
         }
 
-        public Task<Product> CreateAsync(Product product) {
-            return _repository.AddProductAsync(product);
+        public async Task<ProductDto> CreateAsync(CreateAdminProductDto adminProduct)
+        {
+            // 1. DTO → Entity
+            var product = _productMapper.Map<Product>(adminProduct);
+
+            // 2. Сохраняем Entity
+            var created = await _repository.AddProductAsync(product);
+
+            // 3. Entity → DTO
+            return _productMapper.Map<ProductDto>(created);
         }
 
-        public Task UpdateAsync(int id, Product product) {
-           
-            return _repository.UpdateProductAsync(id, product);
+        public async Task<ProductDto> UpdateAsync(int id, UpdateAdminProductDto adminProduct) {
+
+            var product= _productMapper.Map<Product>(adminProduct);
+            var created = _repository.UpdateProductAsync(id, product);
+            return _productMapper.Map<ProductDto>(created);
         }
 
         public Task DeleteAsync(int id) => _repository.DeleteProductAsync(id);
 
-        public async Task<List<ProductDto>> GetLimitAsync(int limit, string? lastDocId) {
+        public async Task<IReadOnlyList<ProductDto>> GetLimitAsync(int limit, string? lastDocId) {
 
             var products = await _repository.GetLimitedProduct(limit, lastDocId ?? null);
             return _productMapper.Map<List<ProductDto>>(products);
