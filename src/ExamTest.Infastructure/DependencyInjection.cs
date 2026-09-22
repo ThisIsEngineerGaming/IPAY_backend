@@ -3,12 +3,12 @@ using ExamTest.Domain.Entities.Media;
 using ExamTest.Domain.Entities.Shop;
 using ExamTest.Domain.Interfaces.ForRepos;
 using ExamTest.Domain.Interfaces.ForRepos.Shop;
+using ExamTest.Infastructure.Cloudinary;
 using ExamTest.Infastructure.Firebase;
 using ExamTest.Infastructure.Firebase.Documents;
 using ExamTest.Infastructure.Repositories.Shop;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
-using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -33,14 +33,9 @@ namespace ExamTest.Infastructure
                 }.Build();
             });
 
-            services.AddSingleton(sp =>
-            {
-                var options = sp.GetRequiredService<IOptions<FirebaseOptions>>().Value;
-                var credential = GoogleCredential.FromFile(options.ServiceAccountKeyPath);
-                return StorageClient.Create(credential);
-            });
-
-            services.AddSingleton<FirebaseStorageService>();
+            // Image hosting - Cloudinary (replaced Firebase Storage).
+            services.Configure<CloudinaryOptions>(configuration.GetSection(CloudinaryOptions.SectionName));
+            services.AddSingleton<CloudinaryImageService>();
 
             // One Firestore collection per entity type - add a line here for any new entity
             // (plus a matching *Document class in Firebase/Documents).

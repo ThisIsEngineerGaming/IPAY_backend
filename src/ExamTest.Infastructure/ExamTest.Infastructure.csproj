@@ -13,11 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Pinned to match/exceed what Domain and the transitive Storage->Apis.Storage.v1 chain
-         require, to avoid NU1605 "package downgrade" errors. -->
     <PackageReference Include="Google.Cloud.Firestore" Version="4.4.0" />
-    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.*" />
     <PackageReference Include="Google.Apis.Auth" Version="1.*" />
+
+    <!-- Image hosting/CDN - replaced Google.Cloud.Storage.V1 (Firebase Storage). -->
+    <PackageReference Include="CloudinaryDotNet" Version="1.*" />
 
     <!-- Microsoft.Extensions.Configuration.Abstractions, DependencyInjection.Abstractions, and
          Options.ConfigurationExtensions are NOT listed here on purpose: the FrameworkReference
