@@ -17,6 +17,8 @@ namespace ExamTest.Domain.Entities.Shop
         // links to the Category entity below rather than duplicating its name as free text.
         public int CategoryId { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+
         /// <summary>Percentage discount off the original price, e.g. 25 for 25% off.</summary>
         public double GetDiscountPercent()
         {

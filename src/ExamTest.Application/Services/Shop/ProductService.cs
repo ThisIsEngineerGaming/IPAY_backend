@@ -1,11 +1,12 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using AutoMapper;
 using ExamTest.Application.DTOs.Shop;
 using ExamTest.Application.Interfaces.Shop;
 using ExamTest.Domain.Entities.Shop;
 using ExamTest.Domain.Interfaces.ForRepos;
 using ExamTest.Domain.Interfaces.ForRepos.Shop;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ExamTest.Application.Services.Shop
 {
@@ -36,6 +37,8 @@ namespace ExamTest.Application.Services.Shop
             // 1. DTO → Entity
             var product = _productMapper.Map<Product>(adminProduct);
 
+            product.CreatedAt = DateTime.UtcNow;
+
             // 2. Сохраняем Entity
             var created = await _repository.AddProductAsync(product);
 
@@ -60,5 +63,24 @@ namespace ExamTest.Application.Services.Shop
             return _productMapper.Map<List<ProductDto>>(products);
 
         }
+
+        public async Task<IReadOnlyList<ProductDto?>> GetFilteredAsync(int limit, string? lastDocId, int? categoryId, double? minPrice, double? maxPrice, string? brand, string? search) { 
+            var result=await _repository.GetFilteredAsync(limit, lastDocId, categoryId, minPrice, maxPrice, brand,search);
+            return _productMapper.Map<List<ProductDto>>(result);
+        }
+
+        public async Task<IReadOnlyList<ProductDto>> GetSortedAsync(
+           int limit,
+           string? lastDocId,
+           string sortBy = "price",
+           string sortDir = "asc")
+        {
+            var products = await _repository.GetSortedAsync(limit, lastDocId, sortBy, sortDir);
+           return _productMapper.Map<List<ProductDto>>(products);
+
+
+        }
+
+
     }
 }
