@@ -1,5 +1,6 @@
 using ExamTest.Domain.Entities.Shop;
 using Google.Cloud.Firestore;
+using static Grpc.Core.Metadata;
 
 namespace ExamTest.Infastructure.Firebase.Documents;
 
@@ -15,17 +16,23 @@ public class ProductDocument
     [FirestoreProperty] public string ImageUrl { get; set; } = string.Empty;
     [FirestoreProperty] public string Manufacturer { get; set; } = string.Empty;
     [FirestoreProperty] public int CategoryId { get; set; }
+    [FirestoreProperty]public string NameLower { get; set; } = string.Empty;
+    [FirestoreProperty] public DateTime CreatedAt { get; set; }
 
     public static ProductDocument FromEntity(Product entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
+        NameLower = entity.Name.Trim().ToLowerInvariant(),
         Price = entity.Price,
         Rating = entity.Rating,
         DiscountedPrice = entity.DiscountedPrice,
         ImageUrl = entity.ImageUrl,
         Manufacturer = entity.Manufacturer,
-        CategoryId = entity.CategoryId
+        CategoryId = entity.CategoryId,
+        CreatedAt = entity.CreatedAt == default
+         ? DateTime.UtcNow
+         : entity.CreatedAt,
     };
 
     public Product ToEntity() => new()
@@ -37,6 +44,7 @@ public class ProductDocument
         DiscountedPrice = DiscountedPrice,
         ImageUrl = ImageUrl,
         Manufacturer = Manufacturer,
-        CategoryId = CategoryId
+        CategoryId = CategoryId,
+        CreatedAt = CreatedAt
     };
 }

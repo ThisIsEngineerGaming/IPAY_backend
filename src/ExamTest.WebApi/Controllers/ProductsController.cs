@@ -46,4 +46,32 @@ public class ProductsController(IProductService service) : ControllerBase
         var result = await service.GetLimitAsync(limit, lastDocId);
         return Ok(result);
     }
+
+
+
+    [HttpGet("filter")]
+    public async Task<ActionResult<ProductDto>> GetFiltered(
+    [FromQuery] int? categoryId,
+    [FromQuery] double? minPrice,
+    [FromQuery] double? maxPrice,
+    [FromQuery] string? brand,
+    [FromQuery] string? search,
+    [FromQuery] int limit = 12,
+    [FromQuery] string? lastDocId = null)
+    {
+        var result = await service.GetFilteredAsync(
+            limit, lastDocId, categoryId, minPrice, maxPrice, brand, search);
+
+        return Ok(result);
+    }
+    [HttpGet("sort")]
+    public async Task<ActionResult<ProductDto>> GetSorted(
+    [FromQuery] string sortBy = "price",   // price | rating | date
+    [FromQuery] string sortDir = "asc",    // asc | desc
+    [FromQuery] int limit = 12,
+    [FromQuery] string? lastDocId = null)
+    {
+        var result = await service.GetSortedAsync(limit, lastDocId, sortBy, sortDir);
+        return Ok(result);
+    }
 }

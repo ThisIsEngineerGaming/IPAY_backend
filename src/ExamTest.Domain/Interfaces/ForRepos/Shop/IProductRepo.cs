@@ -16,5 +16,13 @@ namespace ExamTest.Domain.Interfaces.ForRepos.Shop
         Task DeleteProductAsync(int id);
 
         Task<IReadOnlyList<Product>> GetLimitedProduct(int limit, string? lastDocId);
+
+        Task<IReadOnlyList<Product>> GetFilteredAsync(int limit,string? lastDocId,int? categoryId,double? minPrice,double? maxPrice,string? brand, string? search);
+
+        Task<IReadOnlyList<Product>> GetSortedAsync(
+    int limit,
+    string? lastDocId,
+    string sortBy,    // price | rating | date
+    string sortDir);  // asc | desc
     }
 }
