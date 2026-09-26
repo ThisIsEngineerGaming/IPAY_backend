@@ -49,6 +49,8 @@ namespace ExamTest.Infastructure
                 "films", FilmDocument.FromEntity, document => document.ToEntity());
             services.AddDocumentRepository<Category, CategoryDocument>(
                 "categories", CategoryDocument.FromEntity, document => document.ToEntity());
+            services.AddDocumentRepository<Manufacturer, ManufacturerDocument>(
+                "manufacturers", ManufacturerDocument.FromEntity, document => document.ToEntity());
             services.AddDocumentRepository<Seller, SellerDocument>(
                 "sellers", SellerDocument.FromEntity, document => document.ToEntity());
 
