@@ -1,8 +1,55 @@
 {
   "version": 2,
-  "dgSpecHash": "hhktSR82sBI=",
+  "dgSpecHash": "0JnSceKGWDU=",
   "success": true,
   "projectFilePath": "C:\\Users\\Admin\\Desktop\\coding and step\\asp.net core\\backend\\src\\ExamTest.Infastructure\\ExamTest.Infastructure.csproj",
-  "expectedPackageFiles": [],
-  "logs": []
+  "expectedPackageFiles": [
+    "C:\\Users\\Admin\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\cloudinarydotnet\\1.29.3\\cloudinarydotnet.1.29.3.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\12.1.1\\fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\google.api.commonprotos\\2.17.0\\google.api.commonprotos.2.17.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\google.api.gax\\4.13.1\\google.api.gax.4.13.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\google.api.gax.grpc\\4.13.1\\google.api.gax.grpc.4.13.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\google.apis\\1.76.0\\google.apis.1.76.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\google.apis.auth\\1.76.0\\google.apis.auth.1.76.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\google.apis.core\\1.76.0\\google.apis.core.1.76.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\google.cloud.firestore\\4.4.0\\google.cloud.firestore.4.4.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\google.cloud.firestore.v1\\4.4.0\\google.cloud.firestore.v1.4.4.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\google.cloud.location\\2.4.0\\google.cloud.location.2.4.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\google.longrunning\\3.5.0\\google.longrunning.3.5.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\google.protobuf\\3.31.1\\google.protobuf.3.31.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\grpc.auth\\2.71.0\\grpc.auth.2.71.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\grpc.core.api\\2.71.0\\grpc.core.api.2.71.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\grpc.net.client\\2.71.0\\grpc.net.client.2.71.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\grpc.net.common\\2.71.0\\grpc.net.common.2.71.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\10.0.12\\microsoft.aspnetcore.authentication.jwtbearer.10.0.12.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\10.0.10\\microsoft.bcl.asyncinterfaces.10.0.10.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.bcl.cryptography\\10.0.2\\microsoft.bcl.cryptography.10.0.2.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.identitymodel.abstractions\\8.19.2\\microsoft.identitymodel.abstractions.8.19.2.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\8.19.2\\microsoft.identitymodel.jsonwebtokens.8.19.2.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.identitymodel.logging\\8.19.2\\microsoft.identitymodel.logging.8.19.2.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.identitymodel.protocols\\8.19.2\\microsoft.identitymodel.protocols.8.19.2.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.identitymodel.protocols.openidconnect\\8.19.2\\microsoft.identitymodel.protocols.openidconnect.8.19.2.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.identitymodel.tokens\\8.19.2\\microsoft.identitymodel.tokens.8.19.2.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\newtonsoft.json\\13.0.4\\newtonsoft.json.13.0.4.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\system.codedom\\7.0.0\\system.codedom.7.0.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.19.2\\system.identitymodel.tokens.jwt.8.19.2.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\system.management\\7.0.2\\system.management.7.0.2.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'AutoMapper' 12.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x",
+      "projectPath": "C:\\Users\\Admin\\Desktop\\coding and step\\asp.net core\\backend\\src\\ExamTest.Infastructure\\ExamTest.Infastructure.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\Admin\\Desktop\\coding and step\\asp.net core\\backend\\src\\ExamTest.Infastructure\\ExamTest.Infastructure.csproj",
+      "libraryId": "AutoMapper",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

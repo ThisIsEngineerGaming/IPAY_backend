@@ -1,4 +1,9 @@
+
+using ExamTest.Application.Interfaces.Media;
+using ExamTest.Domain.Entities.Media;
+
 using ExamTest.Application.Services.Media;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamTest.WebApi.Controllers;

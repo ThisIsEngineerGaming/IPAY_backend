@@ -1,10 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using AutoMapper;
+using ExamTest.Application.DTOs.Shop;
+using ExamTest.Domain.Entities.Shop;
 
 namespace ExamTest.Application.Mappings.Shop
 {
-    internal class CategoryMapping
+    public class CategoryMapping : Profile
     {
+        public CategoryMapping()
+        {
+            // Entity → response DTO
+            CreateMap<Category, CategoryDto>();
+
+            // Request DTO → Entity (Id is assigned by the repository / route, never by the client)
+            CreateMap<SaveCategoryDto, Category>();
+        }
     }
 }

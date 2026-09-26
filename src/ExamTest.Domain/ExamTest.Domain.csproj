@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -6,9 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Interfaces\ForRepos\" />
-    <InternalsVisibleTo Include="ExamTest.Tests" />
-  </ItemGroup>
+  <!-- Domain is dependency-free on purpose: persistence types (Firestore) live in ExamTest.Infastructure. -->
 
 </Project>
