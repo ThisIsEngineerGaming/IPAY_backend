@@ -1,0 +1,6 @@
+@IPAY_HostAddress = http://localhost:5278
+
+GET {{IPAY_HostAddress}}/api/categories
+Accept: application/json
+
+###

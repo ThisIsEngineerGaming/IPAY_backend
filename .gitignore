@@ -28,4 +28,4 @@ artifacts/
 *.cache
 
 # Local Firebase admin credential. Never commit this file.
-src/ExamTest.WebApi/firebase-service-account.json
+src/IPAY.WebApi/firebase-service-account.json

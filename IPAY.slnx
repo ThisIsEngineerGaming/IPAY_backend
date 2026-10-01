@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/IPAY.Application/IPAY.Application.csproj" />
+    <Project Path="src/IPAY.Domain/IPAY.Domain.csproj" />
+    <Project Path="src/IPAY.Infrastructure/IPAY.Infrastructure.csproj" />
+    <Project Path="src/IPAY.WebApi/IPAY.WebApi.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/IPAY.UnitTests/IPAY.UnitTests.csproj" />
+  </Folder>
+</Solution>
