@@ -12,6 +12,8 @@ namespace IPAY.Application.DTOs.Shop
         public double DiscountedPrice { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
         public string Manufacturer { get; set; } = string.Empty;
+
+
         public int CategoryId { get; set; }
     }
 }

@@ -46,9 +46,42 @@ namespace IPAY.Application.Services.Shop
             return _productMapper.Map<ProductDto>(created);
         }
 
-        public async Task<ProductDto?> UpdateAsync(int id, UpdateAdminProductDto adminProduct) {
+
+
+        public async Task<ProductDto?> UpdateAsync(int id, UpdateAdminProductDto adminProduct)
+        {
 
             var product = _productMapper.Map<Product>(adminProduct);
+            await _repository.UpdateProductAsync(id, product);
+
+            var updated = await _repository.GetProductByIdAsync(id);
+            return updated is null ? null : _productMapper.Map<ProductDto>(updated);
+        }
+
+
+        public async Task<ProductDto?> CreateAsync(CreateSellerProductDto dto, string sellerId)
+        {
+            var product = _productMapper.Map<Product>(dto);
+
+            var lastId = await _repository.GetAllProductsAsync();
+
+            product.Id = lastId.Count > 0 ? lastId.Max(p => p.Id) + 1 : 1;
+            product.SellerId = sellerId;
+
+            await _repository.AddProductAsync(product);
+
+            return _productMapper.Map<ProductDto>(product);
+        }
+
+        public async Task<ProductDto?> UpdateAsync(int id, UpdateSellerProductDto sellerProduct)
+        {
+            var existing = await _repository.GetProductByIdAsync(id);
+            if (existing is null) return null;
+
+            var product = _productMapper.Map<Product>(sellerProduct);
+            product.Id = id;
+            product.SellerId = existing.SellerId; // зберігаємо, щоб не затерти при update
+
             await _repository.UpdateProductAsync(id, product);
 
             var updated = await _repository.GetProductByIdAsync(id);

@@ -19,6 +19,8 @@ namespace IPAY.Domain.Entities.Shop
 
         public DateTime CreatedAt { get; set; }
 
+        public string SellerId { get; set; } = string.Empty;
+
         /// <summary>Percentage discount off the original price, e.g. 25 for 25% off.</summary>
         public double GetDiscountPercent()
         {
