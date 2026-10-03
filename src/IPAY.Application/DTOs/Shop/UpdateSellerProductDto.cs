@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Shop
 {
-    public class UpdateProductDto
+    public class UpdateSellerProductDto
     {
         public string Name { get; set; } = string.Empty;
         public double Price { get; set; }
@@ -13,5 +13,6 @@ namespace IPAY.Application.DTOs.Shop
         public string ImageUrl { get; set; } = string.Empty;
         public string Manufacturer { get; set; } = string.Empty;
         public int CategoryId { get; set; }
+        public double DiscountPercent { get; set; }
     }
 }

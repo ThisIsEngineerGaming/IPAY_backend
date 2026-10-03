@@ -45,11 +45,11 @@ namespace IPAY.UnitTests.Application.Services.Auth
         public async Task GetByEmail_IsCaseInsensitiveAndTrimsInput()
         {
             _repositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Customer>
-            {
-                new() { Id = 1, Email = "customer@example.com" }
-            });
+        {
+        new() { Id = 1, Email = "customer@example.com" }
+       });
 
-            var result = await _sut.GetByEmail("  SELLER@EXAMPLE.COM  ");
+            var result = await _sut.GetByEmail("  CUSTOMER@EXAMPLE.COM  ");
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result!.Id, Is.EqualTo(1));

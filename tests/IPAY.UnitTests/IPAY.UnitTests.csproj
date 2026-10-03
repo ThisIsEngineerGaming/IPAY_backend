@@ -8,6 +8,8 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
+
+
   <ItemGroup>
     <!-- Needed explicitly because this is a plain class library (not Sdk.Web): gives
          access to Microsoft.AspNetCore.* types (IFormFile, ControllerBase results, etc.)
@@ -35,6 +37,26 @@
     <ProjectReference Include="..\..\src\IPAY.Application\IPAY.Application.csproj" />
     <ProjectReference Include="..\..\src\IPAY.Infrastructure\IPAY.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\IPAY.WebApi\IPAY.WebApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\PC\.nuget\packages\nunit3testadapter\6.3.0\build\net8.0\NUnit3.TestAdapter.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\PC\.nuget\packages\nunit3testadapter\6.3.0\build\net8.0\NUnit3.TestAdapter.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\PC\.nuget\packages\nunit3testadapter\6.3.0\build\net8.0\NUnit3.TestAdapter.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\PC\.nuget\packages\nunit3testadapter\6.3.0\build\net8.0\NUnit3.TestAdapter.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\PC\.nuget\packages\nunit3testadapter\6.3.0\build\net8.0\NUnit3.TestAdapter.dll" />
   </ItemGroup>
 
 </Project>

@@ -37,16 +37,14 @@ namespace IPAY.Application.Services.Auth
             if (!result.IsValid)
                 return false;
 
-
-
-
             var user = _mapper.Map<Customer>(registerDto);
+            if (user is null)
+                return false;
 
-            // login looks users up by a trimmed, case-insensitive email, so stored values must not carry stray spaces/casing.
+            // login looks up users by a trimmed, case-insensitive email, so stored values must not carry stray spaces/casing.
             user.Email = registerDto.Email.Trim().ToLowerInvariant();
             user.Name = registerDto.Name.Trim();
-            user.Password = _passwordHasher.Hash(registerDto.Password);  // твой хешер
-                                                                         // или BCrypt.Net.BCrypt.HashPassword(dto.Password);
+            user.Password = _passwordHasher.Hash(registerDto.Password);
 
             // Explicit on top of the AutoMapper rule in AuthMapping: every
             // self-registration is a Customer. Sellers are promoted later via

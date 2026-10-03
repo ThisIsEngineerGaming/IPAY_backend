@@ -29,3 +29,4 @@ artifacts/
 
 # Local Firebase admin credential. Never commit this file.
 src/IPAY.WebApi/firebase-service-account.json
+src/ExamTest.WebApi/firebase-service-account.json

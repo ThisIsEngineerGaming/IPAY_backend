@@ -39,7 +39,7 @@ namespace IPAY.UnitTests.Application.Services.Auth
                 : new ValidationResult(new List<ValidationFailure> { new("Password", "Too weak") });
 
             _validatorMock
-                .Setup(v => v.ValidateAsync(It.IsAny<IValidationContext>(), It.IsAny<CancellationToken>()))
+                .Setup(v => v.ValidateAsync(It.IsAny<RegisterDto>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(result);
         }
 

@@ -37,7 +37,7 @@ namespace IPAY.UnitTests.Application.Services.Auth
                 : new ValidationResult(new List<ValidationFailure> { new("Email", "Invalid email") });
 
             _validatorMock
-                .Setup(v => v.ValidateAsync(It.IsAny<IValidationContext>(), It.IsAny<CancellationToken>()))
+                .Setup(v => v.ValidateAsync(It.IsAny<LoginDto>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(result);
         }
 
