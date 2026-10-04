@@ -1,3 +1,4 @@
+using FluentValidation;
 using IPAY.Application.DTOs.Auth;
 using IPAY.Application.Interfaces.Auth;
 using IPAY.Application.Interfaces.Media;
@@ -7,11 +8,13 @@ using IPAY.Application.Options;
 using IPAY.Application.Services.Auth;
 using IPAY.Application.Services.Media;
 using IPAY.Application.Services.Shop;
+using IPAY.Application.Services.Shop.IPAY.Application.Services.Shop;
 using IPAY.Application.Validators.Auth;
 using IPAY.Domain.Entities.Users;
 using IPAY.Infrastructure;
-using FluentValidation;
+using IPAY.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
@@ -65,6 +68,8 @@ builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
 builder.Services.AddScoped<IUser<Customer>, CustomerService>();
 builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<ICartItemService, CartItemService>();
 
 
 // Реєструємо сервіси
@@ -105,20 +110,50 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 //-Policy
+// 1. Зареєструвати Handler (поза AddAuthorization)
+builder.Services.AddScoped<IAuthorizationHandler, NotBannedHandler>();
+
+//-Policy
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
+    
         policy.RequireRole("Admin"));
 
+    options.AddPolicy("ModeratorOnly", policy =>
+    {
+        policy.RequireRole("Moderator");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
+
     options.AddPolicy("SellerOnly", policy =>
-        policy.RequireRole("Seller"));
+    {
+        policy.RequireRole("Seller");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
 
     options.AddPolicy("CustomerOnly", policy =>
-    policy.RequireRole("Customer"));
+    {
+        policy.RequireRole("Customer");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
 
     // если нужно Seller или Admin:
     options.AddPolicy("SellerOrAdmin", policy =>
-        policy.RequireRole("Seller", "Admin"));
+    {
+        policy.RequireRole("Seller", "Admin");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
+
+    // окрема policy тільки для перевірки бану (можна використовувати самостійно)
+    options.AddPolicy("NotBanned", policy =>
+        policy.Requirements.Add(new NotBannedRequirement()));
+
+    options.AddPolicy("AnyAuthenticated", policy =>
+    {
+        policy.RequireAuthenticatedUser(); // просто перевірка, що юзер залогінений, без вимоги ролі
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
 });
 
 

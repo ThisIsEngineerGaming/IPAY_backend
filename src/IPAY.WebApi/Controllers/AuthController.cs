@@ -1,9 +1,11 @@
-﻿using IPAY.Domain.Enums;
-using IPAY.Application.DTOs.Auth;
+﻿using IPAY.Application.DTOs.Auth;
 using IPAY.Application.Interfaces.Auth;
 using IPAY.Domain.Entities.Users;
+using IPAY.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Security.Permissions;
 
 namespace IPAY.WebApi.Controllers
 {
@@ -51,7 +53,7 @@ namespace IPAY.WebApi.Controllers
         [HttpPatch("users/{id}/role")]
         public async Task<IActionResult> ChangeRole(int id, [FromQuery] UserRole role)
         {
-            var user = await _customer.GetByIdAsync(id); // или твой репозиторий
+            var user = await _customer.GetByIdAsync(id); 
             if (user is null)
                 return NotFound();
 
@@ -60,19 +62,64 @@ namespace IPAY.WebApi.Controllers
 
             return Ok(user);
         }
-        [Authorize(Policy = "CustomerOnly")]
 
-        [HttpPost("seller-request/{id}")] // пример
-        public async Task<IActionResult> MakeRequest(int id)
+
+        [Authorize(Policy = "CustomerOnly")]
+        [HttpPost("seller-request")]
+        public async Task<IActionResult> MakeRequest()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized();
+
+            var id = int.Parse(userId);
             var user = await _customer.GetByIdAsync(id);
-            if (user is null)
-                return NotFound();
+            if (user is null) return NotFound();
 
             user.Role = UserRole.Seller;
             await _customer.UpdateAsync(id, user);
 
             return Ok("Succed");
+        }
+        [Authorize(Policy = "AdminOnly")]
+        [HttpPatch("admin/{id}/ban")]
+        public async Task<IActionResult> BannedByAdmin(int id)
+        {
+            var user = await _customer.GetByIdAsync(id);
+            if (user is null)
+            {
+                return NotFound();
+            }
+            else if (user.Role == UserRole.Admin)
+            {
+                return Forbid();
+            }
+            user.IsBanned = true;
+            var result = _customer.UpdateAsync(id, user);
+
+            return Ok(result);
+            
+
+        }
+
+        [Authorize(Policy = "ModeratorOnly")]
+        [HttpPatch("moderator/{id}/ban")]
+        public async Task<IActionResult> BannedByModerator(int id)
+        {
+            var user = await _customer.GetByIdAsync(id);
+            if (user is null)
+            {
+                return NotFound();
+            }
+            else if (user.Role == UserRole.Admin || user.Role == UserRole.Moderator)
+            {
+                return Forbid();
+            }
+            user.IsBanned = true;
+            var result = _customer.UpdateAsync(id, user);
+
+            return Ok(result);
+
+
         }
     }
 }

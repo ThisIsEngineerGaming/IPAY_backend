@@ -57,6 +57,12 @@ namespace IPAY.Infrastructure
             services.AddDocumentRepository<Customer, CustomerDocument>(
                 "customers", CustomerDocument.FromEntity, document => document.ToEntity());
 
+            services.AddDocumentRepository<Cart, CartDocument>(
+               "carts", CartDocument.FromEntity, document => document.ToEntity());
+
+            services.AddDocumentRepository<CartItem, CartItemDocument>(
+                "cartItems", CartItemDocument.FromEntity, document => document.ToEntity());
+
 
             services.AddScoped<IProductRepo>(sp =>
               new ProductRepo(
