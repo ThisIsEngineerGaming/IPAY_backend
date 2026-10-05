@@ -1,14 +1,15 @@
 using IPAY.Domain.Entities.Users;
 using IPAY.Domain.Entities.Media;
 using IPAY.Domain.Entities.Shop;
-using IPAY.Domain.Interfaces.ForRepos;
 using IPAY.Domain.Interfaces.ForRepos.Media;
+using IPAY.Domain.Interfaces.ForRepos;
 using IPAY.Domain.Interfaces.ForRepos.Shop;
-using IPAY.Infrastructure.Repositories.Media;
+
 using IPAY.Infrastructure.Cloudinary;
 using IPAY.Infrastructure.Persistence;
 using IPAY.Infrastructure.Persistence.Documents;
 using IPAY.Infrastructure.Repositories.Shop;
+using IPAY.Infrastructure.Repositories.Media;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
 using Microsoft.Extensions.Configuration;
@@ -55,9 +56,9 @@ namespace IPAY.Infrastructure
             services.AddScoped<IRepository<Genre>>(sp => sp.GetRequiredService<IGenreRepo>());
 
             // Films use a dedicated repo (paging / filtering / sorting); it also serves IRepository<Film>.
-            services.AddScoped<IFilmRepo>(sp =>
-                new FilmRepo(sp.GetRequiredService<FirestoreDb>(), "films"));
-            services.AddScoped<IRepository<Film>>(sp => sp.GetRequiredService<IFilmRepo>());
+            //services.AddScoped<IFilmRepo>(sp =>
+            //    new FilmRepo(sp.GetRequiredService<FirestoreDb>(), "films"));
+            //services.AddScoped<IRepository<Film>>(sp => sp.GetRequiredService<IFilmRepo>());
             services.AddDocumentRepository<Category, CategoryDocument>(
                 "categories", CategoryDocument.FromEntity, document => document.ToEntity());
 
@@ -74,6 +75,9 @@ namespace IPAY.Infrastructure
             services.AddDocumentRepository<CartItem, CartItemDocument>(
                 "cartItems", CartItemDocument.FromEntity, document => document.ToEntity());
 
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
 
             services.AddScoped<IProductRepo>(sp =>
               new ProductRepo(

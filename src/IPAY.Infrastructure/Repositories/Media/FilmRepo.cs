@@ -13,11 +13,13 @@ namespace IPAY.Infrastructure.Repositories.Media
     {
         private readonly CollectionReference _films = database.Collection(collectionName);
 
+
         public async Task<IReadOnlyList<Film>> GetPageAsync(
             int limit, string? lastDocId, int? genreId, string? search, string? sortBy, string? sortDir)
         {
             var query = await MediaPageQuery.BuildAsync(
                 _films, limit, lastDocId, genreId, search, sortBy, sortDir);
+
 
             var snapshot = await query.GetSnapshotAsync();
             return snapshot.Documents
@@ -34,3 +36,5 @@ namespace IPAY.Infrastructure.Repositories.Media
         }
     }
 }
+    
+

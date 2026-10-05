@@ -1,5 +1,7 @@
 using FluentValidation;
 using IPAY.Application.DTOs.Auth;
+using IPAY.Application.DTOs.Media;
+using IPAY.Application.DTOs.Shop;
 using IPAY.Application.Interfaces.Auth;
 using IPAY.Application.Interfaces.Media;
 using IPAY.Application.Interfaces.Shop;
@@ -9,13 +11,15 @@ using IPAY.Application.Services.Auth;
 using IPAY.Application.Services.Media;
 using IPAY.Application.Services.Shop;
 using IPAY.Application.Services.Shop.IPAY.Application.Services.Shop;
-using IPAY.Application.DTOs.Media;
 using IPAY.Application.Validators.Auth;
 using IPAY.Application.Validators.Media;
-using IPAY.WebApi.Filters;
+using IPAY.Application.Validators.Shop;
 using IPAY.Domain.Entities.Users;
+using IPAY.Domain.Interfaces.ForRepos.Shop;
 using IPAY.Infrastructure;
 using IPAY.Infrastructure.Authorization;
+using IPAY.Infrastructure.Repositories.Shop;
+using IPAY.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -63,8 +67,9 @@ builder.Services.AddFirebaseInfrastructure(builder.Configuration);
 builder.Services.AddScoped<ISeriesService, SeriesService>();
 builder.Services.AddScoped<IEpisodeService, EpisodeService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
-builder.Services.AddScoped<IFilmService, FilmService>();
-builder.Services.AddScoped<IFilmImportService, FilmImportService>();
+//builder.Services.AddScoped<IFilmService, FilmService>();
+//builder.Services.AddScoped<IFilmImportService, FilmImportService>();
+builder.Services.AddScoped<IOrderService,OrderService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IManufacturerService, ManufacturerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -76,6 +81,9 @@ builder.Services.AddScoped<IValidator<SaveFilmDto>, SaveFilmDtoValidator>();
 builder.Services.AddScoped<IValidator<SaveSeriesDto>, SaveSeriesDtoValidator>();
 builder.Services.AddScoped<IValidator<SaveEpisodeDto>, SaveEpisodeDtoValidator>();
 builder.Services.AddScoped<IValidator<SaveGenreDto>, SaveGenreDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateOrderDto>, CreateOrderDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateOrderItemDto>, CreateOrderItemDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateOrderStatusDto>, UpdateOrderStatusDtoValidator>();
 builder.Services.AddScoped<ValidationFilter>();
 builder.Services.AddScoped<IUser<Customer>, CustomerService>();
 builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>();
@@ -89,6 +97,7 @@ builder.Services.AddScoped<ILogin, LoginDtoService>();
 builder.Services.AddScoped<IJWT,JwtService>();
 builder.Services.Configure<OmdbOptions>(
     builder.Configuration.GetSection(OmdbOptions.SectionName));
+
 
 // OmdbService takes (HttpClient, apiKey, baseUrl); plain strings can't be resolved by DI,
 // so the typed client is built with a factory instead of AddHttpClient<IOmdbService, OmdbService>().

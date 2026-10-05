@@ -10,11 +10,14 @@ namespace IPAY.Domain.Entities.Shop
         [FirestoreProperty] public int ProductId { get; set; }
         [FirestoreProperty] public int Quantity { get; set; }
 
+ 
+
         public static CartItemDocument FromEntity(CartItem entity) => new()
         {
             Id = entity.Id,
             ProductId = entity.ProductId,
             Quantity = entity.Quantity
+           
         };
 
         public CartItem ToEntity() => new()

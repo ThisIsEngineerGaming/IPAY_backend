@@ -13,10 +13,17 @@ namespace IPAY.Infrastructure.Repositories.Media
     {
         private readonly CollectionReference _genres = database.Collection(collectionName);
 
-        public Task AddFilmAsync(int genreId, int filmId) => UpdateIfExistsAsync(genreId, "FilmIds", FieldValue.ArrayUnion(filmId));
-        public Task RemoveFilmAsync(int genreId, int filmId) => UpdateIfExistsAsync(genreId, "FilmIds", FieldValue.ArrayRemove(filmId));
-        public Task AddSeriesAsync(int genreId, int seriesId) => UpdateIfExistsAsync(genreId, "SerialIds", FieldValue.ArrayUnion(seriesId));
-        public Task RemoveSeriesAsync(int genreId, int seriesId) => UpdateIfExistsAsync(genreId, "SerialIds", FieldValue.ArrayRemove(seriesId));
+        public Task AddFilmAsync(int genreId, int filmId) =>
+            UpdateIfExistsAsync(genreId, "FilmIds", FieldValue.ArrayUnion(filmId));
+
+        public Task RemoveFilmAsync(int genreId, int filmId) =>
+            UpdateIfExistsAsync(genreId, "FilmIds", FieldValue.ArrayRemove(filmId));
+
+        public Task AddSeriesAsync(int genreId, int seriesId) =>
+            UpdateIfExistsAsync(genreId, "SerialIds", FieldValue.ArrayUnion(seriesId));
+
+        public Task RemoveSeriesAsync(int genreId, int seriesId) =>
+            UpdateIfExistsAsync(genreId, "SerialIds", FieldValue.ArrayRemove(seriesId));
 
         public async Task ClearAsync(int genreId)
         {
@@ -35,7 +42,7 @@ namespace IPAY.Infrastructure.Repositories.Media
             }
         }
 
-        private async Task UpdateIfExistsAsync(int genreId, string field, FieldValue value)
+        private async Task UpdateIfExistsAsync(int genreId, string field, object value)
         {
             try
             {

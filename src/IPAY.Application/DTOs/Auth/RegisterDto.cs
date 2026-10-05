@@ -10,6 +10,8 @@ namespace IPAY.Application.DTOs.Auth
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string ConfirmPassword {  get; set; } = string.Empty;
+
+        public int?  PhoneNumber {  get; set; } = null;
         public string Name { get; set; } = "guest";
     }
 }

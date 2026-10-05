@@ -15,6 +15,8 @@ namespace IPAY.Domain.Entities.Users
 
         public bool IsBanned { get; set; } = false;
 
+        public int? PhoneNumber { get; set; } = null;
+
         public Customer()
         {
             Role = UserRole.Customer;

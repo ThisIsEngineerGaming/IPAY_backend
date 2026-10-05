@@ -14,6 +14,8 @@ public class CustomerDocument
     [FirestoreProperty] public string? Name { get; set; } = string.Empty;
     [FirestoreProperty] public bool IsBanned { get; set; }
 
+    [FirestoreProperty] public int? PhoneNumber { get; set; } = null;
+
     [FirestoreProperty] public UserRole Role { get; set; }
 
 
@@ -25,7 +27,8 @@ public class CustomerDocument
         Password = entity.Password,
         Name = entity.Name,
         IsBanned = entity.IsBanned,
-        Role=entity.Role
+        Role=entity.Role,
+        PhoneNumber = entity.PhoneNumber
     };
 
     public Customer ToEntity() => new()
@@ -35,6 +38,7 @@ public class CustomerDocument
         Password = Password,
         Name = Name,
         IsBanned = IsBanned,
-        Role= Role
+        Role= Role,
+        PhoneNumber= PhoneNumber
     };
 }
