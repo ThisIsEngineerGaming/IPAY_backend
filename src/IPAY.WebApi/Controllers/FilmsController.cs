@@ -9,6 +9,7 @@ namespace IPAY.WebApi.Controllers;
 
 [ApiController]
 [Route("api/films")]
+[ServiceFilter(typeof(IPAY.WebApi.Filters.ValidationFilter))]
 public sealed partial class FilmsController(
     IFilmService films,
     IFilmImportService importer,

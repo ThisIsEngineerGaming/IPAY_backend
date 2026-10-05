@@ -5,16 +5,16 @@ using AutoMapper;
 using IPAY.Application.DTOs.Media;
 using IPAY.Application.Interfaces.Media;
 using IPAY.Domain.Entities.Media;
-using IPAY.Domain.Interfaces.ForRepos;
+using IPAY.Domain.Interfaces.ForRepos.Media;
 
 namespace IPAY.Application.Services.Media
 {
     public class EpisodeService : IEpisodeService
     {
-        private readonly IRepository<Episode> _repository;
+        private readonly IEpisodeRepo _repository;
         private readonly IMapper _mapper;
 
-        public EpisodeService(IRepository<Episode> repository, IMapper mapper)
+        public EpisodeService(IEpisodeRepo repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
@@ -34,8 +34,8 @@ namespace IPAY.Application.Services.Media
 
         public async Task<IReadOnlyList<EpisodeDto>> GetBySeriesIdAsync(int seriesId)
         {
-            var all = await _repository.GetAllAsync();
-            return _mapper.Map<List<EpisodeDto>>(all.Where(e => e.SerialId == seriesId).ToList());
+            var episodes = await _repository.GetBySeriesIdAsync(seriesId);
+            return _mapper.Map<List<EpisodeDto>>(episodes);
         }
 
         public async Task<EpisodeDto> CreateAsync(SaveEpisodeDto episode)

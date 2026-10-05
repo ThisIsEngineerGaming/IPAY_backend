@@ -7,6 +7,7 @@ namespace IPAY.WebApi.Controllers;
 
 [ApiController]
 [Route("api/episodes")]
+[ServiceFilter(typeof(IPAY.WebApi.Filters.ValidationFilter))]
 public class EpisodesController(IEpisodeService service) : ControllerBase
 {
     [HttpGet]

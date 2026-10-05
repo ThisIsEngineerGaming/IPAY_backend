@@ -1,6 +1,6 @@
 namespace IPAY.Application.DTOs.Media;
 
-/// <summary>Series as returned by the API.</summary>
+/// Series as returned by the API.
 public class SeriesDto
 {
     public int Id { get; set; }
@@ -13,9 +13,10 @@ public class SeriesDto
     public string PosterUrl { get; set; } = string.Empty;
     public List<int> EpisodeIds { get; set; } = new();
     public List<int> GenreIds { get; set; } = new();
+    public DateTime CreatedAt { get; set; }
 }
 
-/// <summary>Request body for creating or replacing a series. The id is assigned by the server / taken from the route.</summary>
+/// Request body for creating or replacing a series. The id is assigned by the server / taken from the route.
 public class SaveSeriesDto
 {
     public string Name { get; set; } = string.Empty;

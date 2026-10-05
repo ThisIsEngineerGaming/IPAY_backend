@@ -3,7 +3,7 @@ using IPAY.Application.DTOs.Media;
 using IPAY.Application.Mappings.Media;
 using IPAY.Application.Services.Media;
 using IPAY.Domain.Entities.Media;
-using IPAY.Domain.Interfaces.ForRepos;
+using IPAY.Domain.Interfaces.ForRepos.Media;
 using Moq;
 using NUnit.Framework;
 
@@ -12,14 +12,14 @@ namespace IPAY.UnitTests.Application.Services.Media
     [TestFixture]
     public class SeriesServiceTests
     {
-        private Mock<IRepository<Series>> _repositoryMock = null!;
+        private Mock<ISeriesRepo> _repositoryMock = null!;
         private IMapper _mapper = null!;
         private SeriesService _sut = null!;
 
         [SetUp]
         public void SetUp()
         {
-            _repositoryMock = new Mock<IRepository<Series>>();
+            _repositoryMock = new Mock<ISeriesRepo>();
             _mapper = new MapperConfiguration(cfg => cfg.AddProfile<MediaMapping>())
                 .CreateMapper();
             _sut = new SeriesService(_repositoryMock.Object, _mapper);
@@ -93,6 +93,30 @@ namespace IPAY.UnitTests.Application.Services.Media
             await _sut.DeleteAsync(8);
 
             _repositoryMock.Verify(r => r.DeleteAsync(8), Times.Once);
+        }
+
+        [Test]
+        public async Task GetPageAsync_ClampsLimitAndPassesFiltersToRepository()
+        {
+            _repositoryMock
+                .Setup(r => r.GetPageAsync(50, "4", 2, "dark", "rating", "desc"))
+                .ReturnsAsync(new List<Series> { new() { Id = 5, Name = "Dark" } });
+
+            var result = await _sut.GetPageAsync(500, "4", 2, "dark", "rating", "desc");
+
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].Name, Is.EqualTo("Dark"));
+        }
+
+        [Test]
+        public async Task UpdateAsync_KeepsOriginalCreatedAt()
+        {
+            var created = new DateTime(2024, 1, 2, 0, 0, 0, DateTimeKind.Utc);
+            _repositoryMock.Setup(r => r.GetByIdAsync(2)).ReturnsAsync(new Series { Id = 2, CreatedAt = created });
+
+            await _sut.UpdateAsync(2, new SaveSeriesDto { Name = "Renamed Show" });
+
+            _repositoryMock.Verify(r => r.UpdateAsync(2, It.Is<Series>(s => s.CreatedAt == created)), Times.Once);
         }
     }
 }

@@ -3,7 +3,7 @@ using Google.Cloud.Firestore;
 
 namespace IPAY.Infrastructure.Persistence.Documents;
 
-/// <summary>Firestore storage shape of <see cref="Series"/>. Field names match the existing documents.</summary>
+/// Firestore storage shape of Series entity. Field names match the existing documents.
 [FirestoreData]
 public class SeriesDocument
 {
@@ -17,11 +17,15 @@ public class SeriesDocument
     [FirestoreProperty] public string PosterUrl { get; set; } = string.Empty;
     [FirestoreProperty] public List<int> EpisodeIds { get; set; } = new();
     [FirestoreProperty] public List<int> GenreIds { get; set; } = new();
+    /// Lower-cased Name, used for prefix search (Firestore has no case-insensitive match).
+    [FirestoreProperty] public string NameLower { get; set; } = string.Empty;
+    [FirestoreProperty] public DateTime CreatedAt { get; set; }
 
     public static SeriesDocument FromEntity(Series entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
+        NameLower = (entity.Name ?? string.Empty).Trim().ToLowerInvariant(),
         Description = entity.Description,
         Year = entity.Year,
         Rating = entity.Rating,
@@ -29,7 +33,8 @@ public class SeriesDocument
         AgeRating = entity.AgeRating,
         PosterUrl = entity.PosterUrl,
         EpisodeIds = [.. entity.EpisodeIds],
-        GenreIds = [.. entity.GenreIds]
+        GenreIds = [.. entity.GenreIds],
+        CreatedAt = entity.CreatedAt == default ? DateTime.UtcNow : entity.CreatedAt
     };
 
     public Series ToEntity() => new()
@@ -43,6 +48,7 @@ public class SeriesDocument
         AgeRating = AgeRating,
         PosterUrl = PosterUrl,
         EpisodeIds = [.. EpisodeIds ?? []],
-        GenreIds = [.. GenreIds ?? []]
+        GenreIds = [.. GenreIds ?? []],
+        CreatedAt = CreatedAt
     };
 }

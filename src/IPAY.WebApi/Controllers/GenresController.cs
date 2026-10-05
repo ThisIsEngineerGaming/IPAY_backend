@@ -7,6 +7,7 @@ namespace IPAY.WebApi.Controllers;
 
 [ApiController]
 [Route("api/genres")]
+[ServiceFilter(typeof(IPAY.WebApi.Filters.ValidationFilter))]
 public class GenresController(IGenreService service) : ControllerBase
 {
     [HttpGet]

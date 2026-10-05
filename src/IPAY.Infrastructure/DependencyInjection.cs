@@ -41,12 +41,19 @@ namespace IPAY.Infrastructure
 
             // One Firestore collection per entity type - add a line here for any new entity
             // (plus a matching *Document class in Firebase/Documents).
-            services.AddDocumentRepository<Series, SeriesDocument>(
-                "series", SeriesDocument.FromEntity, document => document.ToEntity());
-            services.AddDocumentRepository<Episode, EpisodeDocument>(
-                "episodes", EpisodeDocument.FromEntity, document => document.ToEntity());
-            services.AddDocumentRepository<Genre, GenreDocument>(
-                "genres", GenreDocument.FromEntity, document => document.ToEntity());
+            // Media: dedicated repos (each also serves IRepository<T> for code that only needs plain CRUD).
+            services.AddScoped<ISeriesRepo>(sp =>
+                new SeriesRepo(sp.GetRequiredService<FirestoreDb>(), "series"));
+            services.AddScoped<IRepository<Series>>(sp => sp.GetRequiredService<ISeriesRepo>());
+
+            services.AddScoped<IEpisodeRepo>(sp =>
+                new EpisodeRepo(sp.GetRequiredService<FirestoreDb>(), "episodes"));
+            services.AddScoped<IRepository<Episode>>(sp => sp.GetRequiredService<IEpisodeRepo>());
+
+            services.AddScoped<IGenreRepo>(sp =>
+                new GenreRepo(sp.GetRequiredService<FirestoreDb>(), "genres"));
+            services.AddScoped<IRepository<Genre>>(sp => sp.GetRequiredService<IGenreRepo>());
+
             // Films use a dedicated repo (paging / filtering / sorting); it also serves IRepository<Film>.
             services.AddScoped<IFilmRepo>(sp =>
                 new FilmRepo(sp.GetRequiredService<FirestoreDb>(), "films"));

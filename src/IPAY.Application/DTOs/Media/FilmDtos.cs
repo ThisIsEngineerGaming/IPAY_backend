@@ -1,6 +1,6 @@
 namespace IPAY.Application.DTOs.Media;
 
-/// <summary>Film (stored in Firestore) as returned by the API.</summary>
+/// Film (stored in Firestore) as returned by the API.
 public class FilmDto
 {
     public int Id { get; set; }
@@ -17,7 +17,7 @@ public class FilmDto
     public DateTime CreatedAt { get; set; }
 }
 
-/// <summary>Request body for creating or replacing a film. The id is assigned by the server / taken from the route.</summary>
+/// Request body for creating or replacing a film. The id is assigned by the server / taken from the route.
 public class SaveFilmDto
 {
     public string Name { get; set; } = string.Empty;

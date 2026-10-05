@@ -9,7 +9,10 @@ using IPAY.Application.Services.Auth;
 using IPAY.Application.Services.Media;
 using IPAY.Application.Services.Shop;
 using IPAY.Application.Services.Shop.IPAY.Application.Services.Shop;
+using IPAY.Application.DTOs.Media;
 using IPAY.Application.Validators.Auth;
+using IPAY.Application.Validators.Media;
+using IPAY.WebApi.Filters;
 using IPAY.Domain.Entities.Users;
 using IPAY.Infrastructure;
 using IPAY.Infrastructure.Authorization;
@@ -67,6 +70,13 @@ builder.Services.AddScoped<IManufacturerService, ManufacturerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
+
+// Media request validators; applied to controllers through ValidationFilter.
+builder.Services.AddScoped<IValidator<SaveFilmDto>, SaveFilmDtoValidator>();
+builder.Services.AddScoped<IValidator<SaveSeriesDto>, SaveSeriesDtoValidator>();
+builder.Services.AddScoped<IValidator<SaveEpisodeDto>, SaveEpisodeDtoValidator>();
+builder.Services.AddScoped<IValidator<SaveGenreDto>, SaveGenreDtoValidator>();
+builder.Services.AddScoped<ValidationFilter>();
 builder.Services.AddScoped<IUser<Customer>, CustomerService>();
 builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>();
 builder.Services.AddScoped<ICartService, CartService>();
