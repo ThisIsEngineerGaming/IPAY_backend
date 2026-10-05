@@ -13,5 +13,11 @@ namespace IPAY.Application.DTOs.Auth
 
         // Информация о пользователе
         public LoginDto User { get; set; } = null!;
+
+        // Two-factor step: when TwoFactorRequired is true there is NO token yet - the client must send
+        // ChallengeId + the emailed code to /auth/login/verify-code to get the real AuthResponse.
+        public bool TwoFactorRequired { get; set; }
+        public string? ChallengeId { get; set; }
+        public string? MaskedEmail { get; set; }
     }
 }

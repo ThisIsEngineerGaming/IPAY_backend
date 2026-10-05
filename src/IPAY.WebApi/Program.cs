@@ -70,6 +70,10 @@ builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>()
 // Реєструємо сервіси
 builder.Services.AddScoped<IAuthDto<RegisterDto>, RegisterDtoService>();
 builder.Services.AddScoped<ILogin, LoginDtoService>();
+builder.Services.AddScoped<IGoogleLogin, GoogleLoginService>();
+builder.Services.AddSingleton(
+    builder.Configuration.GetSection(TwoFactorOptions.SectionName).Get<TwoFactorOptions>() ?? new TwoFactorOptions());
+builder.Services.AddScoped<ITwoFactorService, TwoFactorService>();
 builder.Services.AddScoped<IJWT,JwtService>();
 builder.Services.Configure<OmdbOptions>(
     builder.Configuration.GetSection(OmdbOptions.SectionName));
@@ -123,6 +127,17 @@ builder.Services.AddAuthorization(options =>
 
 
 var app = builder.Build();
+
+// Fail-open on purpose (so a missing SMTP config can't lock everyone out), but make it loud.
+using (var scope = app.Services.CreateScope())
+{
+    if (!scope.ServiceProvider.GetRequiredService<ITwoFactorService>().IsEnabled)
+    {
+        app.Logger.LogWarning(
+            "Emailed two-factor codes are OFF (TwoFactor:Enabled is false or the \"Email\" section is not configured). " +
+            "Password logins will NOT ask for a code.");
+    }
+}
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

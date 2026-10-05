@@ -15,6 +15,10 @@
   <ItemGroup>
     <PackageReference Include="Google.Cloud.Firestore" Version="4.4.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.*" />
+    <!-- Firebase Authentication (verify Google sign-in tokens, check email verification). -->
+    <PackageReference Include="FirebaseAdmin" Version="3.*" />
+    <!-- SMTP client for the emailed two-factor codes. -->
+    <PackageReference Include="MailKit" Version="4.*" />
 
     <!-- Image hosting/CDN - replaced Google.Cloud.Storage.V1 (Firebase Storage). -->
     <PackageReference Include="CloudinaryDotNet" Version="1.*" />

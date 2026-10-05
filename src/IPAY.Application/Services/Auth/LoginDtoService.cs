@@ -17,17 +17,24 @@ namespace IPAY.Application.Services.Auth
 
         private readonly IJWT _jwt;
         private readonly IPasswordHashingService _passwordHasher;
+        // Optional so the service can still be built without them (unit tests); the DI container always supplies them.
+        private readonly IFirebaseAuthService? _firebase;
+        private readonly ITwoFactorService? _twoFactor;
 
         public LoginDtoService(
             IValidator<LoginDto> validator,
             IJWT jwt,
             IUser<Customer> customer,
-            IPasswordHashingService passwordHasher)
+            IPasswordHashingService passwordHasher,
+            IFirebaseAuthService? firebase = null,
+            ITwoFactorService? twoFactor = null)
         {
             _validator = validator;
             _jwt = jwt;
             _customer= customer;
             _passwordHasher = passwordHasher;
+            _firebase = firebase;
+            _twoFactor = twoFactor;
 
         }
         public async Task<bool> Login(LoginDto loginDto)
@@ -59,6 +66,20 @@ namespace IPAY.Application.Services.Auth
                 if (string.IsNullOrEmpty(user.Password) ||
                     !_passwordHasher.Verify(loginDto.Password, user.Password))
                     return null;
+
+                // 3b. Password is right - now make sure the email address was verified through Firebase.
+                // Checked AFTER the password so nobody can probe which emails are registered/unverified.
+                if (_firebase is { RequireEmailVerification: true } &&
+                    !await _firebase.IsEmailVerifiedAsync(user.Email))
+                {
+                    throw new EmailNotVerifiedException();
+                }
+
+                // 3c. Password (and email) are fine - ask for the emailed code before handing out a session.
+                if (_twoFactor is { IsEnabled: true })
+                {
+                    return await _twoFactor.BeginAsync(user);
+                }
 
                 // 4. Теперь у тебя есть user.Id → передаёшь его в JWT
                 var token = _jwt.GenerateToken(user.Id.Value.ToString(), user.Email,user.Role);
