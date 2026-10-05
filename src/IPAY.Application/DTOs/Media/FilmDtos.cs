@@ -13,6 +13,8 @@ public class FilmDto
     public string PosterUrl { get; set; } = string.Empty;
     public string VideoUrl { get; set; } = string.Empty;
     public List<int> GenreIds { get; set; } = new();
+    public string ImdbId { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
 }
 
 /// <summary>Request body for creating or replacing a film. The id is assigned by the server / taken from the route.</summary>
@@ -27,4 +29,5 @@ public class SaveFilmDto
     public string PosterUrl { get; set; } = string.Empty;
     public string VideoUrl { get; set; } = string.Empty;
     public List<int> GenreIds { get; set; } = new();
+    public string ImdbId { get; set; } = string.Empty;
 }

@@ -61,6 +61,7 @@ builder.Services.AddScoped<ISeriesService, SeriesService>();
 builder.Services.AddScoped<IEpisodeService, EpisodeService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IFilmService, FilmService>();
+builder.Services.AddScoped<IFilmImportService, FilmImportService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IManufacturerService, ManufacturerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -79,12 +80,19 @@ builder.Services.AddScoped<IJWT,JwtService>();
 builder.Services.Configure<OmdbOptions>(
     builder.Configuration.GetSection(OmdbOptions.SectionName));
 
-builder.Services.AddHttpClient<IOmdbService, OmdbService>((sp, client) =>
-{
-    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<OmdbOptions>>().Value;
-
-    client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
-});
+// OmdbService takes (HttpClient, apiKey, baseUrl); plain strings can't be resolved by DI,
+// so the typed client is built with a factory instead of AddHttpClient<IOmdbService, OmdbService>().
+builder.Services
+    .AddHttpClient("omdb", (sp, client) =>
+    {
+        var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<OmdbOptions>>().Value;
+        client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
+    })
+    .AddTypedClient<IOmdbService>((http, sp) =>
+    {
+        var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<OmdbOptions>>().Value;
+        return new OmdbService(http, options.ApiKey, options.BaseUrl);
+    });
 //Mappers
 builder.Services.AddAutoMapper(typeof(ProductMapping));
 // JWT

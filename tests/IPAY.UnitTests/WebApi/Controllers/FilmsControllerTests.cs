@@ -1,4 +1,5 @@
 using IPAY.Application.DTOs.Media;
+using IPAY.Application.Interfaces.Media;
 using IPAY.Application.Services.Media;
 using IPAY.WebApi.Controllers;
 using Microsoft.AspNetCore.Http;
@@ -18,7 +19,10 @@ namespace IPAY.UnitTests.WebApi.Controllers
         public void SetUp()
         {
             _omdbServiceMock = new Mock<IOmdbService>();
-            _sut = new FilmsController(_omdbServiceMock.Object);
+            _sut = new FilmsController(
+                new Mock<IFilmService>().Object,
+                new Mock<IFilmImportService>().Object,
+                _omdbServiceMock.Object);
         }
 
         [Test]

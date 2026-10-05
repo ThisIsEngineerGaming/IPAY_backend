@@ -17,11 +17,16 @@ public class FilmDocument
     [FirestoreProperty] public string PosterUrl { get; set; } = string.Empty;
     [FirestoreProperty] public string VideoUrl { get; set; } = string.Empty;
     [FirestoreProperty] public List<int> GenreIds { get; set; } = new();
+    [FirestoreProperty] public string ImdbId { get; set; } = string.Empty;
+    /// <summary>Lower-cased Name, used for prefix search (Firestore has no case-insensitive match).</summary>
+    [FirestoreProperty] public string NameLower { get; set; } = string.Empty;
+    [FirestoreProperty] public DateTime CreatedAt { get; set; }
 
     public static FilmDocument FromEntity(Film entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
+        NameLower = (entity.Name ?? string.Empty).Trim().ToLowerInvariant(),
         Description = entity.Description,
         Year = entity.Year,
         Rating = entity.Rating,
@@ -29,7 +34,9 @@ public class FilmDocument
         AgeRating = entity.AgeRating,
         PosterUrl = entity.PosterUrl,
         VideoUrl = entity.VideoUrl,
-        GenreIds = [.. entity.GenreIds]
+        GenreIds = [.. entity.GenreIds],
+        ImdbId = entity.ImdbId ?? string.Empty,
+        CreatedAt = entity.CreatedAt == default ? DateTime.UtcNow : entity.CreatedAt
     };
 
     public Film ToEntity() => new()
@@ -43,6 +50,8 @@ public class FilmDocument
         AgeRating = AgeRating,
         PosterUrl = PosterUrl,
         VideoUrl = VideoUrl,
-        GenreIds = [.. GenreIds ?? []]
+        GenreIds = [.. GenreIds ?? []],
+        ImdbId = ImdbId ?? string.Empty,
+        CreatedAt = CreatedAt
     };
 }
