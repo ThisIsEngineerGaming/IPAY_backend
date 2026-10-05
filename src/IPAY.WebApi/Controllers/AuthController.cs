@@ -63,6 +63,27 @@ namespace IPAY.WebApi.Controllers
             return Ok(user);
         }
 
+        [Authorize(Policy = "ModeratorOnly")]
+        [HttpPatch("users/moderator/{id}/role")]
+        public async Task<IActionResult> ChangeRoleByModerator(int id, [FromQuery] UserRole role)
+        {
+            var user = await _customer.GetByIdAsync(id);
+            if (user is null)
+                return NotFound();
+            if(role != UserRole.Moderator && role != UserRole.Admin)
+            {
+                user.Role = role;
+                await _customer.UpdateAsync(id, user); // сохранить в БД/Firestore
+
+                return Ok(user);
+            }
+            else
+            {
+                return BadRequest("Ти не маешь права!");
+            }
+
+        }
+
 
         [Authorize(Policy = "CustomerOnly")]
         [HttpPost("seller-request")]
@@ -121,5 +142,49 @@ namespace IPAY.WebApi.Controllers
 
 
         }
+
+        [Authorize(Policy = "AdminOnly")]
+        [HttpPatch("admin/{id}/unban")]
+        public async Task<IActionResult> UnBannedByAdmin(int id)
+        {
+            var user = await _customer.GetByIdAsync(id);
+            if (user is null)
+            {
+                return NotFound();
+            }
+            else if (user.Role == UserRole.Admin)
+            {
+                return Forbid();
+            }
+            user.IsBanned = false;
+            var result = _customer.UpdateAsync(id, user);
+
+            return Ok(result);
+
+
+        }
+
+        [Authorize(Policy = "ModeratorOnly")]
+        [HttpPatch("moderator/{id}/unban")]
+        public async Task<IActionResult> UnBannedByModerator(int id)
+        {
+            var user = await _customer.GetByIdAsync(id);
+            if (user is null)
+            {
+                return NotFound();
+            }
+            else if (user.Role == UserRole.Admin || user.Role == UserRole.Moderator)
+            {
+                return Forbid();
+            }
+            user.IsBanned = false;
+            var result = _customer.UpdateAsync(id, user);
+
+            return Ok(result);
+
+
+        }
+
+
     }
 }
