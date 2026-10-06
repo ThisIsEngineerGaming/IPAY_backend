@@ -7,80 +7,102 @@ using IPAY.Domain.Interfaces.ForRepos.Shop;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentValidation;
 
 namespace IPAY.Application.Services.Shop
 {
+  
+
     public class ProductService : IProductService
     {
         private readonly IProductRepo _repository;
-
         private readonly IMapper _productMapper;
 
-        public ProductService(IProductRepo repository,IMapper productMapper)
+        private readonly IValidator<UpdateAdminProductDto> _updateAdminValidator;
+        private readonly IValidator<UpdateSellerProductDto> _updateSellerValidator;
+
+        public ProductService(
+            IProductRepo repository,
+            IMapper productMapper,
+            IValidator<UpdateAdminProductDto> updateAdminValidator,
+            IValidator<UpdateSellerProductDto> updateSellerValidator)
         {
             _repository = repository;
             _productMapper = productMapper;
+            _updateAdminValidator = updateAdminValidator;
+            _updateSellerValidator = updateSellerValidator;
         }
 
-        public async Task<IReadOnlyList<ProductDto>> GetAllAsync() {
+        public async Task<IReadOnlyList<ProductDto>> GetAllAsync()
+        {
             var products = await _repository.GetAllProductsAsync();
-            return _productMapper.Map<IReadOnlyList<ProductDto>>(products); 
+            return _productMapper.Map<IReadOnlyList<ProductDto>>(products);
         }
 
-        public async Task<ProductDto?> GetByIdAsync(int id) { 
-            var products = await _repository.GetProductByIdAsync(id);
-            return _productMapper.Map<ProductDto>(products);
+        public async Task<ProductDto?> GetByIdAsync(int id)
+        {
+            var product = await _repository.GetProductByIdAsync(id);
+            return product is null ? null : _productMapper.Map<ProductDto>(product);
         }
+
+        // ---------- ADMIN ----------
 
         public async Task<ProductDto> CreateAsync(CreateAdminProductDto adminProduct)
         {
-            // 1. DTO → Entity
             var product = _productMapper.Map<Product>(adminProduct);
-
             product.CreatedAt = DateTime.UtcNow;
 
-            // 2. Сохраняем Entity
             var created = await _repository.AddProductAsync(product);
-
-            // 3. Entity → DTO
             return _productMapper.Map<ProductDto>(created);
         }
 
-
-
         public async Task<ProductDto?> UpdateAsync(int id, UpdateAdminProductDto adminProduct)
         {
+            await _updateAdminValidator.ValidateAndThrowAsync(adminProduct);
+
+            var existing = await _repository.GetProductByIdAsync(id);
+            if (existing is null) return null;
 
             var product = _productMapper.Map<Product>(adminProduct);
+            product.Id = id;
+            product.SellerId = existing.SellerId;
+            product.CreatedAt = existing.CreatedAt;
+
             await _repository.UpdateProductAsync(id, product);
 
             var updated = await _repository.GetProductByIdAsync(id);
             return updated is null ? null : _productMapper.Map<ProductDto>(updated);
         }
 
+        // ---------- SELLER ----------
 
         public async Task<ProductDto?> CreateAsync(CreateSellerProductDto dto, string sellerId)
         {
             var product = _productMapper.Map<Product>(dto);
 
-            var lastId = await _repository.GetAllProductsAsync();
-
-            product.Id = lastId.Count > 0 ? lastId.Max(p => p.Id) + 1 : 1;
+            var all = await _repository.GetAllProductsAsync();
+            product.Id = all.Count > 0 ? all.Max(p => p.Id) + 1 : 1;
             product.SellerId = sellerId;
+            product.CreatedAt = DateTime.UtcNow;
 
             await _repository.AddProductAsync(product);
-
             return _productMapper.Map<ProductDto>(product);
         }
 
-        public async Task<ProductDto?> UpdateAsync(int id, UpdateSellerProductDto sellerProduct)
+        public async Task<ProductDto?> UpdateAsync(int id, UpdateSellerProductDto sellerProduct, string? sellerId)
         {
+            await _updateSellerValidator.ValidateAndThrowAsync(sellerProduct);
+
             var existing = await _repository.GetProductByIdAsync(id);
             if (existing is null) return null;
 
+            if (existing.SellerId != sellerId)
+                throw new UnauthorizedAccessException("Нельзя изменять чужой товар.");
+
             var product = _productMapper.Map<Product>(sellerProduct);
             product.Id = id;
-            product.SellerId = existing.SellerId; // зберігаємо, щоб не затерти при update
+            product.SellerId = existing.SellerId;
+            product.CreatedAt = existing.CreatedAt;
 
             await _repository.UpdateProductAsync(id, product);
 
@@ -90,30 +112,25 @@ namespace IPAY.Application.Services.Shop
 
         public Task DeleteAsync(int id) => _repository.DeleteProductAsync(id);
 
-        public async Task<IReadOnlyList<ProductDto>> GetLimitAsync(int limit, string? lastDocId) {
-
-            var products = await _repository.GetLimitedProduct(limit, lastDocId ?? null);
+        public async Task<IReadOnlyList<ProductDto>> GetLimitAsync(int limit, string? lastDocId)
+        {
+            var products = await _repository.GetLimitedProduct(limit, lastDocId);
             return _productMapper.Map<List<ProductDto>>(products);
-
         }
 
-        public async Task<IReadOnlyList<ProductDto?>> GetFilteredAsync(int limit, string? lastDocId, int? categoryId, double? minPrice, double? maxPrice, string? brand, string? search) { 
-            var result=await _repository.GetFilteredAsync(limit, lastDocId, categoryId, minPrice, maxPrice, brand,search);
+        public async Task<IReadOnlyList<ProductDto?>> GetFilteredAsync(
+            int limit, string? lastDocId, int? categoryId,
+            double? minPrice, double? maxPrice, string? brand, string? search)
+        {
+            var result = await _repository.GetFilteredAsync(limit, lastDocId, categoryId, minPrice, maxPrice, brand, search);
             return _productMapper.Map<List<ProductDto>>(result);
         }
 
         public async Task<IReadOnlyList<ProductDto>> GetSortedAsync(
-           int limit,
-           string? lastDocId,
-           string sortBy = "price",
-           string sortDir = "asc")
+            int limit, string? lastDocId, string sortBy = "price", string sortDir = "asc")
         {
             var products = await _repository.GetSortedAsync(limit, lastDocId, sortBy, sortDir);
-           return _productMapper.Map<List<ProductDto>>(products);
-
-
+            return _productMapper.Map<List<ProductDto>>(products);
         }
-
-
     }
 }

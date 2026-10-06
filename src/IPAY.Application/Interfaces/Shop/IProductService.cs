@@ -13,7 +13,7 @@ namespace IPAY.Application.Interfaces.Shop
         Task<ProductDto?> UpdateAsync(int id, UpdateAdminProductDto adminProduct);
 
         Task<ProductDto?> CreateAsync(CreateSellerProductDto sellerProduct, string sellerId);
-        Task<ProductDto?> UpdateAsync(int id, UpdateSellerProductDto sellerProduct);
+        Task<ProductDto?> UpdateAsync(int id, UpdateSellerProductDto sellerProduct, string? sellerId);
         Task DeleteAsync(int id);
 
         Task<IReadOnlyList<ProductDto>> GetLimitAsync(int limit, string? lastDocid);

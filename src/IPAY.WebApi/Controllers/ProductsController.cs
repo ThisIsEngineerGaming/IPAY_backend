@@ -16,14 +16,14 @@ public class ProductsController(IProductService service) : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<ProductDto>> GetById(int id) =>
         await service.GetByIdAsync(id) is { } product ? Ok(product) : NotFound();
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     [HttpPost]
     public async Task<ActionResult<ProductDto>> Create(CreateAdminProductDto adminProduct)
     {
         var created = await service.CreateAsync(adminProduct);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<ProductDto>> Update(int id, UpdateAdminProductDto adminProduct)
     {
@@ -41,10 +41,10 @@ public class ProductsController(IProductService service) : ControllerBase
     }
     [Authorize(Roles = "Seller")]
     [HttpPut("seller/{id:int}")]
-    public async Task<ActionResult<ProductDto>> Update(int id, UpdateSellerProductDto sellerProduct)
+    public async Task<ActionResult<ProductDto>> Update(int id, UpdateSellerProductDto sellerProduct , string? sellerId)
     {
         if (await service.GetByIdAsync(id) is null) return NotFound();
-        await service.UpdateAsync(id, sellerProduct);
+        await service.UpdateAsync(id, sellerProduct, sellerId);
         return NoContent();
     }
     [Authorize(Roles = "Seller,Admin")]

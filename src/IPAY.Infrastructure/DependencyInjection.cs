@@ -36,6 +36,19 @@ namespace IPAY.Infrastructure
                 }.Build();
             });
 
+            // Firebase Authentication (Google sign-in token check + email-verified lookup).
+            services.AddSingleton<IPAY.Application.Interfaces.Auth.IFirebaseAuthService,
+                IPAY.Infrastructure.Identity.FirebaseAuthService>();
+
+            // Emailed two-factor codes: SMTP sender + in-memory store for pending challenges.
+            services.Configure<IPAY.Infrastructure.Email.EmailOptions>(
+                configuration.GetSection(IPAY.Infrastructure.Email.EmailOptions.SectionName));
+            services.AddSingleton<IPAY.Application.Interfaces.Auth.IEmailSender,
+                IPAY.Infrastructure.Email.SmtpEmailSender>();
+            services.AddMemoryCache();
+            services.AddSingleton<IPAY.Application.Interfaces.Auth.ITwoFactorStore,
+                IPAY.Infrastructure.Caching.MemoryTwoFactorStore>();
+
             // Image hosting - Cloudinary (replaced Firebase Storage).
             services.Configure<CloudinaryOptions>(configuration.GetSection(CloudinaryOptions.SectionName));
             services.AddSingleton<CloudinaryImageService>();
