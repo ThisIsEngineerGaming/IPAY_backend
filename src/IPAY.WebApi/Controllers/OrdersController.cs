@@ -18,6 +18,7 @@ namespace IPAY.WebApi.Controllers
 
         // ==================== ORDER ====================
         [Authorize(Policy ="NotBanned")]
+        [Authorize(Roles ="Admin,Moderator,Customer,Seller")]
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetAll()
         {
@@ -25,6 +26,7 @@ namespace IPAY.WebApi.Controllers
             return Ok(orders);
         }
         [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
         [HttpGet("{id:int}")]
         public async Task<ActionResult<OrderDto>> GetById(int id)
         {
@@ -35,6 +37,7 @@ namespace IPAY.WebApi.Controllers
             return Ok(order);
         }
         [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
         [HttpGet("user/{userId:int}")]
         public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetByUserId(int userId)
         {
@@ -42,6 +45,7 @@ namespace IPAY.WebApi.Controllers
             return Ok(orders);
         }
         [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
         [HttpPost]
         public async Task<ActionResult<OrderDto>> Create([FromBody] CreateOrderDto dto)
         {
@@ -53,6 +57,7 @@ namespace IPAY.WebApi.Controllers
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
         }
         [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
         [HttpPut("{id:int}/status")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateOrderStatusDto dto)
         {
@@ -60,6 +65,7 @@ namespace IPAY.WebApi.Controllers
             return NoContent();
         }
         [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -69,6 +75,7 @@ namespace IPAY.WebApi.Controllers
 
         // ==================== ORDER ITEMS ====================
         [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
         [HttpPost("{orderId:int}/items")]
         public async Task<ActionResult<OrderItemDto>> AddItem(int orderId, [FromBody] CreateOrderItemDto dto)
         {
@@ -76,6 +83,7 @@ namespace IPAY.WebApi.Controllers
             return Ok(item);
         }
         [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
         [HttpPut("{orderId:int}/items/{itemId:int}")]
         public async Task<IActionResult> UpdateItem(int orderId, int itemId, [FromBody] CreateOrderItemDto dto)
         {
@@ -83,6 +91,7 @@ namespace IPAY.WebApi.Controllers
             return NoContent();
         }
         [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
         [HttpDelete("{orderId:int}/items/{itemId:int}")]
         public async Task<IActionResult> DeleteItem(int orderId, int itemId)
         {

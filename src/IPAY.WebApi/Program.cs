@@ -100,11 +100,12 @@ builder.Services.AddScoped<IAuthDto<RegisterDto>, RegisterDtoService>();
 builder.Services.AddScoped<ILogin, LoginDtoService>();
 builder.Services.AddScoped<IGoogleLogin, GoogleLoginService>();
 builder.Services.AddSingleton(
-builder.Configuration.GetSection(TwoFactorOptions.SectionName).Get<TwoFactorOptions>() ?? new TwoFactorOptions());
+    builder.Configuration.GetSection(TwoFactorOptions.SectionName).Get<TwoFactorOptions>() ?? new TwoFactorOptions());
 builder.Services.AddScoped<ITwoFactorService, TwoFactorService>();
-builder.Services.AddScoped<IJWT,JwtService>();
+builder.Services.AddScoped<IJWT, JwtService>();
 builder.Services.Configure<OmdbOptions>(
     builder.Configuration.GetSection(OmdbOptions.SectionName));
+
 
 
 // OmdbService takes (HttpClient, apiKey, baseUrl); plain strings can't be resolved by DI,

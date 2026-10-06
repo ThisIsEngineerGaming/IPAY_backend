@@ -13,6 +13,8 @@ public class CustomerDocument
     [FirestoreProperty] public string? Password { get; set; } = string.Empty;
     [FirestoreProperty] public string? Name { get; set; } = string.Empty;
     [FirestoreProperty] public bool IsBanned { get; set; }
+    // Missing in documents created before email verification existed -> reads back as null.
+    [FirestoreProperty] public bool? EmailVerified { get; set; }
 
     [FirestoreProperty] public int? PhoneNumber { get; set; } = null;
 
@@ -27,8 +29,8 @@ public class CustomerDocument
         Password = entity.Password,
         Name = entity.Name,
         IsBanned = entity.IsBanned,
-        Role=entity.Role,
-        PhoneNumber = entity.PhoneNumber
+        EmailVerified = entity.EmailVerified,
+        Role = entity.Role
     };
 
     public Customer ToEntity() => new()
@@ -38,7 +40,7 @@ public class CustomerDocument
         Password = Password,
         Name = Name,
         IsBanned = IsBanned,
-        Role= Role,
-        PhoneNumber= PhoneNumber
+        EmailVerified = EmailVerified,
+        Role = Role
     };
 }

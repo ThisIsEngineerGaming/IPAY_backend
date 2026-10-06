@@ -21,5 +21,15 @@ namespace IPAY.Domain.Entities.Users
         {
             Role = UserRole.Customer;
         }
+
+        /// <summary>
+        /// One-time email confirmation, stored on the account so it is never asked again.
+        /// null  = account created before email verification existed (grandfathered: never blocked,
+        ///         and no emailed sign-in code, since its address was never confirmed)
+        /// false = just registered, still has to click the link in the verification email
+        /// true  = confirmed (also set for accounts created through Google sign-in)
+        /// </summary>
+        public bool? EmailVerified { get; set; }
+
     }
 }

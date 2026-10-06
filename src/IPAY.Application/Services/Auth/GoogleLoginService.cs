@@ -47,11 +47,20 @@ namespace IPAY.Application.Services.Auth
                     Email = email,
                     Name = name,
                     Password = string.Empty,
-                    Role = UserRole.Customer
+                    Role = UserRole.Customer,
+                    EmailVerified = true // Google already verified this address
                 });
 
                 user = await _customers.GetByEmail(email);
             }
+
+            else if (user.EmailVerified != true && user.Id is not null)
+            {
+                // Existing password account whose owner just proved the address through Google.
+                user.EmailVerified = true;
+                await _customers.UpdateAsync(user.Id.Value, user);
+            }
+
 
             if (user is null || user.Id is null || string.IsNullOrWhiteSpace(user.Email) || user.IsBanned)
                 return null;

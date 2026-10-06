@@ -160,14 +160,7 @@ namespace IPAY.Application.Services.Auth
         private async Task SendCodeAsync(string toAddress, string code)
         {
             var minutes = (int)Lifetime.TotalMinutes;
-            var body =
-                "<div style=\"font-family:Arial,sans-serif;font-size:14px;color:#111\">" +
-                "<p>Your IPAY sign-in code is:</p>" +
-                $"<p style=\"font-size:28px;font-weight:bold;letter-spacing:6px\">{code}</p>" +
-                $"<p>It expires in {minutes} minutes. If you did not try to sign in, you can ignore this email " +
-                "- but consider changing your password.</p>" +
-                "<p>Never share this code with anyone.</p>" +
-                "</div>";
+            var body = EmailTemplates.SignInCode(code, minutes);
 
             try
             {
