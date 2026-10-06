@@ -18,9 +18,11 @@ namespace IPAY.WebApi.Controllers
         private readonly ITwoFactorService _twoFactor;
 
         private readonly IUser<Customer> _customer;
+        private readonly ILogger<AuthController>? _logger;
 
-        public AuthController(IAuthDto<RegisterDto> register, ILogin login, IUser<Customer> customer, IGoogleLogin googleLogin, ITwoFactorService twoFactor)
+        public AuthController(IAuthDto<RegisterDto> register, ILogin login, IUser<Customer> customer, IGoogleLogin googleLogin, ITwoFactorService twoFactor, ILogger<AuthController>? logger = null)
         {
+            _logger = logger;
             _register = register;
             _login = login;
             _customer = customer;
@@ -101,10 +103,25 @@ namespace IPAY.WebApi.Controllers
         [HttpPost("google")]
         public async Task<ActionResult<AuthResponse>> GoogleLogin([FromBody] GoogleLoginDto dto)
         {
-            var result = await _googleLogin.LoginWithGoogleAsync(dto.IdToken);
+            AuthResponse? result;
+            try
+            {
+                result = await _googleLogin.LoginWithGoogleAsync(dto.IdToken);
+            }
+            catch (Exception ex)
+            {
+                // Firestore/network/credential problems used to surface as a bare 500 with no detail.
+                _logger?.LogError(ex, "Google sign-in crashed after the token check (user lookup/creation or JWT step).");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Google sign-in failed. Please try again.");
+            }
 
             if (result == null)
             {
+                _logger?.LogWarning(
+                    "Google sign-in returned no result (idToken empty: {Empty}). Look for a preceding 'Google sign-in:' " +
+                    "warning from FirebaseAuthService; otherwise the account was banned or could not be created/read.",
+                    string.IsNullOrWhiteSpace(dto.IdToken));
+
                 // 400 (not 401): the frontend's axios interceptor hard-redirects to /login on any 401.
                 return BadRequest("Google sign-in failed. Please try again.");
             }
