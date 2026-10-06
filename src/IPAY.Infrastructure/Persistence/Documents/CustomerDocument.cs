@@ -13,6 +13,8 @@ public class CustomerDocument
     [FirestoreProperty] public string? Password { get; set; } = string.Empty;
     [FirestoreProperty] public string? Name { get; set; } = string.Empty;
     [FirestoreProperty] public bool IsBanned { get; set; }
+    // Missing in documents created before email verification existed -> reads back as null.
+    [FirestoreProperty] public bool? EmailVerified { get; set; }
 
     [FirestoreProperty] public UserRole Role { get; set; }
 
@@ -25,6 +27,7 @@ public class CustomerDocument
         Password = entity.Password,
         Name = entity.Name,
         IsBanned = entity.IsBanned,
+        EmailVerified = entity.EmailVerified,
         Role=entity.Role
     };
 
@@ -35,6 +38,7 @@ public class CustomerDocument
         Password = Password,
         Name = Name,
         IsBanned = IsBanned,
+        EmailVerified = EmailVerified,
         Role= Role
     };
 }

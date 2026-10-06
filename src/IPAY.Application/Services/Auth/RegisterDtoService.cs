@@ -51,6 +51,9 @@ namespace IPAY.Application.Services.Auth
             // AuthController's seller-request/role-change endpoints, never here.
             user.Role = UserRole.Customer;
 
+            // New accounts must confirm their email once (see Customer.EmailVerified).
+            user.EmailVerified = false;
+
             return await _customerService.CreateAsync(user) is not null;
         }
     }
