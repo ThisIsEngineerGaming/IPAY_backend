@@ -76,6 +76,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
 
+
 // Media request validators; applied to controllers through ValidationFilter.
 builder.Services.AddScoped<IValidator<SaveFilmDto>, SaveFilmDtoValidator>();
 builder.Services.AddScoped<IValidator<SaveSeriesDto>, SaveSeriesDtoValidator>();
@@ -89,7 +90,14 @@ builder.Services.AddScoped<IValidator<CreateSellerProductDto>, CreateSellerProdu
 builder.Services.AddScoped<IValidator<UpdateAdminProductDto>, UpdateAdminProductDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdateSellerProductDto>, UpdateSellerProductDtoValidator>();
 builder.Services.AddScoped<ValidationFilter>();
+
+builder.Services.AddScoped<IValidator<ChangeUsernameDto>, ChangeUsernameValidator>();
+builder.Services.AddScoped<IValidator<ChangePasswordDto>, ChangePasswordValidator>();
+builder.Services.AddScoped<IValidator<StartEmailChangeDto>, StartEmailChangeValidator>();
+builder.Services.AddScoped<IValidator<ConfirmEmailChangeDto>, ConfirmEmailChangeValidator>();
+
 builder.Services.AddScoped<IUser<Customer>, CustomerService>();
+builder.Services.AddScoped<IGuestService, GuestService>();
 builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartItemService, CartItemService>();
@@ -99,6 +107,7 @@ builder.Services.AddScoped<ICartItemService, CartItemService>();
 builder.Services.AddScoped<IAuthDto<RegisterDto>, RegisterDtoService>();
 builder.Services.AddScoped<ILogin, LoginDtoService>();
 builder.Services.AddScoped<IGoogleLogin, GoogleLoginService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddSingleton(
     builder.Configuration.GetSection(TwoFactorOptions.SectionName).Get<TwoFactorOptions>() ?? new TwoFactorOptions());
 builder.Services.AddScoped<ITwoFactorService, TwoFactorService>();

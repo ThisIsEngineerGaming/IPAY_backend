@@ -77,7 +77,8 @@ namespace IPAY.Infrastructure
 
             services.AddDocumentRepository<Manufacturer, ManufacturerDocument>(
                 "manufacturers", ManufacturerDocument.FromEntity, document => document.ToEntity());
-
+            services.AddDocumentRepository<Guest, GuestDocument>(
+                "guests", GuestDocument.FromEntity, document => document.ToEntity());
 
             services.AddDocumentRepository<Customer, CustomerDocument>(
                 "customers", CustomerDocument.FromEntity, document => document.ToEntity());

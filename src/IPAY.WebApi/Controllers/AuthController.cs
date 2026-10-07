@@ -20,14 +20,19 @@ namespace IPAY.WebApi.Controllers
         private readonly ITwoFactorService _twoFactor;
 
         private readonly IUser<Customer> _customer;
+        private readonly ILogger<AuthController>? _logger;
 
-        public AuthController(IAuthDto<RegisterDto> register, ILogin login, IUser<Customer> customer, IGoogleLogin googleLogin, ITwoFactorService twoFactor)
+
+
+        public AuthController(IAuthDto<RegisterDto> register, ILogin login, IUser<Customer> customer, IGoogleLogin googleLogin, ITwoFactorService twoFactor, ILogger<AuthController>? logger = null)
         {
+            _logger = logger;
             _register = register;
             _login = login;
             _customer = customer;
             _googleLogin = googleLogin;
             _twoFactor = twoFactor;
+
         }
 
         [HttpPost("register")]
@@ -103,10 +108,25 @@ namespace IPAY.WebApi.Controllers
         [HttpPost("google")]
         public async Task<ActionResult<AuthResponse>> GoogleLogin([FromBody] GoogleLoginDto dto)
         {
-            var result = await _googleLogin.LoginWithGoogleAsync(dto.IdToken);
+            AuthResponse? result;
+            try
+            {
+                result = await _googleLogin.LoginWithGoogleAsync(dto.IdToken);
+            }
+            catch (Exception ex)
+            {
+                // Firestore/network/credential problems used to surface as a bare 500 with no detail.
+                _logger?.LogError(ex, "Google sign-in crashed after the token check (user lookup/creation or JWT step).");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Google sign-in failed. Please try again.");
+            }
 
             if (result == null)
             {
+                _logger?.LogWarning(
+                    "Google sign-in returned no result (idToken empty: {Empty}). Look for a preceding 'Google sign-in:' " +
+                    "warning from FirebaseAuthService; otherwise the account was banned or could not be created/read.",
+                    string.IsNullOrWhiteSpace(dto.IdToken));
+
                 // 400 (not 401): the frontend's axios interceptor hard-redirects to /login on any 401.
                 return BadRequest("Google sign-in failed. Please try again.");
             }
@@ -114,40 +134,6 @@ namespace IPAY.WebApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = "AdminOnly")]
-        [HttpPatch("users/{id}/role")]
-        public async Task<IActionResult> ChangeRole(int id, [FromQuery] UserRole role)
-        {
-            var user = await _customer.GetByIdAsync(id); 
-            if (user is null)
-                return NotFound();
-
-            user.Role = role;
-            await _customer.UpdateAsync(id,user); // сохранить в БД/Firestore
-
-            return Ok(user);
-        }
-
-        [Authorize(Policy = "ModeratorOnly")]
-        [HttpPatch("users/moderator/{id}/role")]
-        public async Task<IActionResult> ChangeRoleByModerator(int id, [FromQuery] UserRole role)
-        {
-            var user = await _customer.GetByIdAsync(id);
-            if (user is null)
-                return NotFound();
-            if(role != UserRole.Moderator && role != UserRole.Admin)
-            {
-                user.Role = role;
-                await _customer.UpdateAsync(id, user); // сохранить в БД/Firestore
-
-                return Ok(user);
-            }
-            else
-            {
-                return BadRequest("Ти не маешь права!");
-            }
-
-        }
 
 
         [Authorize(Policy = "CustomerOnly")]
@@ -166,90 +152,6 @@ namespace IPAY.WebApi.Controllers
 
             return Ok("Succed");
         }
-        [Authorize(Policy = "AdminOnly")]
-        [HttpPatch("admin/{id}/ban")]
-        public async Task<IActionResult> BannedByAdmin(int id)
-        {
-            var user = await _customer.GetByIdAsync(id);
-            if (user is null)
-            {
-                return NotFound();
-            }
-            else if (user.Role == UserRole.Admin)
-            {
-                return Forbid();
-            }
-            user.IsBanned = true;
-            var result = _customer.UpdateAsync(id, user);
-
-            return Ok(result);
-            
-
-        }
-
-        [Authorize(Policy = "ModeratorOnly")]
-        [HttpPatch("moderator/{id}/ban")]
-        public async Task<IActionResult> BannedByModerator(int id)
-        {
-            var user = await _customer.GetByIdAsync(id);
-            if (user is null)
-            {
-                return NotFound();
-            }
-            else if (user.Role == UserRole.Admin || user.Role == UserRole.Moderator)
-            {
-                return Forbid();
-            }
-            user.IsBanned = true;
-            var result = _customer.UpdateAsync(id, user);
-
-            return Ok(result);
-
-
-        }
-
-        [Authorize(Policy = "AdminOnly")]
-        [HttpPatch("admin/{id}/unban")]
-        public async Task<IActionResult> UnBannedByAdmin(int id)
-        {
-            var user = await _customer.GetByIdAsync(id);
-            if (user is null)
-            {
-                return NotFound();
-            }
-            else if (user.Role == UserRole.Admin)
-            {
-                return Forbid();
-            }
-            user.IsBanned = false;
-            var result = _customer.UpdateAsync(id, user);
-
-            return Ok(result);
-
-
-        }
-
-        [Authorize(Policy = "ModeratorOnly")]
-        [HttpPatch("moderator/{id}/unban")]
-        public async Task<IActionResult> UnBannedByModerator(int id)
-        {
-            var user = await _customer.GetByIdAsync(id);
-            if (user is null)
-            {
-                return NotFound();
-            }
-            else if (user.Role == UserRole.Admin || user.Role == UserRole.Moderator)
-            {
-                return Forbid();
-            }
-            user.IsBanned = false;
-            var result = _customer.UpdateAsync(id, user);
-
-            return Ok(result);
-
-
-        }
-
 
     }
 }
