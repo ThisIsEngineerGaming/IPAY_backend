@@ -10,8 +10,7 @@ namespace IPAY.Application.Mappings.Shop
     using global::IPAY.Domain.Enums;
 
 
-    namespace IPAY.Application.Mappings.Auth
-    {
+
         public class GuestMapping : Profile
         {
             public GuestMapping()
@@ -49,4 +48,4 @@ namespace IPAY.Application.Mappings.Shop
             }
         }
     }
-}
+

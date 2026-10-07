@@ -14,18 +14,54 @@ namespace IPAY.WebApi.Controllers
     public class AdminController:ControllerBase
     {
         private readonly IUser<Customer> _customer;
-        private readonly ILogger<AuthController>? _logger;
+        private readonly ILogger<AdminController>? _logger;
 
         private readonly IGuestService _guest;
 
-        private readonly IPasswordHasher<Customer> _passwordHasher;
+        private readonly IPasswordHashingService _passwordHasher;
 
-        public AdminController( IUser<Customer> customer,  IGuestService guest,IPasswordHasher<Customer> passwordHasher, ILogger<AuthController>? logger = null)
+        private readonly IJWT _jwt;
+
+        public AdminController(
+            IUser<Customer> customer,
+            IGuestService guest,
+            IPasswordHashingService passwordHasher,
+            IJWT jwt,
+            ILogger<AdminController>? logger = null)
         {
-            _logger = logger;
             _customer = customer;
             _guest = guest;
-            _passwordHasher= passwordHasher;
+            _passwordHasher = passwordHasher;
+            _jwt = jwt;
+            _logger = logger;
+        }
+
+        [HttpPost("guests/session")]
+        public async Task<IActionResult> EnsureGuestSession([FromBody] GuestSessionDto? dto)
+        {
+            var guest = await _guest.GetOrCreateAsync(dto?.SessionKey, dto?.Name);
+
+            if (guest.IsBanned)
+                return StatusCode(403, "Заблоковано");
+
+            // email у гостя нет — в claim кладём заглушку
+            var token = _jwt.GenerateToken(
+                guest.Id.ToString(),
+                $"guest-{guest.Id}@guest.local",
+                UserRole.Guest);
+
+            return Ok(new
+            {
+                guest.Id,
+                guest.Name,
+                guest.Role,
+                guest.IsBanned,
+                guest.SessionKey,
+                guest.CreatedAt,
+                accessToken = token,
+                tokenType = "Bearer",
+                expiresAt = DateTime.UtcNow.AddHours(4)
+            });
         }
 
         [Authorize(Policy = "AdminOnly")]
@@ -158,7 +194,7 @@ namespace IPAY.WebApi.Controllers
 
             // пароль хешируем, если передали сырой
             if (!string.IsNullOrWhiteSpace(customer.Password))
-                customer.Password = _passwordHasher.HashPassword(customer,customer.Password);
+                customer.Password = _passwordHasher.Hash(customer.Password);
 
             customer.Email = customer.Email?.Trim().ToLowerInvariant();
             customer.Role = customer.Role == default ? UserRole.Customer : customer.Role;
@@ -212,7 +248,7 @@ namespace IPAY.WebApi.Controllers
                 existing.Email = customer.Email.Trim().ToLowerInvariant();
 
             if (!string.IsNullOrWhiteSpace(customer.Password))
-                existing.Password = _passwordHasher.HashPassword(customer, customer.Password);
+                existing.Password = _passwordHasher.Hash(customer.Password);
 
             existing.Role = customer.Role;
             existing.IsBanned = customer.IsBanned;
@@ -236,17 +272,6 @@ namespace IPAY.WebApi.Controllers
         }
 
 
-        // --- SESSION (публичный: создать / найти гостя) ---
-        [HttpPost("guests/session")]
-        public async Task<IActionResult> EnsureGuestSession([FromBody] GuestSessionDto? dto)
-        {
-            var guest = await _guest.GetOrCreateAsync(dto?.SessionKey, dto?.Name);
-
-            if (guest.IsBanned)
-                return StatusCode(403, "Заблоковано");
-
-            return Ok(guest);
-        }
 
         // --- READ ALL ---
         [Authorize(Policy = "AdminOnly")]
