@@ -63,6 +63,10 @@ builder.Services.AddScoped<IManufacturerService, ManufacturerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
+builder.Services.AddScoped<IValidator<ChangeUsernameDto>, ChangeUsernameValidator>();
+builder.Services.AddScoped<IValidator<ChangePasswordDto>, ChangePasswordValidator>();
+builder.Services.AddScoped<IValidator<StartEmailChangeDto>, StartEmailChangeValidator>();
+builder.Services.AddScoped<IValidator<ConfirmEmailChangeDto>, ConfirmEmailChangeValidator>();
 builder.Services.AddScoped<IUser<Customer>, CustomerService>();
 builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>();
 
@@ -71,6 +75,7 @@ builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>()
 builder.Services.AddScoped<IAuthDto<RegisterDto>, RegisterDtoService>();
 builder.Services.AddScoped<ILogin, LoginDtoService>();
 builder.Services.AddScoped<IGoogleLogin, GoogleLoginService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddSingleton(
     builder.Configuration.GetSection(TwoFactorOptions.SectionName).Get<TwoFactorOptions>() ?? new TwoFactorOptions());
 builder.Services.AddScoped<ITwoFactorService, TwoFactorService>();

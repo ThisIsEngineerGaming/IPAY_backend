@@ -17,5 +17,14 @@ namespace IPAY.Application.Interfaces.Auth
 
         /// <summary>True when a Firebase account exists for this email AND its email is verified.</summary>
         Task<bool> IsEmailVerifiedAsync(string email);
+
+        /// <summary>
+        /// Sets a new password on the Firebase account that has this email, so Firebase stays in sync with
+        /// the password we store. Returns false (and changes nothing) when there is no such account.
+        /// </summary>
+        Task<bool> SetPasswordAsync(string email, string newPassword);
+
+        /// <summary>Deletes the Firebase account with this email. Does nothing when there is none.</summary>
+        Task DeleteAccountAsync(string email);
     }
 }

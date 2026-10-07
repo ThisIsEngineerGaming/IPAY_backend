@@ -99,5 +99,32 @@ namespace IPAY.Infrastructure.Identity
                 return false; // no Firebase account yet -> no verification email was ever confirmed
             }
         }
+
+        public async Task<bool> SetPasswordAsync(string email, string newPassword)
+        {
+            try
+            {
+                var user = await _auth.GetUserByEmailAsync(email);
+                await _auth.UpdateUserAsync(new UserRecordArgs { Uid = user.Uid, Password = newPassword });
+                return true;
+            }
+            catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+            {
+                return false; // older account that never got a Firebase account - nothing to keep in sync
+            }
+        }
+
+        public async Task DeleteAccountAsync(string email)
+        {
+            try
+            {
+                var user = await _auth.GetUserByEmailAsync(email);
+                await _auth.DeleteUserAsync(user.Uid);
+            }
+            catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+            {
+                // already gone
+            }
+        }
     }
 }
