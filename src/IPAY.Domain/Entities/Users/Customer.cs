@@ -10,6 +10,9 @@ namespace IPAY.Domain.Entities.Users
 
         public string? Password { get; set; } = string.Empty;
 
+        /// <summary>Optional contact number, stored normalised (digits with an optional leading +). null = never added.</summary>
+        public string? Phone { get; set; }
+
 
 
         public bool IsBanned { get; set; } = false;
