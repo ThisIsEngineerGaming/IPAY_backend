@@ -23,11 +23,21 @@ namespace IPAY.Application.Mappings.Shop
             CreateMap<Product, UpdateAdminProductDto>()
                 .ForMember(dest => dest.DiscountPercent,
                            opt => opt.MapFrom(src => src.GetDiscountPercent()));
+            // Entity → DTO (со скидкой)
+            CreateMap<Product, CreateSellerProductDto>()
+                .ForMember(dest => dest.DiscountPercent,
+                           opt => opt.MapFrom(src => src.GetDiscountPercent()));
+            // Entity → DTO (со скидкой)
+            CreateMap<Product, UpdateSellerProductDto>()
+                .ForMember(dest => dest.DiscountPercent,
+                           opt => opt.MapFrom(src => src.GetDiscountPercent()));
 
             // DTO → Entity
             CreateMap<ProductDto, Product>();
             CreateMap<CreateAdminProductDto, Product>();
             CreateMap<UpdateAdminProductDto, Product>();
+            CreateMap<CreateSellerProductDto, Product>();
+            CreateMap<UpdateSellerProductDto, Product>();
         }
     }
 }

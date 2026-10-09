@@ -53,12 +53,14 @@ namespace IPAY.Application.Services.Auth
 
                 user = await _customers.GetByEmail(email);
             }
+
             else if (user.EmailVerified != true && user.Id is not null)
             {
                 // Existing password account whose owner just proved the address through Google.
                 user.EmailVerified = true;
                 await _customers.UpdateAsync(user.Id.Value, user);
             }
+
 
             if (user is null || user.Id is null || string.IsNullOrWhiteSpace(user.Email) || user.IsBanned)
                 return null;

@@ -1,12 +1,15 @@
 using IPAY.Domain.Entities.Users;
 using IPAY.Domain.Entities.Media;
 using IPAY.Domain.Entities.Shop;
+using IPAY.Domain.Interfaces.ForRepos.Media;
 using IPAY.Domain.Interfaces.ForRepos;
 using IPAY.Domain.Interfaces.ForRepos.Shop;
+
 using IPAY.Infrastructure.Cloudinary;
 using IPAY.Infrastructure.Persistence;
 using IPAY.Infrastructure.Persistence.Documents;
 using IPAY.Infrastructure.Repositories.Shop;
+using IPAY.Infrastructure.Repositories.Media;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
 using Microsoft.Extensions.Configuration;
@@ -52,24 +55,43 @@ namespace IPAY.Infrastructure
 
             // One Firestore collection per entity type - add a line here for any new entity
             // (plus a matching *Document class in Firebase/Documents).
-            services.AddDocumentRepository<Series, SeriesDocument>(
-                "series", SeriesDocument.FromEntity, document => document.ToEntity());
-            services.AddDocumentRepository<Episode, EpisodeDocument>(
-                "episodes", EpisodeDocument.FromEntity, document => document.ToEntity());
-            services.AddDocumentRepository<Genre, GenreDocument>(
-                "genres", GenreDocument.FromEntity, document => document.ToEntity());
-            services.AddDocumentRepository<Film, FilmDocument>(
-                "films", FilmDocument.FromEntity, document => document.ToEntity());
+            // Media: dedicated repos (each also serves IRepository<T> for code that only needs plain CRUD).
+            services.AddScoped<ISeriesRepo>(sp =>
+                new SeriesRepo(sp.GetRequiredService<FirestoreDb>(), "series"));
+            services.AddScoped<IRepository<Series>>(sp => sp.GetRequiredService<ISeriesRepo>());
+
+            services.AddScoped<IEpisodeRepo>(sp =>
+                new EpisodeRepo(sp.GetRequiredService<FirestoreDb>(), "episodes"));
+            services.AddScoped<IRepository<Episode>>(sp => sp.GetRequiredService<IEpisodeRepo>());
+
+            services.AddScoped<IGenreRepo>(sp =>
+                new GenreRepo(sp.GetRequiredService<FirestoreDb>(), "genres"));
+            services.AddScoped<IRepository<Genre>>(sp => sp.GetRequiredService<IGenreRepo>());
+
+            // Films use a dedicated repo (paging / filtering / sorting); it also serves IRepository<Film>.
+            //services.AddScoped<IFilmRepo>(sp =>
+            //    new FilmRepo(sp.GetRequiredService<FirestoreDb>(), "films"));
+            //services.AddScoped<IRepository<Film>>(sp => sp.GetRequiredService<IFilmRepo>());
             services.AddDocumentRepository<Category, CategoryDocument>(
                 "categories", CategoryDocument.FromEntity, document => document.ToEntity());
 
             services.AddDocumentRepository<Manufacturer, ManufacturerDocument>(
                 "manufacturers", ManufacturerDocument.FromEntity, document => document.ToEntity());
-
+            services.AddDocumentRepository<Guest, GuestDocument>(
+                "guests", GuestDocument.FromEntity, document => document.ToEntity());
 
             services.AddDocumentRepository<Customer, CustomerDocument>(
                 "customers", CustomerDocument.FromEntity, document => document.ToEntity());
 
+            services.AddDocumentRepository<Cart, CartDocument>(
+               "carts", CartDocument.FromEntity, document => document.ToEntity());
+
+            services.AddDocumentRepository<CartItem, CartItemDocument>(
+                "cartItems", CartItemDocument.FromEntity, document => document.ToEntity());
+
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
 
             services.AddScoped<IProductRepo>(sp =>
               new ProductRepo(

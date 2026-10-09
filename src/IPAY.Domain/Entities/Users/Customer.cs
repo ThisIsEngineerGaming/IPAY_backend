@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IPAY.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,12 +11,16 @@ namespace IPAY.Domain.Entities.Users
 
         public string? Password { get; set; } = string.Empty;
 
-        /// <summary>Optional contact number, stored normalised (digits with an optional leading +). null = never added.</summary>
-        public string? Phone { get; set; }
-
-
+        
 
         public bool IsBanned { get; set; } = false;
+
+        public int? PhoneNumber { get; set; } = null;
+
+        public Customer()
+        {
+            Role = UserRole.Customer;
+        }
 
         /// <summary>
         /// One-time email confirmation, stored on the account so it is never asked again.
@@ -25,5 +30,6 @@ namespace IPAY.Domain.Entities.Users
         /// true  = confirmed (also set for accounts created through Google sign-in)
         /// </summary>
         public bool? EmailVerified { get; set; }
+
     }
 }

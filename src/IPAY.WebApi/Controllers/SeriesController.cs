@@ -6,10 +6,22 @@ namespace IPAY.WebApi.Controllers;
 
 [ApiController]
 [Route("api/series")]
+[ServiceFilter(typeof(IPAY.WebApi.Filters.ValidationFilter))]
 public class SeriesController(ISeriesService service) : ControllerBase
 {
     [HttpGet]
     public Task<IReadOnlyList<SeriesDto>> GetAll() => service.GetAllAsync();
+
+    /// Cursor-paged list (same query options as GET api/films). Pass the last id you received as lastDocId.
+    [HttpGet("page")]
+    public async Task<ActionResult<IReadOnlyList<SeriesDto>>> GetPage(
+        [FromQuery] int limit = 20,
+        [FromQuery] string? lastDocId = null,
+        [FromQuery] int? genreId = null,
+        [FromQuery] string? search = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDir = null) =>
+        Ok(await service.GetPageAsync(limit, lastDocId, genreId, search, sortBy, sortDir));
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<SeriesDto>> GetById(int id) =>

@@ -20,42 +20,6 @@ namespace IPAY.Application.Validators.Auth
                 .NotEmpty().WithMessage("Name is required.")
                 .Must(name => name.Trim().Length is >= 2 and <= 50).WithMessage("Name must be 2-50 characters.")
                 .Matches(@"^[a-zA-Zа-яА-ЯіІїЇєЄґҐ\s\-]+$").WithMessage("Name can only contain letters, spaces and hyphens.");
-
-        public static IRuleBuilderOptions<T, string> ValidPhone<T>(this IRuleBuilder<T, string> rule) =>
-            rule
-                .NotEmpty().WithMessage("Phone number is required.")
-                .Must(phone => PhoneRules.TryNormalize(phone, out _))
-                .WithMessage("Enter a valid phone number with 7-15 digits, e.g. +380 12 345 6789.");
-    }
-
-    public static class PhoneRules
-    {
-        /// <summary>
-        /// Accepts what people type (spaces, dashes, dots, brackets, an optional leading +) and returns the
-        /// compact form we store: an optional + followed by 7-15 digits (the E.164 limit).
-        /// </summary>
-        public static bool TryNormalize(string? raw, out string normalized)
-        {
-            normalized = string.Empty;
-            if (string.IsNullOrWhiteSpace(raw)) return false;
-
-            var text = raw.Trim();
-            var hasPlus = text.StartsWith('+');
-            if (hasPlus) text = text[1..];
-
-            var digits = new System.Text.StringBuilder();
-            foreach (var c in text)
-            {
-                if (c is >= '0' and <= '9') digits.Append(c);
-                else if (c is ' ' or '-' or '.' or '(' or ')') continue;
-                else return false;
-            }
-
-            if (digits.Length is < 7 or > 15) return false;
-
-            normalized = (hasPlus ? "+" : string.Empty) + digits;
-            return true;
-        }
     }
 
     public class ChangeUsernameValidator : AbstractValidator<ChangeUsernameDto>
@@ -63,14 +27,6 @@ namespace IPAY.Application.Validators.Auth
         public ChangeUsernameValidator()
         {
             RuleFor(x => x.NewName).ValidName();
-        }
-    }
-
-    public class ChangePhoneValidator : AbstractValidator<ChangePhoneDto>
-    {
-        public ChangePhoneValidator()
-        {
-            RuleFor(x => x.NewPhone).ValidPhone();
         }
     }
 
@@ -85,17 +41,6 @@ namespace IPAY.Application.Validators.Auth
 
             RuleFor(x => x.NewPassword)
                 .NotEqual(x => x.CurrentPassword).WithMessage("New password must be different from the current one.");
-        }
-    }
-
-    public class ConfirmPasswordChangeValidator : AbstractValidator<ConfirmPasswordChangeDto>
-    {
-        public ConfirmPasswordChangeValidator()
-        {
-            RuleFor(x => x.IdToken)
-                .NotEmpty().WithMessage("Confirmation is missing. Please try again.");
-
-            RuleFor(x => x.NewPassword).StrongPassword();
         }
     }
 

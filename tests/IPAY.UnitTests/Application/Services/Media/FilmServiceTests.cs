@@ -3,7 +3,7 @@ using IPAY.Application.DTOs.Media;
 using IPAY.Application.Mappings.Media;
 using IPAY.Application.Services.Media;
 using IPAY.Domain.Entities.Media;
-using IPAY.Domain.Interfaces.ForRepos;
+using IPAY.Domain.Interfaces.ForRepos.Media;
 using Moq;
 using NUnit.Framework;
 
@@ -12,14 +12,14 @@ namespace IPAY.UnitTests.Application.Services.Media
     [TestFixture]
     public class FilmServiceTests
     {
-        private Mock<IRepository<Film>> _repositoryMock = null!;
+        private Mock<IFilmRepo> _repositoryMock = null!;
         private IMapper _mapper = null!;
         private FilmService _sut = null!;
 
         [SetUp]
         public void SetUp()
         {
-            _repositoryMock = new Mock<IRepository<Film>>();
+            _repositoryMock = new Mock<IFilmRepo>();
             _mapper = new MapperConfiguration(cfg => cfg.AddProfile<MediaMapping>())
                 .CreateMapper();
             _sut = new FilmService(_repositoryMock.Object, _mapper);

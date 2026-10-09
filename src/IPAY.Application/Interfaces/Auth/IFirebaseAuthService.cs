@@ -1,10 +1,7 @@
 namespace IPAY.Application.Interfaces.Auth
 {
-    /// <summary>
-    /// What we trust about a user after Firebase has verified their ID token.
-    /// AuthTime is when the person actually signed in to Firebase (the token's auth_time claim), null if absent.
-    /// </summary>
-    public record FirebaseIdentity(string Uid, string Email, string? Name, bool EmailVerified, DateTimeOffset? AuthTime = null);
+    /// <summary>What we trust about a user after Firebase has verified their ID token.</summary>
+    public record FirebaseIdentity(string Uid, string Email, string? Name, bool EmailVerified);
 
     /// <summary>
     /// Thin wrapper around the Firebase Admin SDK (Firebase Authentication only - user data
@@ -29,18 +26,5 @@ namespace IPAY.Application.Interfaces.Auth
 
         /// <summary>Deletes the Firebase account with this email. Does nothing when there is none.</summary>
         Task DeleteAccountAsync(string email);
-
-        /// <summary>
-        /// Makes sure a Firebase account exists for this email, so a password reset email can be sent from it.
-        /// A missing account (older users never got one) is created with a random password nobody knows:
-        /// the only way to get into it is the reset link emailed to the owner of the address.
-        /// </summary>
-        Task EnsureAccountAsync(string email);
-
-        /// <summary>
-        /// When the password of the Firebase account with this email was last changed (a reset revokes the
-        /// account's sign-ins, which Firebase timestamps). Null when there is no account or it never changed.
-        /// </summary>
-        Task<DateTimeOffset?> GetPasswordChangedAtAsync(string email);
     }
 }

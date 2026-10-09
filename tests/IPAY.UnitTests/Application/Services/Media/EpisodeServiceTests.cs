@@ -3,7 +3,7 @@ using IPAY.Application.DTOs.Media;
 using IPAY.Application.Mappings.Media;
 using IPAY.Application.Services.Media;
 using IPAY.Domain.Entities.Media;
-using IPAY.Domain.Interfaces.ForRepos;
+using IPAY.Domain.Interfaces.ForRepos.Media;
 using Moq;
 using NUnit.Framework;
 
@@ -12,14 +12,14 @@ namespace IPAY.UnitTests.Application.Services.Media
     [TestFixture]
     public class EpisodeServiceTests
     {
-        private Mock<IRepository<Episode>> _repositoryMock = null!;
+        private Mock<IEpisodeRepo> _repositoryMock = null!;
         private IMapper _mapper = null!;
         private EpisodeService _sut = null!;
 
         [SetUp]
         public void SetUp()
         {
-            _repositoryMock = new Mock<IRepository<Episode>>();
+            _repositoryMock = new Mock<IEpisodeRepo>();
             _mapper = new MapperConfiguration(cfg => cfg.AddProfile<MediaMapping>())
                 .CreateMapper();
             _sut = new EpisodeService(_repositoryMock.Object, _mapper);
@@ -63,29 +63,24 @@ namespace IPAY.UnitTests.Application.Services.Media
         }
 
         [Test]
-        public async Task GetBySeriesIdAsync_FiltersEpisodesBySerialId()
+        public async Task GetBySeriesIdAsync_ReturnsEpisodesFromRepositoryQuery()
         {
-            var episodes = new List<Episode>
+            _repositoryMock.Setup(r => r.GetBySeriesIdAsync(10)).ReturnsAsync(new List<Episode>
             {
                 new() { Id = 1, Name = "S1E1", SerialId = 10 },
-                new() { Id = 2, Name = "S2E1", SerialId = 20 },
                 new() { Id = 3, Name = "S1E2", SerialId = 10 }
-            };
-            _repositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(episodes);
+            });
 
             var result = await _sut.GetBySeriesIdAsync(10);
 
-            Assert.That(result, Has.Count.EqualTo(2));
-            Assert.That(result.Select(e => e.Name), Is.EquivalentTo(new[] { "S1E1", "S1E2" }));
+            Assert.That(result.Select(e => e.Name), Is.EqualTo(new[] { "S1E1", "S1E2" }));
+            _repositoryMock.Verify(r => r.GetAllAsync(), Times.Never);
         }
 
         [Test]
         public async Task GetBySeriesIdAsync_WhenNoMatches_ReturnsEmptyList()
         {
-            _repositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Episode>
-            {
-                new() { Id = 1, SerialId = 99 }
-            });
+            _repositoryMock.Setup(r => r.GetBySeriesIdAsync(1)).ReturnsAsync(new List<Episode>());
 
             var result = await _sut.GetBySeriesIdAsync(1);
 
