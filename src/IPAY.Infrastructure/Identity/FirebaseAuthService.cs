@@ -1,4 +1,5 @@
 using FirebaseAdmin;
+using System.Security.Cryptography;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using IPAY.Application.Interfaces.Auth;
@@ -61,7 +62,12 @@ namespace IPAY.Infrastructure.Identity
                     _logger.LogWarning("Google sign-in: email_verified is not true for {Email} (raw claim: {Raw}).",
                         email, flag);
 
-                return new FirebaseIdentity(token.Uid, email, Claim("name"), verified);
+                DateTimeOffset? authTime = token.Claims.TryGetValue("auth_time", out var rawAuthTime) &&
+                                           ToUnixSeconds(rawAuthTime) is long seconds
+                    ? DateTimeOffset.FromUnixTimeSeconds(seconds)
+                    : null;
+
+                return new FirebaseIdentity(token.Uid, email, Claim("name"), verified, authTime);
             }
             catch (FirebaseAuthException ex)
             {
@@ -78,6 +84,18 @@ namespace IPAY.Infrastructure.Identity
                 return null; // malformed token string
             }
         }
+
+        // Numeric claims come back as long, double or a JsonElement depending on the JSON stack.
+        private static long? ToUnixSeconds(object? value) => value switch
+        {
+            long l => l,
+            int i => i,
+            double d => (long)d,
+            string s when long.TryParse(s, out var parsed) => parsed,
+            System.Text.Json.JsonElement { ValueKind: System.Text.Json.JsonValueKind.Number } element
+                when element.TryGetInt64(out var n) => n,
+            _ => null
+        };
 
         private static bool IsTrue(object? value) => value switch
         {
@@ -111,6 +129,42 @@ namespace IPAY.Infrastructure.Identity
             catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
             {
                 return false; // older account that never got a Firebase account - nothing to keep in sync
+            }
+        }
+
+        public async Task EnsureAccountAsync(string email)
+        {
+            try
+            {
+                await _auth.GetUserByEmailAsync(email);
+            }
+            catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+            {
+                await _auth.CreateUserAsync(new UserRecordArgs
+                {
+                    Email = email,
+                    Password = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)),
+                    EmailVerified = false
+                });
+            }
+        }
+
+        public async Task<DateTimeOffset?> GetPasswordChangedAtAsync(string email)
+        {
+            try
+            {
+                var user = await _auth.GetUserByEmailAsync(email);
+
+                // Typed as nullable on purpose: compiles whether the SDK exposes DateTime or DateTime?.
+                DateTime? validSince = user.TokensValidAfterTimestamp;
+                if (validSince is null || validSince.Value.Year < 2000)
+                    return null; // never revoked, so the password was never changed
+
+                return new DateTimeOffset(DateTime.SpecifyKind(validSince.Value, DateTimeKind.Utc));
+            }
+            catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+            {
+                return null;
             }
         }
 

@@ -16,7 +16,8 @@ public class CustomerDocument
     // Missing in documents created before email verification existed -> reads back as null.
     [FirestoreProperty] public bool? EmailVerified { get; set; }
 
-    [FirestoreProperty] public int? PhoneNumber { get; set; } = null;
+    // Missing in documents created before phone numbers existed -> reads back as null.
+    [FirestoreProperty] public string? Phone { get; set; }
 
     [FirestoreProperty] public UserRole Role { get; set; }
 
@@ -28,6 +29,7 @@ public class CustomerDocument
         Email = entity.Email,
         Password = entity.Password,
         Name = entity.Name,
+        Phone = entity.Phone,
         IsBanned = entity.IsBanned,
         EmailVerified = entity.EmailVerified,
         Role = entity.Role
@@ -39,6 +41,7 @@ public class CustomerDocument
         Email = Email,
         Password = Password,
         Name = Name,
+        Phone = Phone,
         IsBanned = IsBanned,
         EmailVerified = EmailVerified,
         Role = Role

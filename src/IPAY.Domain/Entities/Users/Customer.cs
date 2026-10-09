@@ -15,7 +15,8 @@ namespace IPAY.Domain.Entities.Users
 
         public bool IsBanned { get; set; } = false;
 
-        public int? PhoneNumber { get; set; } = null;
+        /// <summary>Optional contact number, stored normalised (digits with an optional leading +). null = never added.</summary>
+        public string? Phone { get; set; }
 
         public Customer()
         {

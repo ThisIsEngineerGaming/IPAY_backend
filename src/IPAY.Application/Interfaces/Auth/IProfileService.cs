@@ -20,7 +20,10 @@ namespace IPAY.Application.Interfaces.Auth
         public static ProfileResult<T> NotFound() => new(default, "Account not found.", ProfileFailure.NotFound);
     }
 
-    /// <summary>The "Your profile" page: view the account and change name, password and email.</summary>
+    /// <summary>
+    /// The "Your profile" page (view the account, change name, phone, password and email) and the
+    /// "Forgot password?" flow for people who are not signed in.
+    /// </summary>
     public interface IProfileService
     {
         Task<ProfileResult<ProfileDto>> GetProfileAsync(int userId);
@@ -28,8 +31,21 @@ namespace IPAY.Application.Interfaces.Auth
         /// <summary>Needs the current password (accounts without one, i.e. Google-only, skip that check).</summary>
         Task<ProfileResult<ProfileDto>> ChangeUsernameAsync(int userId, ChangeUsernameDto dto);
 
-        /// <summary>Checks the current password, then updates our stored hash AND the Firebase account.</summary>
-        Task<ProfileResult<ProfileDto>> ChangePasswordAsync(int userId, ChangePasswordDto dto);
+        /// <summary>Needs the current password (accounts without one, i.e. Google-only, skip that check).</summary>
+        Task<ProfileResult<ProfileDto>> ChangePhoneAsync(int userId, ChangePhoneDto dto);
+
+        /// <summary>
+        /// Password change, step 1: the current password is right and a Firebase account exists to send the
+        /// reset email from. The client then asks Firebase to email the reset link. Changes nothing here.
+        /// </summary>
+        Task<ProfileResult<ProfileDto>> StartPasswordChangeAsync(int userId, StartPasswordChangeDto dto);
+
+        /// <summary>
+        /// Password change, step 2: the person opened the Firebase reset email and chose the new password there.
+        /// The Firebase ID token (from signing in with that new password) proves it, and only then is our
+        /// stored hash updated. There is deliberately no way to change the password without this step.
+        /// </summary>
+        Task<ProfileResult<ProfileDto>> ConfirmPasswordChangeAsync(int userId, ConfirmPasswordChangeDto dto);
 
         /// <summary>Email change, step 1: password is right and the new address is free. Changes nothing.</summary>
         Task<ProfileResult<ProfileDto>> StartEmailChangeAsync(int userId, StartEmailChangeDto dto);
@@ -39,5 +55,18 @@ namespace IPAY.Application.Interfaces.Auth
         /// the link). Switches the email and returns a fresh session, because the JWT carries the email.
         /// </summary>
         Task<ProfileResult<AuthResponse>> ConfirmEmailChangeAsync(int userId, ConfirmEmailChangeDto dto);
+
+        /// <summary>
+        /// "Forgot password?" step 1. Makes sure a Firebase account exists so the reset email can be sent.
+        /// Never reveals whether the address belongs to an account: unknown addresses are silently ignored.
+        /// </summary>
+        Task StartForgotPasswordAsync(string email);
+
+        /// <summary>
+        /// "Forgot password?" step 2: same proof as <see cref="ConfirmPasswordChangeAsync"/> (the emailed link
+        /// was used), except nobody is signed in and there is no current password to check - the account is
+        /// found through the email inside the verified Firebase token.
+        /// </summary>
+        Task<ProfileResult<bool>> ResetForgottenPasswordAsync(ConfirmPasswordChangeDto dto);
     }
 }

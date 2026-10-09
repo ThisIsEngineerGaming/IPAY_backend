@@ -92,7 +92,11 @@ builder.Services.AddScoped<IValidator<UpdateSellerProductDto>, UpdateSellerProdu
 builder.Services.AddScoped<ValidationFilter>();
 
 builder.Services.AddScoped<IValidator<ChangeUsernameDto>, ChangeUsernameValidator>();
-builder.Services.AddScoped<IValidator<ChangePasswordDto>, ChangePasswordValidator>();
+builder.Services.AddScoped<IValidator<ChangePhoneDto>, ChangePhoneValidator>();
+builder.Services.AddScoped<IValidator<StartPasswordChangeDto>, StartPasswordChangeValidator>();
+// ResetForgottenPasswordValidator is deliberately NOT registered: it validates the same DTO type, and
+// ProfileService creates it itself so DI cannot hand it out in place of this one.
+builder.Services.AddScoped<IValidator<ConfirmPasswordChangeDto>, ConfirmPasswordChangeValidator>();
 builder.Services.AddScoped<IValidator<StartEmailChangeDto>, StartEmailChangeValidator>();
 builder.Services.AddScoped<IValidator<ConfirmEmailChangeDto>, ConfirmEmailChangeValidator>();
 
