@@ -74,12 +74,17 @@ namespace IPAY.Application.Validators.Auth
         }
     }
 
-    public class StartPasswordChangeValidator : AbstractValidator<StartPasswordChangeDto>
+    public class ChangePasswordValidator : AbstractValidator<ChangePasswordDto>
     {
-        public StartPasswordChangeValidator()
+        public ChangePasswordValidator()
         {
             RuleFor(x => x.CurrentPassword)
                 .NotEmpty().WithMessage("Current password is required.");
+
+            RuleFor(x => x.NewPassword).StrongPassword();
+
+            RuleFor(x => x.NewPassword)
+                .NotEqual(x => x.CurrentPassword).WithMessage("New password must be different from the current one.");
         }
     }
 
@@ -90,13 +95,7 @@ namespace IPAY.Application.Validators.Auth
             RuleFor(x => x.IdToken)
                 .NotEmpty().WithMessage("Confirmation is missing. Please try again.");
 
-            RuleFor(x => x.CurrentPassword)
-                .NotEmpty().WithMessage("Current password is required.");
-
             RuleFor(x => x.NewPassword).StrongPassword();
-
-            RuleFor(x => x.NewPassword)
-                .NotEqual(x => x.CurrentPassword).WithMessage("New password must be different from the current one.");
         }
     }
 

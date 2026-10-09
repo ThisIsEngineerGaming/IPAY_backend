@@ -19,7 +19,7 @@ namespace IPAY.Application.Services.Auth
         private readonly IJWT _jwt;
         private readonly IValidator<ChangeUsernameDto> _usernameValidator;
         private readonly IValidator<ChangePhoneDto> _phoneValidator;
-        private readonly IValidator<StartPasswordChangeDto> _startPasswordValidator;
+        private readonly IValidator<ChangePasswordDto> _changePasswordValidator;
         private readonly IValidator<ConfirmPasswordChangeDto> _confirmPasswordValidator;
         private readonly IValidator<StartEmailChangeDto> _startEmailValidator;
         private readonly IValidator<ConfirmEmailChangeDto> _confirmEmailValidator;
@@ -31,7 +31,7 @@ namespace IPAY.Application.Services.Auth
             IJWT jwt,
             IValidator<ChangeUsernameDto> usernameValidator,
             IValidator<ChangePhoneDto> phoneValidator,
-            IValidator<StartPasswordChangeDto> startPasswordValidator,
+            IValidator<ChangePasswordDto> changePasswordValidator,
             IValidator<ConfirmPasswordChangeDto> confirmPasswordValidator,
             IValidator<StartEmailChangeDto> startEmailValidator,
             IValidator<ConfirmEmailChangeDto> confirmEmailValidator)
@@ -42,7 +42,7 @@ namespace IPAY.Application.Services.Auth
             _jwt = jwt;
             _usernameValidator = usernameValidator;
             _phoneValidator = phoneValidator;
-            _startPasswordValidator = startPasswordValidator;
+            _changePasswordValidator = changePasswordValidator;
             _confirmPasswordValidator = confirmPasswordValidator;
             _startEmailValidator = startEmailValidator;
             _confirmEmailValidator = confirmEmailValidator;
@@ -98,9 +98,9 @@ namespace IPAY.Application.Services.Auth
             return ProfileResult<ProfileDto>.Ok(ToProfile(user));
         }
 
-        public async Task<ProfileResult<ProfileDto>> StartPasswordChangeAsync(int userId, StartPasswordChangeDto dto)
+        public async Task<ProfileResult<ProfileDto>> ChangePasswordAsync(int userId, ChangePasswordDto dto)
         {
-            var validation = await _startPasswordValidator.ValidateAsync(dto);
+            var validation = await _changePasswordValidator.ValidateAsync(dto);
             if (!validation.IsValid)
                 return ProfileResult<ProfileDto>.Fail(validation.Errors[0].ErrorMessage);
 
@@ -113,6 +113,37 @@ namespace IPAY.Application.Services.Auth
 
             if (!_passwordHasher.Verify(dto.CurrentPassword, user.Password!))
                 return ProfileResult<ProfileDto>.Fail("Current password is incorrect.");
+
+            // Keep the Firebase account's password in step with ours (the email-change flow signs in to
+            // Firebase with it). Done first so a Firebase failure leaves nothing half-changed on our side.
+            // No Firebase account yet (older user) just returns false: nothing to sync.
+            if (!string.IsNullOrWhiteSpace(user.Email))
+            {
+                try
+                {
+                    await _firebase.SetPasswordAsync(user.Email, dto.NewPassword);
+                }
+                catch (Exception)
+                {
+                    return ProfileResult<ProfileDto>.Fail(
+                        "We could not update your password right now. Please try again.");
+                }
+            }
+
+            user.Password = _passwordHasher.Hash(dto.NewPassword);
+            await _customers.UpdateAsync(userId, user);
+
+            return ProfileResult<ProfileDto>.Ok(ToProfile(user));
+        }
+
+        public async Task<ProfileResult<ProfileDto>> StartPasswordChangeAsync(int userId)
+        {
+            var user = await GetActiveUserAsync(userId);
+            if (user is null)
+                return ProfileResult<ProfileDto>.NotFound();
+
+            if (!HasPassword(user))
+                return ProfileResult<ProfileDto>.Fail("This account signs in with Google, so it has no password to change.");
 
             if (string.IsNullOrWhiteSpace(user.Email))
                 return ProfileResult<ProfileDto>.Fail("Your account has no email address to send the confirmation to.");
@@ -151,32 +182,9 @@ namespace IPAY.Application.Services.Auth
             if (!HasPassword(user))
                 return ProfileResult<ProfileDto>.Fail("This account signs in with Google, so it has no password to change.");
 
-            // Our own hash still holds the OLD password until this call succeeds.
-            if (!_passwordHasher.Verify(dto.CurrentPassword, user.Password!))
-                return ProfileResult<ProfileDto>.Fail("Current password is incorrect.");
-
-            const string notConfirmed =
-                "We could not confirm your new password. Open the link we emailed you, set the new password there, then try again.";
-
-            // 1. The token must be a real Firebase sign-in for THIS account.
             var identity = await _firebase.VerifyIdTokenAsync(dto.IdToken);
-            if (identity is null || string.IsNullOrWhiteSpace(user.Email) ||
-                !string.Equals(identity.Email.Trim(), user.Email.Trim(), StringComparison.OrdinalIgnoreCase))
-                return ProfileResult<ProfileDto>.Fail(notConfirmed);
-
-            // 2. ...a recent one, so an old token cannot be replayed.
-            var now = DateTimeOffset.UtcNow;
-            if (identity.AuthTime is not { } signedInAt || now - signedInAt > SignInFreshness)
-                return ProfileResult<ProfileDto>.Fail("This confirmation has expired. Please start again.");
-
-            // 3. Firebase's password must have been changed recently (that is what the emailed link does),
-            //    and the sign-in must have happened after that change. Without this, anyone who knows the
-            //    current password could skip the email by signing in to Firebase with it.
-            var changedAt = await _firebase.GetPasswordChangedAtAsync(user.Email);
-            if (changedAt is not { } changed ||
-                now - changed > ResetFreshness ||
-                signedInAt < changed.AddSeconds(-2))
-                return ProfileResult<ProfileDto>.Fail(notConfirmed);
+            if (await CheckResetProofAsync(user, identity) is { } proofProblem)
+                return ProfileResult<ProfileDto>.Fail(proofProblem);
 
             // Firebase already holds the new password (the person set it through the emailed link and just
             // signed in with it), so only our own copy needs to catch up.
@@ -184,6 +192,60 @@ namespace IPAY.Application.Services.Auth
             await _customers.UpdateAsync(userId, user);
 
             return ProfileResult<ProfileDto>.Ok(ToProfile(user));
+        }
+
+        public async Task StartForgotPasswordAsync(string? email)
+        {
+            var address = email?.Trim().ToLowerInvariant();
+            if (string.IsNullOrEmpty(address))
+                return;
+
+            try
+            {
+                var user = await _customers.GetByEmail(address);
+                if (user is null || user.IsBanned || !HasPassword(user) || string.IsNullOrWhiteSpace(user.Email))
+                    return;
+
+                // Older accounts never got a Firebase account, and without one Firebase would silently send
+                // nothing. Unlike the signed-in flow the Firebase password is left alone: nobody here has
+                // proved anything, and the reset only counts once the emailed link has been used.
+                await _firebase.EnsureAccountAsync(user.Email);
+            }
+            catch (Exception)
+            {
+                // Deliberately silent: an error must not tell a stranger whether the address exists.
+            }
+        }
+
+        public async Task<ProfileResult<bool>> ResetForgottenPasswordAsync(ConfirmPasswordChangeDto dto)
+        {
+            var validation = await _confirmPasswordValidator.ValidateAsync(dto);
+            if (!validation.IsValid)
+                return ProfileResult<bool>.Fail(validation.Errors[0].ErrorMessage);
+
+            const string notConfirmed =
+                "We could not confirm your new password. Open the link we emailed you, set the new password there, then try again.";
+
+            // The account is whoever Firebase says signed in - never an email taken from the request.
+            var identity = await _firebase.VerifyIdTokenAsync(dto.IdToken);
+            if (identity is null || string.IsNullOrWhiteSpace(identity.Email))
+                return ProfileResult<bool>.Fail(notConfirmed);
+
+            var user = await _customers.GetByEmail(identity.Email.Trim().ToLowerInvariant());
+            if (user is null || user.IsBanned || user.Id is not int userId)
+                return ProfileResult<bool>.Fail(notConfirmed);
+
+            if (!HasPassword(user))
+                return ProfileResult<bool>.Fail("This account signs in with Google, so it has no password to reset.");
+
+            if (await CheckResetProofAsync(user, identity) is { } proofProblem)
+                return ProfileResult<bool>.Fail(proofProblem);
+
+            // Firebase already holds the new password; only our own copy needs to catch up.
+            user.Password = _passwordHasher.Hash(dto.NewPassword);
+            await _customers.UpdateAsync(userId, user);
+
+            return ProfileResult<bool>.Ok(true);
         }
 
         public async Task<ProfileResult<ProfileDto>> StartEmailChangeAsync(int userId, StartEmailChangeDto dto)
@@ -295,6 +357,37 @@ namespace IPAY.Application.Services.Auth
                 return "Enter your password to confirm the change.";
 
             return _passwordHasher.Verify(password, user.Password!) ? null : "Incorrect password.";
+        }
+
+        /// <summary>
+        /// Did this person really use the emailed Firebase reset link? Returns a message safe to show, or null
+        /// when the proof holds. Shared by the signed-in and the "forgot password" flows.
+        /// </summary>
+        private async Task<string?> CheckResetProofAsync(Customer user, FirebaseIdentity? identity)
+        {
+            const string notConfirmed =
+                "We could not confirm your new password. Open the link we emailed you, set the new password there, then try again.";
+
+            // 1. The token must be a real Firebase sign-in for THIS account.
+            if (identity is null || string.IsNullOrWhiteSpace(user.Email) ||
+                !string.Equals(identity.Email.Trim(), user.Email.Trim(), StringComparison.OrdinalIgnoreCase))
+                return notConfirmed;
+
+            // 2. ...a recent one, so an old token cannot be replayed.
+            var now = DateTimeOffset.UtcNow;
+            if (identity.AuthTime is not { } signedInAt || now - signedInAt > SignInFreshness)
+                return "This confirmation has expired. Please start again.";
+
+            // 3. Firebase's password must have been changed recently (that is what the emailed link does),
+            //    and the sign-in must have happened after that change. Without this, anyone who knows the
+            //    current password could skip the email by signing in to Firebase with it.
+            var changedAt = await _firebase.GetPasswordChangedAtAsync(user.Email);
+            if (changedAt is not { } changed ||
+                now - changed > ResetFreshness ||
+                signedInAt < changed.AddSeconds(-2))
+                return notConfirmed;
+
+            return null;
         }
 
         private static bool HasPassword(Customer user) => !string.IsNullOrEmpty(user.Password);

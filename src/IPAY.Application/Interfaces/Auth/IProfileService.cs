@@ -32,17 +32,39 @@ namespace IPAY.Application.Interfaces.Auth
         Task<ProfileResult<ProfileDto>> ChangePhoneAsync(int userId, ChangePhoneDto dto);
 
         /// <summary>
-        /// Password change, step 1: the current password is right and a Firebase account exists to send the
-        /// reset email from. The client then asks Firebase to email the reset link. Changes nothing here.
+        /// Password change, option 1: the current password and the new one. Updates our stored hash and keeps the
+        /// Firebase account's password in step.
         /// </summary>
-        Task<ProfileResult<ProfileDto>> StartPasswordChangeAsync(int userId, StartPasswordChangeDto dto);
+        Task<ProfileResult<ProfileDto>> ChangePasswordAsync(int userId, ChangePasswordDto dto);
 
         /// <summary>
-        /// Password change, step 2: the person opened the Firebase reset email and chose the new password there.
-        /// The Firebase ID token (from signing in with that new password) proves it, and only then is our
-        /// stored hash updated. There is deliberately no way to change the password without this step.
+        /// Password change, option 2 (email reset), step 1: makes sure a Firebase account exists to send the
+        /// reset email from. No current password needed. The client then asks Firebase to email the reset link.
+        /// Changes nothing here.
+        /// </summary>
+        Task<ProfileResult<ProfileDto>> StartPasswordChangeAsync(int userId);
+
+        /// <summary>
+        /// Password change, option 2 (email reset), step 2: the person opened the Firebase reset email and chose
+        /// the new password there. The Firebase ID token (from signing in with that new password) proves it, and
+        /// only then is our stored hash updated.
         /// </summary>
         Task<ProfileResult<ProfileDto>> ConfirmPasswordChangeAsync(int userId, ConfirmPasswordChangeDto dto);
+
+        /// <summary>
+        /// "Forgot password?" (signed out), step 1: makes sure a Firebase account exists for this email so the
+        /// reset email can really be sent. Never reveals whether the email belongs to an account: it always
+        /// completes quietly, and Google-only, banned and unknown addresses are simply ignored.
+        /// </summary>
+        Task StartForgotPasswordAsync(string? email);
+
+        /// <summary>
+        /// "Forgot password?" (signed out), step 2: the person opened the Firebase reset email and chose the new
+        /// password there. The Firebase ID token (from signing in with it) identifies the account and proves the
+        /// mailbox was reached; only then is our stored hash updated. The account comes from the token, never
+        /// from the request.
+        /// </summary>
+        Task<ProfileResult<bool>> ResetForgottenPasswordAsync(ConfirmPasswordChangeDto dto);
 
         /// <summary>Email change, step 1: password is right and the new address is free. Changes nothing.</summary>
         Task<ProfileResult<ProfileDto>> StartEmailChangeAsync(int userId, StartEmailChangeDto dto);

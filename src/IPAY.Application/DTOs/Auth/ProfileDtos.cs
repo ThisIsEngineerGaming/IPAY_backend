@@ -28,21 +28,28 @@ namespace IPAY.Application.DTOs.Auth
         public string Password { get; set; } = string.Empty;
     }
 
-    /// <summary>Step 1 of a password change: the current password is right; then Firebase emails the reset link.</summary>
-    public class StartPasswordChangeDto
+    /// <summary>Option 1 of a password change: type the current password and the new one.</summary>
+    public class ChangePasswordDto
     {
         public string CurrentPassword { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
     }
 
     /// <summary>
-    /// Step 2 of a password change, after the person opened the Firebase reset email and chose the new password
-    /// there. IdToken is a Firebase ID token from signing in to Firebase with that new password.
+    /// Option 2 of a password change (email reset), step 2: the person opened the Firebase reset email and chose
+    /// the new password there. IdToken is a Firebase ID token from signing in to Firebase with that new password.
+    /// The current password is not needed: access to the account's mailbox is the proof.
     /// </summary>
     public class ConfirmPasswordChangeDto
     {
         public string IdToken { get; set; } = string.Empty;
-        public string CurrentPassword { get; set; } = string.Empty;
         public string NewPassword { get; set; } = string.Empty;
+    }
+
+    /// <summary>"Forgot password?" on the login page, step 1: which account's reset email to prepare.</summary>
+    public class ForgotPasswordDto
+    {
+        public string Email { get; set; } = string.Empty;
     }
 
     /// <summary>Step 1 of an email change: check the password and that the new address is free.</summary>

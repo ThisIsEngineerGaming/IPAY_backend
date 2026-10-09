@@ -43,17 +43,26 @@ namespace IPAY.WebApi.Controllers
             return ToResponse(await _profile.ChangePhoneAsync(id, dto));
         }
 
-        // Password change, step 1. Body: { currentPassword } -> { name, email, phone, hasPassword }
-        // The client then asks Firebase to email the reset link.
-        [HttpPost("password/start")]
-        public async Task<IActionResult> StartPasswordChange([FromBody] StartPasswordChangeDto dto)
+        // Password change, option 1: current password + new one.
+        // Body: { currentPassword, newPassword } -> { name, email, phone, hasPassword }
+        [HttpPut("password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
         {
             if (CurrentUserId() is not int id) return Unauthorized();
-            return ToResponse(await _profile.StartPasswordChangeAsync(id, dto));
+            return ToResponse(await _profile.ChangePasswordAsync(id, dto));
         }
 
-        // Password change, step 2 (the only way to change it - there is no direct endpoint).
-        // Body: { idToken, currentPassword, newPassword } -> { name, email, phone, hasPassword }
+        // Password change, option 2 (email reset), step 1. No body -> { name, email, phone, hasPassword }
+        // The client then asks Firebase to email the reset link.
+        [HttpPost("password/start")]
+        public async Task<IActionResult> StartPasswordChange()
+        {
+            if (CurrentUserId() is not int id) return Unauthorized();
+            return ToResponse(await _profile.StartPasswordChangeAsync(id));
+        }
+
+        // Password change, option 2 (email reset), step 2.
+        // Body: { idToken, newPassword } -> { name, email, phone, hasPassword }
         [HttpPost("password/confirm")]
         public async Task<IActionResult> ConfirmPasswordChange([FromBody] ConfirmPasswordChangeDto dto)
         {
