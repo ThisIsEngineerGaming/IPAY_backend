@@ -80,13 +80,14 @@ namespace IPAY.Application.Services.Shop
         {
             var product = _productMapper.Map<Product>(dto);
 
-            var all = await _repository.GetAllProductsAsync();
-            product.Id = all.Count > 0 ? all.Max(p => p.Id) + 1 : 1;
+            // The id is assigned by the repository. SellerId always comes from the caller's token,
+            // and a seller can't rate their own listing, so rating starts at 0 whatever the body says.
             product.SellerId = sellerId;
+            product.Rating = 0;
             product.CreatedAt = DateTime.UtcNow;
 
-            await _repository.AddProductAsync(product);
-            return _productMapper.Map<ProductDto>(product);
+            var created = await _repository.AddProductAsync(product);
+            return _productMapper.Map<ProductDto>(created);
         }
 
         public async Task<ProductDto?> UpdateAsync(int id, UpdateSellerProductDto sellerProduct, string? sellerId)
@@ -102,6 +103,7 @@ namespace IPAY.Application.Services.Shop
             var product = _productMapper.Map<Product>(sellerProduct);
             product.Id = id;
             product.SellerId = existing.SellerId;
+            product.Rating = existing.Rating; // sellers can't change their own rating
             product.CreatedAt = existing.CreatedAt;
 
             await _repository.UpdateProductAsync(id, product);
@@ -111,6 +113,12 @@ namespace IPAY.Application.Services.Shop
         }
 
         public Task DeleteAsync(int id) => _repository.DeleteProductAsync(id);
+
+        public async Task<IReadOnlyList<ProductDto>> GetBySellerAsync(string sellerId)
+        {
+            var products = await _repository.GetBySellerAsync(sellerId);
+            return _productMapper.Map<IReadOnlyList<ProductDto>>(products);
+        }
 
         public async Task<IReadOnlyList<ProductDto>> GetLimitAsync(int limit, string? lastDocId)
         {

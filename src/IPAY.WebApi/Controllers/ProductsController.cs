@@ -1,5 +1,6 @@
 using IPAY.Application.DTOs.Shop;
 using IPAY.Application.Interfaces.Shop;
+using IPAY.WebApi.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -31,22 +32,55 @@ public class ProductsController(IProductService service) : ControllerBase
         await service.UpdateAsync(id, adminProduct);
         return NoContent();
     }
+
+    // ---------- SELLER ----------
+    // The seller id is always taken from the JWT, never from the request, so a seller
+    // can only ever create / edit / list their own products.
+
     [Authorize(Roles = "Seller")]
-    [HttpPost("/seller")]
+    [HttpGet("seller/mine")]
+    public async Task<ActionResult<IReadOnlyList<ProductDto>>> GetMine()
+    {
+        var sellerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(sellerId)) return Unauthorized();
+
+        return Ok(await service.GetBySellerAsync(sellerId));
+    }
+
+    [Authorize(Roles = "Seller")]
+    [ServiceFilter(typeof(ValidationFilter))]
+    [HttpPost("seller")]
     public async Task<ActionResult<ProductDto>> Create(CreateSellerProductDto sellerProduct)
     {
         var sellerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var created = await service.CreateAsync(sellerProduct,sellerId);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        if (string.IsNullOrEmpty(sellerId)) return Unauthorized();
+
+        var created = await service.CreateAsync(sellerProduct, sellerId);
+        return CreatedAtAction(nameof(GetById), new { id = created!.Id }, created);
     }
+
     [Authorize(Roles = "Seller")]
+    [ServiceFilter(typeof(ValidationFilter))]
     [HttpPut("seller/{id:int}")]
-    public async Task<ActionResult<ProductDto>> Update(int id, UpdateSellerProductDto sellerProduct , string? sellerId)
+    public async Task<ActionResult<ProductDto>> Update(int id, UpdateSellerProductDto sellerProduct)
     {
+        var sellerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(sellerId)) return Unauthorized();
+
         if (await service.GetByIdAsync(id) is null) return NotFound();
-        await service.UpdateAsync(id, sellerProduct, sellerId);
+
+        try
+        {
+            await service.UpdateAsync(id, sellerProduct, sellerId);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid(); // somebody else's product
+        }
+
         return NoContent();
     }
+
     [Authorize(Roles = "Seller,Admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)

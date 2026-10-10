@@ -16,6 +16,9 @@ namespace IPAY.Application.Interfaces.Shop
         Task<ProductDto?> UpdateAsync(int id, UpdateSellerProductDto sellerProduct, string? sellerId);
         Task DeleteAsync(int id);
 
+        /// <summary>Products listed by one seller (the seller's own catalogue).</summary>
+        Task<IReadOnlyList<ProductDto>> GetBySellerAsync(string sellerId);
+
         Task<IReadOnlyList<ProductDto>> GetLimitAsync(int limit, string? lastDocid);
 
         Task<IReadOnlyList<ProductDto?>> GetFilteredAsync(int limit, string? lastDocId, int? categoryId, double? minPrice, double? maxPrice, string? brand, string? search);

@@ -38,6 +38,16 @@ namespace IPAY.Infrastructure.Repositories.Shop
 
         public Task DeleteProductAsync(int id) => _collection.Document(id.ToString()).DeleteAsync();
 
+        public async Task<IReadOnlyList<Product>> GetBySellerAsync(string sellerId)
+        {
+            // Single-field equality filter: no composite index needed. Sorted in memory.
+            var snapshot = await _collection.WhereEqualTo("SellerId", sellerId).GetSnapshotAsync();
+            return snapshot.Documents
+                .Select(document => document.ConvertTo<ProductDocument>().ToEntity())
+                .OrderByDescending(product => product.CreatedAt)
+                .ToList();
+        }
+
         private async Task<int> GetNextIdAsync()
         {
             var all = await GetAllProductsAsync();
