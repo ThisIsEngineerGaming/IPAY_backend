@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -153,6 +154,28 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
+
+    // The role lives inside the token, so after an admin changes someone's role the old token would keep
+    // working. Compare it with the user's current role on every request and reject it (401) when they differ;
+    // the client reacts to a 401 by logging the person out, so they have to sign in again to get the new role.
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async ctx =>
+        {
+            var tokenRole = ctx.Principal?.FindFirstValue(ClaimTypes.Role);
+            var userId = ctx.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Guests aren't stored as customers, and tokens without these claims are handled elsewhere.
+            if (tokenRole is null || userId is null || tokenRole == "Guest" || !int.TryParse(userId, out var id))
+                return;
+
+            var customers = ctx.HttpContext.RequestServices.GetRequiredService<IUser<Customer>>();
+            var customer = await customers.GetByIdAsync(id);
+
+            if (customer is null || customer.Role.ToString() != tokenRole)
+                ctx.Fail("Role changed. Please sign in again.");
+        }
     };
 });
 
