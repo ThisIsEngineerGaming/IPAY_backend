@@ -174,6 +174,13 @@ builder.Services.AddAuthorization(options =>
         policy.Requirements.Add(new NotBannedRequirement());
     });
 
+    // For things both staff roles may do (e.g. listing users and making someone a seller).
+    options.AddPolicy("ModeratorOrAdmin", policy =>
+    {
+        policy.RequireRole("Moderator", "Admin");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
+
     options.AddPolicy("SellerOnly", policy =>
     {
         policy.RequireRole("Seller");

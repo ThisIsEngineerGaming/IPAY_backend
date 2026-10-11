@@ -169,6 +169,11 @@ namespace IPAY.WebApi.Controllers
             var user = await _customer.GetByIdAsync(id);
             if (user is null)
                 return NotFound();
+
+            // Same protection as the ban endpoints: a moderator must not be able to touch admins or other
+            // moderators (without this, role=Customer would have demoted an admin).
+            if (user.Role == UserRole.Admin || user.Role == UserRole.Moderator)
+                return Forbid();
             if (role != UserRole.Moderator && role != UserRole.Admin)
             {
                 user.Role = role;
@@ -183,6 +188,64 @@ namespace IPAY.WebApi.Controllers
 
         }
 
+
+        // --- Role management for the admin page ------------------------------------------------
+        // Who may do what:
+        //   make a Seller    -> an Admin or a Moderator
+        //   make a Moderator -> an Admin only
+        // Admins and moderators themselves can never be changed through these endpoints.
+        // The promoted person's current login keeps the old role until they sign in again,
+        // because the role is baked into the JWT.
+
+        // Everyone the admin page lists. Admin and moderator both need it.
+        [Authorize(Policy = "ModeratorOrAdmin")]
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var all = await _customer.GetAllAsync();
+            return Ok(all.OrderBy(c => c.Id).Select(ToAdminUser).ToList());
+        }
+
+        [Authorize(Policy = "ModeratorOrAdmin")]
+        [HttpPost("users/{id:int}/make-seller")]
+        public Task<IActionResult> MakeSeller(int id) => PromoteAsync(id, UserRole.Seller);
+
+        [Authorize(Policy = "AdminOnly")]
+        [HttpPost("users/{id:int}/make-moderator")]
+        public Task<IActionResult> MakeModerator(int id) => PromoteAsync(id, UserRole.Moderator);
+
+        private async Task<IActionResult> PromoteAsync(int id, UserRole newRole)
+        {
+            var user = await _customer.GetByIdAsync(id);
+            if (user is null)
+                return NotFound("User not found.");
+
+            if (user.Role == newRole)
+                return BadRequest($"This user is already a {newRole.ToString().ToLowerInvariant()}.");
+
+            // 403 with a message (not Forbid(), whose body is empty) so the admin page can show the reason.
+            if (user.Role is UserRole.Admin or UserRole.Moderator)
+                return StatusCode(StatusCodes.Status403Forbidden,
+                    "Admins and moderators can't be changed here.");
+
+            if (user.IsBanned)
+                return BadRequest("This account is banned. Unban it before changing its role.");
+
+            user.Role = newRole;
+            await _customer.UpdateAsync(id, user);
+
+            return Ok(ToAdminUser(user));
+        }
+
+        private static AdminUserDto ToAdminUser(Customer c) => new()
+        {
+            Id = c.Id ?? 0,
+            Name = c.Name ?? string.Empty,
+            Email = c.Email ?? string.Empty,
+            Phone = c.Phone ?? string.Empty,
+            Role = c.Role.ToString(),
+            IsBanned = c.IsBanned
+        };
 
         // --- CREATE ---
         [Authorize(Policy = "AdminOnly")]
