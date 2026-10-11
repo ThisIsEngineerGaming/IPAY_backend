@@ -21,11 +21,14 @@ namespace IPAY.Application.Services.Auth
         private readonly IFirebaseAuthService? _firebase;
         private readonly ITwoFactorService? _twoFactor;
 
+        private readonly IRefreshTokenService? _refreshTokenService;
+
         public LoginDtoService(
             IValidator<LoginDto> validator,
             IJWT jwt,
             IUser<Customer> customer,
             IPasswordHashingService passwordHasher,
+            IRefreshTokenService refreshTokenService,
             IFirebaseAuthService? firebase = null,
             ITwoFactorService? twoFactor = null)
         {
@@ -35,6 +38,8 @@ namespace IPAY.Application.Services.Auth
             _passwordHasher = passwordHasher;
             _firebase = firebase;
             _twoFactor = twoFactor;
+            _refreshTokenService = refreshTokenService;
+
 
         }
         public async Task<bool> Login(LoginDto loginDto)
@@ -100,17 +105,13 @@ namespace IPAY.Application.Services.Auth
                     return await _twoFactor.BeginAsync(user);
                 }
 
-                // 4. Теперь у тебя есть user.Id → передаёшь его в JWT
-                var token = _jwt.GenerateToken(user.Id.Value.ToString(), user.Email,user.Role);
 
-                // 5. Возвращаешь AuthResponse
-                return new AuthResponse
-                {
-                    AccessToken = token,
-                    TokenType = "Bearer",
-                    ExpiresAt = DateTime.UtcNow.AddHours(2),
-                    User = new LoginDto { Email = user.Email ?? string.Empty, Name = user.Name }
-                };
+                // 4. Возвращаешь AuthResponse
+                return await _refreshTokenService.CreateAuthResponseAsync(
+                    user.Id.Value,
+                    user.Email!,
+                    user.Name,
+                    user.Role);
             }
         }
     }

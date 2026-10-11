@@ -27,6 +27,8 @@ namespace IPAY.Application.Interfaces.Shop
         Task<CancelOrderOutcome> CancelAsync(int orderId, int userId);
         Task DeleteAsync(int id);
 
+        Task<IReadOnlyList<OrderStatusHistoryDto>> GetStatusHistoryAsync(int orderId);
+
         // OrderItems (внутри заказа)
         Task<OrderItemDto> AddItemAsync(int orderId, CreateOrderItemDto dto);
         Task UpdateItemAsync(int orderId, int itemId, CreateOrderItemDto dto);

@@ -3,48 +3,55 @@ using IPAY.Application.Interfaces.Auth;
 using IPAY.Domain.Entities.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Security.Cryptography;
+
 
 namespace IPAY.Application.Services.Auth
 {
-    public class JwtService:IJWT
+    public class JwtService : IJWT
     {
         private readonly IConfiguration _config;
 
-        public JwtService(IConfiguration config)
-        {
-            _config = config;
-        }
+        public JwtService(IConfiguration config) => _config = config;
 
-        public string GenerateToken(string userId, string email, UserRole userRole)
+        public string GenerateAccessToken(string userId, string email, UserRole role)
         {
             var claims = new List<Claim>
             {
-              new Claim(ClaimTypes.NameIdentifier, userId),
-              new Claim(ClaimTypes.Email, email),
-              new Claim(ClaimTypes.Role, userRole.ToString())  // ← главное
+                new(ClaimTypes.NameIdentifier, userId),
+                new(ClaimTypes.Email, email),
+                new(ClaimTypes.Role, role.ToString())
             };
 
-
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
-
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var minutes = int.TryParse(_config["Jwt:AccessTokenMinutes"], out var m) ? m : 20;
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(4),   // токен живёт 4 часа
-                signingCredentials: credentials
-            );
+                expires: DateTime.UtcNow.AddMinutes(minutes),
+                signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var bytes = new byte[64];
+            RandomNumberGenerator.Fill(bytes);
+            return Convert.ToBase64String(bytes);
+        }
+
+        public string HashToken(string rawToken)
+        {
+            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(rawToken));
+            return Convert.ToHexString(hash);
         }
     }
 }
