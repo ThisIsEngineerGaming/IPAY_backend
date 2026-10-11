@@ -71,14 +71,15 @@ namespace IPAY.WebApi.Controllers
             var user = await _customer.GetByIdAsync(id);
             if (user is null)
             {
-                return NotFound();
+                return NotFound("User not found.");
             }
             else if (user.Role == UserRole.Admin)
             {
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden, "Admins can't be banned.");
             }
             user.IsBanned = true;
-            var result = _customer.UpdateAsync(id, user);
+            await _customer.UpdateAsync(id, user);
+            var result = ToAdminUser(user);
 
             return Ok(result);
 
@@ -92,14 +93,15 @@ namespace IPAY.WebApi.Controllers
             var user = await _customer.GetByIdAsync(id);
             if (user is null)
             {
-                return NotFound();
+                return NotFound("User not found.");
             }
             else if (user.Role == UserRole.Admin || user.Role == UserRole.Moderator)
             {
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden, "Moderators can't ban admins or other moderators.");
             }
             user.IsBanned = true;
-            var result = _customer.UpdateAsync(id, user);
+            await _customer.UpdateAsync(id, user);
+            var result = ToAdminUser(user);
 
             return Ok(result);
 
@@ -113,14 +115,15 @@ namespace IPAY.WebApi.Controllers
             var user = await _customer.GetByIdAsync(id);
             if (user is null)
             {
-                return NotFound();
+                return NotFound("User not found.");
             }
             else if (user.Role == UserRole.Admin)
             {
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden, "Admins can't be changed here.");
             }
             user.IsBanned = false;
-            var result = _customer.UpdateAsync(id, user);
+            await _customer.UpdateAsync(id, user);
+            var result = ToAdminUser(user);
 
             return Ok(result);
 
@@ -134,14 +137,15 @@ namespace IPAY.WebApi.Controllers
             var user = await _customer.GetByIdAsync(id);
             if (user is null)
             {
-                return NotFound();
+                return NotFound("User not found.");
             }
             else if (user.Role == UserRole.Admin || user.Role == UserRole.Moderator)
             {
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden, "Moderators can't change admins or other moderators.");
             }
             user.IsBanned = false;
-            var result = _customer.UpdateAsync(id, user);
+            await _customer.UpdateAsync(id, user);
+            var result = ToAdminUser(user);
 
             return Ok(result);
 
@@ -152,6 +156,10 @@ namespace IPAY.WebApi.Controllers
         [HttpPatch("users/{id}/role")]
         public async Task<IActionResult> ChangeRole(int id, [FromQuery] UserRole role)
         {
+            // Admins can no longer make other people admins (through this or any other endpoint).
+            if (role == UserRole.Admin)
+                return BadRequest("Admins can't make other people admins.");
+
             var user = await _customer.GetByIdAsync(id);
             if (user is null)
                 return NotFound();
@@ -191,10 +199,13 @@ namespace IPAY.WebApi.Controllers
 
         // --- Role management for the admin page ------------------------------------------------
         // Who may do what:
-        //   make a Seller    -> an Admin or a Moderator
-        //   make a Moderator -> an Admin only
-        // Admins and moderators themselves can never be changed through these endpoints.
-        // The promoted person's current login keeps the old role until they sign in again,
+        //   make a Seller            -> an Admin or a Moderator
+        //   make a Moderator         -> an Admin only
+        //   remove Moderator (-> Customer) -> an Admin only
+        //   demote Seller (-> Customer)    -> an Admin or a Moderator
+        // Nobody can be made an Admin through the API, and existing admins can never be changed through
+        // these endpoints. Moderators can only be changed by an admin removing their moderator role.
+        // The affected person's current login keeps the old role until they sign in again,
         // because the role is baked into the JWT.
 
         // Everyone the admin page lists. Admin and moderator both need it.
@@ -214,6 +225,36 @@ namespace IPAY.WebApi.Controllers
         [HttpPost("users/{id:int}/make-moderator")]
         public Task<IActionResult> MakeModerator(int id) => PromoteAsync(id, UserRole.Moderator);
 
+        // Admin only: takes the moderator role away from a person (they become a plain Customer).
+        [Authorize(Policy = "AdminOnly")]
+        [HttpPost("users/{id:int}/remove-moderator")]
+        public Task<IActionResult> RemoveModerator(int id) => DemoteAsync(id, UserRole.Moderator);
+
+        // Admin or moderator: turns a Seller back into a Customer.
+        [Authorize(Policy = "ModeratorOrAdmin")]
+        [HttpPost("users/{id:int}/make-customer")]
+        public Task<IActionResult> MakeCustomer(int id) => DemoteAsync(id, UserRole.Seller);
+
+        // Demotes a user from `expectedRole` back to Customer. The target must currently hold exactly that role,
+        // which also keeps admins (and, for the seller route, moderators) out of reach.
+        private async Task<IActionResult> DemoteAsync(int id, UserRole expectedRole)
+        {
+            var user = await _customer.GetByIdAsync(id);
+            if (user is null)
+                return NotFound("User not found.");
+
+            if (user.Role == UserRole.Admin)
+                return StatusCode(StatusCodes.Status403Forbidden, "Admins can't be changed here.");
+
+            if (user.Role != expectedRole)
+                return BadRequest($"This user is not a {expectedRole.ToString().ToLowerInvariant()}.");
+
+            user.Role = UserRole.Customer;
+            await _customer.UpdateAsync(id, user);
+
+            return Ok(ToAdminUser(user));
+        }
+
         private async Task<IActionResult> PromoteAsync(int id, UserRole newRole)
         {
             var user = await _customer.GetByIdAsync(id);
@@ -222,6 +263,10 @@ namespace IPAY.WebApi.Controllers
 
             if (user.Role == newRole)
                 return BadRequest($"This user is already a {newRole.ToString().ToLowerInvariant()}.");
+
+            // Nobody becomes an admin through the API.
+            if (newRole == UserRole.Admin)
+                return StatusCode(StatusCodes.Status403Forbidden, "Admins can't make other people admins.");
 
             // 403 with a message (not Forbid(), whose body is empty) so the admin page can show the reason.
             if (user.Role is UserRole.Admin or UserRole.Moderator)
@@ -260,6 +305,9 @@ namespace IPAY.WebApi.Controllers
                 customer.Password = _passwordHasher.Hash(customer.Password);
 
             customer.Email = customer.Email?.Trim().ToLowerInvariant();
+            if (customer.Role == UserRole.Admin)
+                return BadRequest("Admins can't make other people admins.");
+
             customer.Role = customer.Role == default ? UserRole.Customer : customer.Role;
             customer.EmailVerified ??= true; // админ создаёт — можно сразу verified
 
@@ -312,6 +360,9 @@ namespace IPAY.WebApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(customer.Password))
                 existing.Password = _passwordHasher.Hash(customer.Password);
+
+            if (customer.Role == UserRole.Admin && existing.Role != UserRole.Admin)
+                return BadRequest("Admins can't make other people admins.");
 
             existing.Role = customer.Role;
             existing.IsBanned = customer.IsBanned;

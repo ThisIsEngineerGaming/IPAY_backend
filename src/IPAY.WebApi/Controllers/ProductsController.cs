@@ -81,7 +81,7 @@ public class ProductsController(IProductService service) : ControllerBase
         return NoContent();
     }
 
-    [Authorize(Roles = "Seller,Admin")]
+    [Authorize(Roles = "Seller,Admin,Moderator")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

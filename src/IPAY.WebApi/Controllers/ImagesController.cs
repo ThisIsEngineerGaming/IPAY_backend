@@ -8,7 +8,7 @@ namespace IPAY.WebApi.Controllers;
 [Route("api/images")]
 public class ImagesController(CloudinaryImageService storage, ILogger<ImagesController> logger) : ControllerBase
 {
-    [Authorize(Roles = "Seller,Admin")]
+    [Authorize(Roles = "Seller,Admin,Moderator")]
     [HttpPost]
     [RequestSizeLimit(5 * 1024 * 1024)]
     public async Task<ActionResult<object>> Upload(IFormFile file, CancellationToken cancellationToken)

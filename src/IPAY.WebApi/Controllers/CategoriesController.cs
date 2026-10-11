@@ -16,14 +16,14 @@ public class CategoriesController(ICategoryService service) : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<CategoryDto>> GetById(int id) =>
         await service.GetByIdAsync(id) is { } category ? Ok(category) : NotFound();
-    [Authorize(Roles = "Seller,Admin")]
+    [Authorize(Roles = "Seller,Admin,Moderator")]
     [HttpPost]
     public async Task<ActionResult<CategoryDto>> Create(SaveCategoryDto category)
     {
         var created = await service.CreateAsync(category);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
-    [Authorize(Roles = "Seller,Admin")]
+    [Authorize(Roles = "Seller,Admin,Moderator")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, SaveCategoryDto category)
     {
@@ -31,7 +31,7 @@ public class CategoriesController(ICategoryService service) : ControllerBase
         await service.UpdateCategoryAsync(id, category);
         return NoContent();
     }
-    [Authorize(Roles = "Seller,Admin")]
+    [Authorize(Roles = "Seller,Admin,Moderator")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -39,7 +39,7 @@ public class CategoriesController(ICategoryService service) : ControllerBase
         await service.DeleteAsync(id);
         return NoContent();
     }
-    [Authorize(Roles = "Seller,Admin")]
+    [Authorize(Roles = "Seller,Admin,Moderator")]
     [HttpPut("{id:int}/products/{productId:int}")]
     public async Task<IActionResult> AddProduct(int id, int productId)
     {
@@ -47,7 +47,7 @@ public class CategoriesController(ICategoryService service) : ControllerBase
         await service.AddToCategoryAsync(id, productId);
         return NoContent();
     }
-    [Authorize(Roles = "Seller,Admin")]
+    [Authorize(Roles = "Seller,Admin,Moderator")]
     [HttpDelete("{id:int}/products/{productId:int}")]
     public async Task<IActionResult> RemoveProduct(int id, int productId)
     {

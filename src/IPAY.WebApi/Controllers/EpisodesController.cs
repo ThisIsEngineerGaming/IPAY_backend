@@ -17,14 +17,14 @@ public class EpisodesController(IEpisodeService service) : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<EpisodeDto>> GetById(int id) =>
         await service.GetByIdAsync(id) is { } episode ? Ok(episode) : NotFound();
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpPost]
     public async Task<ActionResult<EpisodeDto>> Create(SaveEpisodeDto episode)
     {
         var created = await service.CreateAsync(episode);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, SaveEpisodeDto episode)
     {
@@ -32,7 +32,7 @@ public class EpisodesController(IEpisodeService service) : ControllerBase
         await service.UpdateAsync(id, episode);
         return NoContent();
     }
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

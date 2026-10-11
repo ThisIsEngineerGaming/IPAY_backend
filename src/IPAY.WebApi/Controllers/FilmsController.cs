@@ -35,7 +35,7 @@ public sealed partial class FilmsController(
     public async Task<ActionResult<FilmDto>> GetById(int id) =>
         await films.GetByIdAsync(id) is { } film ? Ok(film) : NotFound();
 
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpPost]
     public async Task<ActionResult<FilmDto>> Create(SaveFilmDto film)
     {
@@ -43,7 +43,7 @@ public sealed partial class FilmsController(
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, SaveFilmDto film)
     {
@@ -52,7 +52,7 @@ public sealed partial class FilmsController(
         return NoContent();
     }
 
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -62,7 +62,7 @@ public sealed partial class FilmsController(
     }
 
     /// Copies a film from OMDb into our catalog. Matching genres are linked; missing genres are reported, never created.
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpPost("import/{imdbId}")]
     public async Task<IActionResult> Import(string imdbId, CancellationToken cancellationToken = default)
     {
