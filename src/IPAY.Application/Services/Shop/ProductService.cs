@@ -66,6 +66,9 @@ namespace IPAY.Application.Services.Shop
             var product = _productMapper.Map<Product>(adminProduct);
             product.Id = id;
             product.SellerId = existing.SellerId;
+            // Ratings come only from users rating the product, so an admin edit must not reset them.
+            product.Rating = existing.Rating;
+            product.RatingCount = existing.RatingCount;
             product.CreatedAt = existing.CreatedAt;
 
             await _repository.UpdateProductAsync(id, product);
@@ -104,6 +107,7 @@ namespace IPAY.Application.Services.Shop
             product.Id = id;
             product.SellerId = existing.SellerId;
             product.Rating = existing.Rating; // sellers can't change their own rating
+            product.RatingCount = existing.RatingCount;
             product.CreatedAt = existing.CreatedAt;
 
             await _repository.UpdateProductAsync(id, product);

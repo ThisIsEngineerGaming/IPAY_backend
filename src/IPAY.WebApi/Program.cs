@@ -74,6 +74,8 @@ builder.Services.AddScoped<IOrderService,OrderService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IManufacturerService, ManufacturerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductRatingService, ProductRatingService>();
+builder.Services.AddScoped<ISellerRequestService, SellerRequestService>();
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
 
@@ -201,6 +203,13 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ModeratorOrAdmin", policy =>
     {
         policy.RequireRole("Moderator", "Admin");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
+
+    // Anyone with a real account (not a guest) who isn't banned - e.g. allowed to rate products.
+    options.AddPolicy("RegisteredUser", policy =>
+    {
+        policy.RequireRole("Customer", "Seller", "Moderator", "Admin");
         policy.Requirements.Add(new NotBannedRequirement());
     });
 

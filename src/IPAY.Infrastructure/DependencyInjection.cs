@@ -93,6 +93,17 @@ namespace IPAY.Infrastructure
             services.AddScoped<IOrderItemRepository, OrderItemRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
 
+            // Users' star ratings of products (document id = "{productId}_{userId}", so one rating per user per product).
+            services.AddScoped<IProductRatingRepo>(sp =>
+                new ProductRatingRepo(
+                    sp.GetRequiredService<FirestoreDb>(),
+                    "products",
+                    "productRatings"));
+
+            // Customers asking to become sellers.
+            services.AddDocumentRepository<SellerRequest, SellerRequestDocument>(
+                "sellerRequests", SellerRequestDocument.FromEntity, document => document.ToEntity());
+
             services.AddScoped<IProductRepo>(sp =>
               new ProductRepo(
                   sp.GetRequiredService<FirestoreDb>(),

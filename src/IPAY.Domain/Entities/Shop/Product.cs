@@ -9,6 +9,9 @@ namespace IPAY.Domain.Entities.Shop
         // without a custom converter - same as Rating below.
         public double Price { get; set; }
         public double Rating { get; set; }
+
+        /// <summary>How many registered users have rated this product. Rating is the average of their ratings.</summary>
+        public int RatingCount { get; set; }
         public double DiscountedPrice { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
         public string Manufacturer { get; set; } = string.Empty;

@@ -28,7 +28,7 @@ namespace IPAY.Application.Validators.Shop
                     .WithMessage("Скидочная цена не может превышать обычную.")
                 .Must(HaveMax2Decimals);
 
-            RuleFor(p => p.Rating).Must(BeFinite).InclusiveBetween(0, 5);
+            // Rating isn't part of the request: it comes from users' ratings (see ProductRatingService).
 
             RuleFor(p => p.ImageUrl)
                 .NotEmpty().MaximumLength(2048)

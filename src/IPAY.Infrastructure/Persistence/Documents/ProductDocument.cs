@@ -12,6 +12,8 @@ public class ProductDocument
     [FirestoreProperty] public string Name { get; set; } = string.Empty;
     [FirestoreProperty] public double Price { get; set; }
     [FirestoreProperty] public double Rating { get; set; }
+    // Missing in documents created before user ratings existed -> reads back as 0.
+    [FirestoreProperty] public int RatingCount { get; set; }
     [FirestoreProperty] public double DiscountedPrice { get; set; }
     [FirestoreProperty] public string ImageUrl { get; set; } = string.Empty;
     [FirestoreProperty] public string Manufacturer { get; set; } = string.Empty;
@@ -28,6 +30,7 @@ public class ProductDocument
         NameLower = entity.Name.Trim().ToLowerInvariant(),
         Price = entity.Price,
         Rating = entity.Rating,
+        RatingCount = entity.RatingCount,
         DiscountedPrice = entity.DiscountedPrice,
         ImageUrl = entity.ImageUrl,
         Manufacturer = entity.Manufacturer,
@@ -44,6 +47,7 @@ public class ProductDocument
         Name = Name,
         Price = Price,
         Rating = Rating,
+        RatingCount = RatingCount,
         DiscountedPrice = DiscountedPrice,
         ImageUrl = ImageUrl,
         Manufacturer = Manufacturer,
