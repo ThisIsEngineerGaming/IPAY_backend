@@ -168,6 +168,52 @@ namespace IPAY.Infrastructure.Identity
             }
         }
 
+        // Custom claim on the Firebase account: the customer id an email change was started for.
+        // Only the Admin SDK can write claims, so nobody can fake it from a browser.
+        private const string EmailChangeClaim = "emailChangeFor";
+
+        public async Task<string> BeginEmailChangeAsync(string currentEmail, int customerId)
+        {
+            var user = await _auth.GetUserByEmailAsync(currentEmail);
+
+            await _auth.SetCustomUserClaimsAsync(user.Uid, new Dictionary<string, object>
+            {
+                [EmailChangeClaim] = customerId.ToString()
+            });
+
+            return await _auth.CreateCustomTokenAsync(user.Uid);
+        }
+
+        public async Task<bool> IsEmailChangeConfirmedAsync(string newEmail, int customerId)
+        {
+            try
+            {
+                var user = await _auth.GetUserByEmailAsync(newEmail);
+
+                return user.EmailVerified &&
+                       user.CustomClaims is not null &&
+                       user.CustomClaims.TryGetValue(EmailChangeClaim, out var marker) &&
+                       string.Equals(marker?.ToString(), customerId.ToString(), StringComparison.Ordinal);
+            }
+            catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+            {
+                return false; // the link was not opened yet, so the account still has the old address
+            }
+        }
+
+        public async Task CompleteEmailChangeAsync(string newEmail)
+        {
+            try
+            {
+                var user = await _auth.GetUserByEmailAsync(newEmail);
+                await _auth.SetCustomUserClaimsAsync(user.Uid, new Dictionary<string, object>());
+            }
+            catch (FirebaseAuthException ex) when (ex.AuthErrorCode == AuthErrorCode.UserNotFound)
+            {
+                // nothing to clean up
+            }
+        }
+
         public async Task DeleteAccountAsync(string email)
         {
             try

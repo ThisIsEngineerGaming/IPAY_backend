@@ -42,5 +42,23 @@ namespace IPAY.Application.Interfaces.Auth
         /// account's sign-ins, which Firebase timestamps). Null when there is no account or it never changed.
         /// </summary>
         Task<DateTimeOffset?> GetPasswordChangedAtAsync(string email);
+
+        /// <summary>
+        /// Starts an email change for the customer whose Firebase account has this (current) email: marks that
+        /// account with the customer's id and returns a custom sign-in token for it. The client signs in with the
+        /// token and asks Firebase to email the confirmation link to the new address - no password needed.
+        /// The account must exist (see <see cref="EnsureAccountAsync"/>).
+        /// </summary>
+        Task<string> BeginEmailChangeAsync(string currentEmail, int customerId);
+
+        /// <summary>
+        /// True when a Firebase account now has this email, the email is verified (the link was opened) and the
+        /// account carries the marker set by <see cref="BeginEmailChangeAsync"/> for this customer. That marker is
+        /// what ties the confirmed address to the change this customer started.
+        /// </summary>
+        Task<bool> IsEmailChangeConfirmedAsync(string newEmail, int customerId);
+
+        /// <summary>Removes the pending-change marker once the change is done. Best effort.</summary>
+        Task CompleteEmailChangeAsync(string newEmail);
     }
 }

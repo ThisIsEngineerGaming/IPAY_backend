@@ -113,9 +113,6 @@ namespace IPAY.Application.Validators.Auth
                 .NotEmpty().WithMessage("New email is required.")
                 .EmailAddress().WithMessage("Enter a valid email address.")
                 .MaximumLength(100).WithMessage("Email must not exceed 100 characters.");
-
-            RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("Enter your current password.");
         }
     }
 
@@ -123,11 +120,10 @@ namespace IPAY.Application.Validators.Auth
     {
         public ConfirmEmailChangeValidator()
         {
-            RuleFor(x => x.IdToken)
-                .NotEmpty().WithMessage("Verification token is missing. Please try again.");
-
-            RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("Enter your current password.");
+            RuleFor(x => x.NewEmail)
+                .NotEmpty().WithMessage("New email is required.")
+                .EmailAddress().WithMessage("Enter a valid email address.")
+                .MaximumLength(100).WithMessage("Email must not exceed 100 characters.");
         }
     }
 }

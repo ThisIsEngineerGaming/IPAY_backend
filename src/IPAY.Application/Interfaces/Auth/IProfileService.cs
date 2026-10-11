@@ -54,12 +54,17 @@ namespace IPAY.Application.Interfaces.Auth
         /// </summary>
         Task<ProfileResult<ProfileDto>> ConfirmPasswordChangeAsync(int userId, ConfirmPasswordChangeDto dto);
 
-        /// <summary>Email change, step 1: password is right and the new address is free. Changes nothing.</summary>
-        Task<ProfileResult<ProfileDto>> StartEmailChangeAsync(int userId, StartEmailChangeDto dto);
+        /// <summary>
+        /// Email change, step 1 (email only, no password): the new address is free. Marks the person's Firebase
+        /// account as having a change pending and returns a Firebase sign-in token, which the client uses once to
+        /// have Firebase email the confirmation link to the new address. Changes nothing in our own data yet.
+        /// </summary>
+        Task<ProfileResult<StartEmailChangeResultDto>> StartEmailChangeAsync(int userId, StartEmailChangeDto dto);
 
         /// <summary>
-        /// Email change, step 2: the Firebase ID token proves the new address was verified (the person clicked
-        /// the link). Switches the email and returns a fresh session, because the JWT carries the email.
+        /// Email change, step 2: Firebase itself says the new address was verified (the person opened the link)
+        /// and that it belongs to the change this account started. Switches the email and returns a fresh
+        /// session, because the JWT carries the email.
         /// </summary>
         Task<ProfileResult<AuthResponse>> ConfirmEmailChangeAsync(int userId, ConfirmEmailChangeDto dto);
 

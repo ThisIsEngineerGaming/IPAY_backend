@@ -53,20 +53,30 @@ namespace IPAY.Application.DTOs.Auth
         public string Email { get; set; } = string.Empty;
     }
 
-    /// <summary>Step 1 of an email change: check the password and that the new address is free.</summary>
+    /// <summary>
+    /// Step 1 of an email change: the address to switch to. No password is involved - the whole change is
+    /// confirmed through the Firebase email sent to that address.
+    /// </summary>
     public class StartEmailChangeDto
     {
         public string NewEmail { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
     }
 
     /// <summary>
-    /// Step 2 of an email change, after the person clicked the Firebase link sent to the NEW address.
-    /// IdToken is a Firebase ID token for the account that now carries the (verified) new email.
+    /// What step 1 hands back: a short-lived Firebase sign-in token for the signed-in person's own Firebase
+    /// account. The client uses it once to ask Firebase to email the confirmation link to the new address.
+    /// </summary>
+    public class StartEmailChangeResultDto
+    {
+        public string FirebaseToken { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Step 2 of an email change, after the person opened the Firebase link sent to the NEW address.
+    /// Nothing but the address is sent: the backend asks Firebase itself whether it was confirmed.
     /// </summary>
     public class ConfirmEmailChangeDto
     {
-        public string IdToken { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public string NewEmail { get; set; } = string.Empty;
     }
 }
