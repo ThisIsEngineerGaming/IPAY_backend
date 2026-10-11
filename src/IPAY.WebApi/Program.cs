@@ -15,9 +15,11 @@ using IPAY.Application.Validators.Auth;
 using IPAY.Application.Validators.Media;
 using IPAY.Application.Validators.Shop;
 using IPAY.Domain.Entities.Users;
+using IPAY.Domain.Interfaces.ForRepos.Auth;
 using IPAY.Domain.Interfaces.ForRepos.Shop;
 using IPAY.Infrastructure;
 using IPAY.Infrastructure.Authorization;
+using IPAY.Infrastructure.Repositories.Auth;
 using IPAY.Infrastructure.Repositories.Shop;
 using IPAY.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -112,6 +114,7 @@ builder.Services.AddSingleton(
     builder.Configuration.GetSection(TwoFactorOptions.SectionName).Get<TwoFactorOptions>() ?? new TwoFactorOptions());
 builder.Services.AddScoped<ITwoFactorService, TwoFactorService>();
 builder.Services.AddScoped<IJWT, JwtService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.Configure<OmdbOptions>(
     builder.Configuration.GetSection(OmdbOptions.SectionName));
 

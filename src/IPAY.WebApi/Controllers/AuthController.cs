@@ -1,6 +1,7 @@
 ﻿using IPAY.Application.DTOs.Auth;
 using IPAY.Application.Interfaces.Auth;
 using IPAY.Application.Services.Auth;
+using IPAY.Domain.Entities.Auth;
 using IPAY.Domain.Entities.Users;
 using IPAY.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -22,9 +23,13 @@ namespace IPAY.WebApi.Controllers
         private readonly IUser<Customer> _customer;
         private readonly ILogger<AuthController>? _logger;
 
+        private readonly IRefreshTokenService _refreshTokenService;
+
+        private readonly IGuestService _guest;
 
 
-        public AuthController(IAuthDto<RegisterDto> register, ILogin login, IUser<Customer> customer, IGoogleLogin googleLogin, ITwoFactorService twoFactor, ILogger<AuthController>? logger = null)
+
+        public AuthController(IAuthDto<RegisterDto> register, ILogin login, IUser<Customer> customer, IGuestService guest, IRefreshTokenService refreshTokenService, IGoogleLogin googleLogin, ITwoFactorService twoFactor, ILogger<AuthController>? logger = null)
         {
             _logger = logger;
             _register = register;
@@ -32,6 +37,8 @@ namespace IPAY.WebApi.Controllers
             _customer = customer;
             _googleLogin = googleLogin;
             _twoFactor = twoFactor;
+            _refreshTokenService = refreshTokenService;
+            _guest = guest;
 
         }
 
@@ -151,6 +158,57 @@ namespace IPAY.WebApi.Controllers
             await _customer.UpdateAsync(id, user);
 
             return Ok("Succed");
+        }
+
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult<AuthResponse>> Refresh([FromBody] RefreshTokenRequest request)
+        {
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var result = await _refreshTokenService.RefreshAsync(request.RefreshToken, ip);
+
+            // 400, не 401 — у вас axios на 401 кидает на /login
+            if (result is null)
+                return BadRequest("Invalid or expired refresh token");
+
+            return Ok(result);
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest request)
+        {
+            await _refreshTokenService.RevokeAsync(request.RefreshToken);
+            return Ok();
+        }
+
+        [HttpPost("guests/session")]
+        public async Task<IActionResult> EnsureGuestSession([FromBody] GuestSessionDto? dto)
+        {
+            var guest = await _guest.GetOrCreateAsync(dto?.SessionKey, dto?.Name);
+
+            if (guest.IsBanned)
+                return StatusCode(403, "Заблоковано");
+
+            var response = await _refreshTokenService.CreateAuthResponseAsync(
+                guest.Id,
+                $"guest-{guest.Id}@guest.local",
+                guest.Name,
+                UserRole.Guest,
+                HttpContext.Connection.RemoteIpAddress?.ToString());
+
+            return Ok(new
+            {
+                guest.Id,
+                guest.Name,
+                guest.Role,
+                guest.IsBanned,
+                guest.SessionKey,
+                guest.CreatedAt,
+                accessToken = response.AccessToken,
+                refreshToken = response.RefreshToken,
+                tokenType = response.TokenType,
+                expiresAt = response.ExpiresAt
+            });
         }
 
     }
