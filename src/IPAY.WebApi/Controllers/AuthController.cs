@@ -23,6 +23,7 @@ namespace IPAY.WebApi.Controllers
         private readonly IUser<Customer> _customer;
         private readonly ILogger<AuthController>? _logger;
 
+
         private readonly IRefreshTokenService _refreshTokenService;
 
         private readonly IGuestService _guest;
@@ -30,6 +31,7 @@ namespace IPAY.WebApi.Controllers
 
 
         public AuthController(IAuthDto<RegisterDto> register, ILogin login, IUser<Customer> customer, IGuestService guest, IRefreshTokenService refreshTokenService, IGoogleLogin googleLogin, ITwoFactorService twoFactor, ILogger<AuthController>? logger = null)
+
         {
             _logger = logger;
             _register = register;

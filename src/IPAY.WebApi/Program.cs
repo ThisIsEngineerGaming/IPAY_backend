@@ -79,6 +79,7 @@ builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
 
 
+
 // Media request validators; applied to controllers through ValidationFilter.
 builder.Services.AddScoped<IValidator<SaveFilmDto>, SaveFilmDtoValidator>();
 builder.Services.AddScoped<IValidator<SaveSeriesDto>, SaveSeriesDtoValidator>();
@@ -92,6 +93,7 @@ builder.Services.AddScoped<IValidator<CreateSellerProductDto>, CreateSellerProdu
 builder.Services.AddScoped<IValidator<UpdateAdminProductDto>, UpdateAdminProductDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdateSellerProductDto>, UpdateSellerProductDtoValidator>();
 builder.Services.AddScoped<ValidationFilter>();
+
 
 builder.Services.AddScoped<IValidator<ChangeUsernameDto>, ChangeUsernameValidator>();
 builder.Services.AddScoped<IValidator<ChangePasswordDto>, ChangePasswordValidator>();

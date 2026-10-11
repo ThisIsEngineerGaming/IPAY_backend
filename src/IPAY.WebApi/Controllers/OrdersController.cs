@@ -73,6 +73,15 @@ namespace IPAY.WebApi.Controllers
             return NoContent();
         }
 
+        [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
+        [HttpGet("{id:int}/status-history")]
+        public async Task<ActionResult<IReadOnlyList<OrderStatusHistoryDto>>> GetStatusHistory(int id)
+        {
+            var history = await _orderService.GetStatusHistoryAsync(id);
+            return Ok(history);
+        }
+
         // ==================== ORDER ITEMS ====================
         [Authorize(Policy = "NotBanned")]
         [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
@@ -98,5 +107,7 @@ namespace IPAY.WebApi.Controllers
             await _orderService.DeleteItemAsync(orderId, itemId);
             return NoContent();
         }
+
+
     }
 }

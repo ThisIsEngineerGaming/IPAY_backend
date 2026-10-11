@@ -27,18 +27,22 @@ namespace IPAY.Application.Services.Auth
         private readonly IJWT _jwt;
         private readonly TwoFactorOptions _options;
 
+        private readonly IRefreshTokenService _refreshTokenService;
+
         public TwoFactorService(
             ITwoFactorStore store,
             IEmailSender email,
             IUser<Customer> customers,
             IJWT jwt,
-            TwoFactorOptions options)
+            TwoFactorOptions options,
+            IRefreshTokenService refreshTokenService)
         {
             _store = store;
             _email = email;
             _customers = customers;
             _jwt = jwt;
             _options = options;
+            _refreshTokenService = refreshTokenService;
         }
 
         // No SMTP server configured => nobody could receive a code, so don't lock everyone out.
@@ -112,15 +116,15 @@ namespace IPAY.Application.Services.Auth
             if (user is null || user.Id is null || string.IsNullOrWhiteSpace(user.Email) || user.IsBanned)
                 return TwoFactorResult<AuthResponse>.Fail("Sign-in failed. Please try again.");
 
-            var token = _jwt.GenerateToken(user.Id.Value.ToString(), user.Email, user.Role);
+            var token = _jwt.GenerateAccessToken(user.Id.Value.ToString(), user.Email, user.Role);
 
-            return TwoFactorResult<AuthResponse>.Ok(new AuthResponse
-            {
-                AccessToken = token,
-                TokenType = "Bearer",
-                ExpiresAt = DateTime.UtcNow.AddHours(2),
-                User = new LoginDto { Email = user.Email, Name = user.Name }
-            });
+            var auth = await _refreshTokenService.CreateAuthResponseAsync(
+                user.Id.Value,
+                user.Email!,
+                user.Name,
+                user.Role);
+
+            return TwoFactorResult<AuthResponse>.Ok(auth);
         }
 
         public async Task<TwoFactorResult<string>> ResendAsync(string challengeId)
