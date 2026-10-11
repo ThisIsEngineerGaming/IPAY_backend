@@ -35,15 +35,22 @@ namespace IPAY.Application.Interfaces.Auth
         Task<ProfileResult<ProfileDto>> ChangePhoneAsync(int userId, ChangePhoneDto dto);
 
         /// <summary>
-        /// Password change, step 1: the current password is right and a Firebase account exists to send the
-        /// reset email from. The client then asks Firebase to email the reset link. Changes nothing here.
+        /// Password change, option 1: the current password is right, so the new one is stored right away
+        /// (and copied to the Firebase account so both keep the same password).
         /// </summary>
-        Task<ProfileResult<ProfileDto>> StartPasswordChangeAsync(int userId, StartPasswordChangeDto dto);
+        Task<ProfileResult<ProfileDto>> ChangePasswordAsync(int userId, ChangePasswordDto dto);
 
         /// <summary>
-        /// Password change, step 2: the person opened the Firebase reset email and chose the new password there.
-        /// The Firebase ID token (from signing in with that new password) proves it, and only then is our
-        /// stored hash updated. There is deliberately no way to change the password without this step.
+        /// Password change, option 2 (email reset), step 1: makes sure a Firebase account exists to send the
+        /// reset email from. No current password is needed: nothing changes until step 2. The client then asks
+        /// Firebase to email the reset link.
+        /// </summary>
+        Task<ProfileResult<ProfileDto>> StartPasswordChangeAsync(int userId);
+
+        /// <summary>
+        /// Password change, option 2 (email reset), step 2: the person opened the Firebase reset email and chose
+        /// the new password there. The Firebase ID token (from signing in with that new password) proves it,
+        /// and only then is our stored hash updated.
         /// </summary>
         Task<ProfileResult<ProfileDto>> ConfirmPasswordChangeAsync(int userId, ConfirmPasswordChangeDto dto);
 

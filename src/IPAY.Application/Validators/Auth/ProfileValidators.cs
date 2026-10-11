@@ -74,23 +74,11 @@ namespace IPAY.Application.Validators.Auth
         }
     }
 
-    public class StartPasswordChangeValidator : AbstractValidator<StartPasswordChangeDto>
+    /// <summary>Direct password change: current password + new password.</summary>
+    public class ChangePasswordValidator : AbstractValidator<ChangePasswordDto>
     {
-        public StartPasswordChangeValidator()
+        public ChangePasswordValidator()
         {
-            RuleFor(x => x.CurrentPassword)
-                .NotEmpty().WithMessage("Current password is required.");
-        }
-    }
-
-    /// <summary>Signed-in password change, step 2: needs the current password.</summary>
-    public class ConfirmPasswordChangeValidator : AbstractValidator<ConfirmPasswordChangeDto>
-    {
-        public ConfirmPasswordChangeValidator()
-        {
-            RuleFor(x => x.IdToken)
-                .NotEmpty().WithMessage("Confirmation is missing. Please try again.");
-
             RuleFor(x => x.CurrentPassword)
                 .NotEmpty().WithMessage("Current password is required.");
 
@@ -102,8 +90,9 @@ namespace IPAY.Application.Validators.Auth
     }
 
     /// <summary>
-    /// "Forgot password" step 2. Same DTO as above, but there is no current password (that is the point), so it
-    /// is NOT registered in DI next to ConfirmPasswordChangeValidator; ProfileService uses it directly.
+    /// Step 2 of an emailed password reset (signed-in profile page and "forgot password" alike): the emailed
+    /// link is the proof, so there is no current password to check. Registered in DI as the one
+    /// IValidator&lt;ConfirmPasswordChangeDto&gt;.
     /// </summary>
     public class ResetForgottenPasswordValidator : AbstractValidator<ConfirmPasswordChangeDto>
     {

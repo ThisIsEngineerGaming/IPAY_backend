@@ -93,10 +93,9 @@ builder.Services.AddScoped<ValidationFilter>();
 
 builder.Services.AddScoped<IValidator<ChangeUsernameDto>, ChangeUsernameValidator>();
 builder.Services.AddScoped<IValidator<ChangePhoneDto>, ChangePhoneValidator>();
-builder.Services.AddScoped<IValidator<StartPasswordChangeDto>, StartPasswordChangeValidator>();
-// ResetForgottenPasswordValidator is deliberately NOT registered: it validates the same DTO type, and
-// ProfileService creates it itself so DI cannot hand it out in place of this one.
-builder.Services.AddScoped<IValidator<ConfirmPasswordChangeDto>, ConfirmPasswordChangeValidator>();
+builder.Services.AddScoped<IValidator<ChangePasswordDto>, ChangePasswordValidator>();
+// Step 2 of the emailed reset (profile page and "forgot password"): no current password, the link is the proof.
+builder.Services.AddScoped<IValidator<ConfirmPasswordChangeDto>, ResetForgottenPasswordValidator>();
 builder.Services.AddScoped<IValidator<StartEmailChangeDto>, StartEmailChangeValidator>();
 builder.Services.AddScoped<IValidator<ConfirmEmailChangeDto>, ConfirmEmailChangeValidator>();
 
