@@ -100,6 +100,7 @@ namespace IPAY.Infrastructure
             services.AddScoped<IOrderStatusHistoryRepository, OrderStatusHistoryRepository>();
             services.AddScoped<IPaymentProvider, MockPaymentProvider>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IReviewRepository, ReviewRepository>();
 
             // Users' star ratings of products (document id = "{productId}_{userId}", so one rating per user per product).
             services.AddScoped<IProductRatingRepo>(sp =>
