@@ -100,6 +100,7 @@ namespace IPAY.Infrastructure
             services.AddScoped<IOrderStatusHistoryRepository, OrderStatusHistoryRepository>();
             services.AddScoped<IPaymentProvider, MockPaymentProvider>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IReviewRepository, ReviewRepository>();
 
             services.AddScoped<IProductRepo>(sp =>
               new ProductRepo(

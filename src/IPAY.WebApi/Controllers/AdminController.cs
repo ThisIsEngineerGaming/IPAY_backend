@@ -15,30 +15,26 @@ namespace IPAY.WebApi.Controllers
     public class AdminController:ControllerBase
     {
         private readonly IUser<Customer> _customer;
-        private readonly ILogger<AdminController>? _logger;
+
 
         private readonly IGuestService _guest;
 
         private readonly IPasswordHashingService _passwordHasher;
 
-        private readonly IJWT _jwt;
 
-        private readonly IRefreshTokenService _refreshTokenService;
+
+
 
         public AdminController(
             IUser<Customer> customer,
             IGuestService guest,
-            IPasswordHashingService passwordHasher,
-            IJWT jwt,
-            IRefreshTokenService refreshTokenService,
-            ILogger<AdminController>? logger = null)
+            IPasswordHashingService passwordHasher)
         {
             _customer = customer;
             _guest = guest;
             _passwordHasher = passwordHasher;
-            _jwt = jwt;
-            _logger = logger;
-            _refreshTokenService= refreshTokenService;
+
+
         }
 
 

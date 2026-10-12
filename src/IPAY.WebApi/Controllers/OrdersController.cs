@@ -2,6 +2,7 @@
 using IPAY.Application.Interfaces.Shop;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace IPAY.WebApi.Controllers
 {
@@ -18,7 +19,7 @@ namespace IPAY.WebApi.Controllers
 
         // ==================== ORDER ====================
         [Authorize(Policy ="NotBanned")]
-        [Authorize(Roles ="Admin,Moderator,Customer,Seller")]
+        [Authorize(Roles ="Admin,Moderator")]
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetAll()
         {
@@ -44,14 +45,16 @@ namespace IPAY.WebApi.Controllers
             var orders = await _orderService.GetByUserIdAsync(userId);
             return Ok(orders);
         }
+        [HttpPost]
         [Authorize(Policy = "NotBanned")]
         [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
-        [HttpPost]
         public async Task<ActionResult<OrderDto>> Create([FromBody] CreateOrderDto dto)
         {
-            // В реальном проекте UserId берётся из токена:
-            // var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var userId = 1; // временно для курсовой
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("sub")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+                return Unauthorized("User id not found in token");
 
             var order = await _orderService.CreateAsync(dto, userId);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
@@ -80,6 +83,21 @@ namespace IPAY.WebApi.Controllers
         {
             var history = await _orderService.GetStatusHistoryAsync(id);
             return Ok(history);
+        }
+
+        [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
+        [HttpGet("my")]
+        public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetMyOrders()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("sub")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+                return Unauthorized("User id not found in token");
+
+            var orders = await _orderService.GetByUserIdAsync(userId);
+            return Ok(orders);
         }
 
         // ==================== ORDER ITEMS ====================
