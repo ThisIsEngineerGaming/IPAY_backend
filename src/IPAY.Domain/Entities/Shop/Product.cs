@@ -24,6 +24,10 @@ namespace IPAY.Domain.Entities.Shop
 
         public string SellerId { get; set; } = string.Empty;
 
+        /// <summary>The price a customer actually pays: the discounted price when a valid discount exists, otherwise the list price.</summary>
+        public double GetFinalPrice() =>
+            DiscountedPrice > 0 && DiscountedPrice < Price ? DiscountedPrice : Price;
+
         /// <summary>Percentage discount off the original price, e.g. 25 for 25% off.</summary>
         public double GetDiscountPercent()
         {

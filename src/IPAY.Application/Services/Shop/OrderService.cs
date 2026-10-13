@@ -113,9 +113,8 @@ namespace IPAY.Application.Services.Shop
                     OrderId = order.Id,
                     ProductId = itemDto.ProductId,
                     Quantity = itemDto.Quantity,
-                    Price = product.Price  ,
-                    ProductName=product.Name// ← вот здесь берём цену
-                                                   // если есть скидка: Price = product.Price * (1 - product.Discount / 100)
+                    Price = product.GetFinalPrice(),
+                    ProductName=product.Name
                 };
 
                 orderItem = await _orderItemRepository.AddAsync(orderItem);
@@ -166,7 +165,7 @@ namespace IPAY.Application.Services.Shop
                 OrderId = orderId,
                 ProductId = dto.ProductId,
                 Quantity = dto.Quantity,
-                Price = product.Price,
+                Price = product.GetFinalPrice(),
                 ProductName = product.Name,
             };
 

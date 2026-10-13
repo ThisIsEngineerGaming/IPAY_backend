@@ -47,7 +47,7 @@ namespace IPAY.Application.Services.Shop
             {
                 dto.ProductName = product.Name;
                 dto.ImageUrl = product.ImageUrl;
-                dto.Price = product.Price;
+                dto.Price = product.GetFinalPrice();
             }
 
             return dto;
