@@ -64,6 +64,25 @@ namespace IPAY.WebApi.Controllers
             await _orderService.UpdateStatusAsync(id, dto);
             return NoContent();
         }
+
+        // A customer cancelling THEIR OWN order (the owner is taken from the token, never from the request).
+        // Staff cancel any order through the status endpoint above.
+        [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
+        [HttpPost("{id:int}/cancel")]
+        public async Task<ActionResult<OrderDto>> Cancel(int id)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var outcome = await _orderService.CancelAsync(id, userId);
+
+            if (outcome.Result == CancelOrderResult.Cancelled)
+                return Ok(outcome.Order);
+
+            if (outcome.Result == CancelOrderResult.NotCancellable)
+                return BadRequest("This order has already shipped, so it can no longer be cancelled.");
+
+            return NotFound($"Order with id {id} not found");
+        }
         [Authorize(Policy = "NotBanned")]
         [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
         [HttpDelete("{id:int}")]

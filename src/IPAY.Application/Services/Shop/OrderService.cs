@@ -137,6 +137,28 @@ namespace IPAY.Application.Services.Shop
             await _orderRepository.UpdateAsync(id, order);
         }
 
+        public async Task<CancelOrderOutcome> CancelAsync(int orderId, int userId)
+        {
+            var order = await _orderRepository.GetByIdAsync(orderId);
+
+            // Someone else's order must look exactly like a missing one, so ids can't be probed.
+            if (order is null || order.UserId != userId)
+                return new CancelOrderOutcome(CancelOrderResult.NotFound);
+
+            // Only before it ships. (Cancelling an already-cancelled order is treated as success.)
+            if (order.Status is not (OrderStatus.Pending or OrderStatus.Paid or OrderStatus.Cancelled))
+                return new CancelOrderOutcome(CancelOrderResult.NotCancellable);
+
+            if (order.Status != OrderStatus.Cancelled)
+            {
+                order.Status = OrderStatus.Cancelled;
+                await _orderRepository.UpdateAsync(orderId, order);
+            }
+
+            order.Items = (await _orderItemRepository.GetByOrderIdAsync(orderId)).ToList();
+            return new CancelOrderOutcome(CancelOrderResult.Cancelled, _mapper.Map<OrderDto>(order));
+        }
+
         public async Task DeleteAsync(int id)
         {
             var items = await _orderItemRepository.GetByOrderIdAsync(id);

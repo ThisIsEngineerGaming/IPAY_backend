@@ -5,6 +5,15 @@ using System.Text;
 
 namespace IPAY.Application.Interfaces.Shop
 {
+    public enum CancelOrderResult
+    {
+        Cancelled,
+        NotFound,       // no such order, or it belongs to someone else (deliberately indistinguishable)
+        NotCancellable  // already on its way or delivered
+    }
+
+    public record CancelOrderOutcome(CancelOrderResult Result, OrderDto? Order = null);
+
     public interface IOrderService
     {
         // Order
@@ -13,6 +22,9 @@ namespace IPAY.Application.Interfaces.Shop
         Task<IReadOnlyList<OrderDto>> GetByUserIdAsync(int userId);
         Task<OrderDto> CreateAsync(CreateOrderDto dto, int userId);
         Task UpdateStatusAsync(int id, UpdateOrderStatusDto dto);
+
+        /// <summary>A customer cancelling their OWN order. Only allowed before it has shipped.</summary>
+        Task<CancelOrderOutcome> CancelAsync(int orderId, int userId);
         Task DeleteAsync(int id);
 
         // OrderItems (внутри заказа)
