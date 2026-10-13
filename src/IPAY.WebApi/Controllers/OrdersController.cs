@@ -2,6 +2,7 @@
 using IPAY.Application.Interfaces.Shop;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace IPAY.WebApi.Controllers
 {
@@ -49,9 +50,8 @@ namespace IPAY.WebApi.Controllers
         [HttpPost]
         public async Task<ActionResult<OrderDto>> Create([FromBody] CreateOrderDto dto)
         {
-            // В реальном проекте UserId берётся из токена:
-            // var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var userId = 1; // временно для курсовой
+            // The order belongs to whoever is signed in (same claim the cart uses).
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var order = await _orderService.CreateAsync(dto, userId);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
