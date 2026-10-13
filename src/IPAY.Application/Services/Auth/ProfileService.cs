@@ -113,7 +113,7 @@ namespace IPAY.Application.Services.Auth
                 return ProfileResult<ProfileDto>.NotFound();
 
             if (!HasPassword(user))
-                return ProfileResult<ProfileDto>.Fail("This account signs in with Google, so it has no password to change.");
+                return ProfileResult<ProfileDto>.Fail("This account has no password yet. Use \"Create password\" to add one.");
 
             if (!_passwordHasher.Verify(dto.CurrentPassword, user.Password!))
                 return ProfileResult<ProfileDto>.Fail("Current password is incorrect.");
@@ -161,9 +161,8 @@ namespace IPAY.Application.Services.Auth
             if (user is null)
                 return ProfileResult<ProfileDto>.NotFound();
 
-            if (!HasPassword(user))
-                return ProfileResult<ProfileDto>.Fail("This account signs in with Google, so it has no password to change.");
-
+            // Google-only accounts (no password yet) are allowed here: this is how they create one. The emailed
+            // Firebase reset link is the proof of ownership either way.
             if (string.IsNullOrWhiteSpace(user.Email))
                 return ProfileResult<ProfileDto>.Fail("Your account has no email address to send the confirmation to.");
 
@@ -191,9 +190,6 @@ namespace IPAY.Application.Services.Auth
             var user = await GetActiveUserAsync(userId);
             if (user is null)
                 return ProfileResult<ProfileDto>.NotFound();
-
-            if (!HasPassword(user))
-                return ProfileResult<ProfileDto>.Fail("This account signs in with Google, so it has no password to change.");
 
             // The token must be a real Firebase sign-in for THIS account...
             var identity = await _firebase.VerifyIdTokenAsync(dto.IdToken);
