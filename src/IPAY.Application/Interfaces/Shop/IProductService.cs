@@ -15,6 +15,10 @@ namespace IPAY.Application.Interfaces.Shop
 
         Task<IReadOnlyList<ProductDto>> GetLimitAsync(int limit, string? lastDocid);
 
+  
+
+
+
         Task<IReadOnlyList<ProductDto?>> GetFilteredAsync(int limit, string? lastDocId, int? categoryId, double? minPrice, double? maxPrice, string? brand, string? search);
 
         Task<IReadOnlyList<ProductDto>> GetSortedAsync(
