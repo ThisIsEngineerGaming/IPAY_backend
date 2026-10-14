@@ -112,6 +112,14 @@ public sealed partial class FilmsController(
         {
             return StatusCode(StatusCodes.Status502BadGateway, new { message = "Could not reach OMDb.", detail = ex.Message });
         }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return StatusCode(StatusCodes.Status504GatewayTimeout, new { message = "OMDb took too long to respond." });
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "OMDb lookup failed.", detail = ex.Message });
+        }
     }
 
     [HttpGet("omdb/{imdbId}")]
@@ -130,6 +138,14 @@ public sealed partial class FilmsController(
         catch (HttpRequestException ex)
         {
             return StatusCode(StatusCodes.Status502BadGateway, new { message = "Could not reach OMDb.", detail = ex.Message });
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return StatusCode(StatusCodes.Status504GatewayTimeout, new { message = "OMDb took too long to respond." });
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "OMDb lookup failed.", detail = ex.Message });
         }
     }
 }

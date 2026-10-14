@@ -256,6 +256,12 @@ using (var scope = app.Services.CreateScope())
             "Password logins will NOT ask for a code.");
     }
 }
+if (string.IsNullOrWhiteSpace(builder.Configuration[$"{OmdbOptions.SectionName}:ApiKey"]))
+{
+    app.Logger.LogWarning(
+        "Omdb:ApiKey is not set. OMDb lookups (the movies page) will fail. " +
+        "On Render, add the environment variable Omdb__ApiKey (two underscores).");
+}
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
