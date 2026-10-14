@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
 using IPAY.Application.DTOs.Media;
 using IPAY.Application.Interfaces.Media;
-using IPAY.Application.Services.Media;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,13 +11,13 @@ namespace IPAY.WebApi.Controllers;
 [ServiceFilter(typeof(IPAY.WebApi.Filters.ValidationFilter))]
 public sealed partial class FilmsController(
     IFilmService films,
-    IFilmImportService importer,
-    IOmdbService omdbService) : ControllerBase
+    IFilmImportService importer) : ControllerBase
 {
     [GeneratedRegex(@"^tt\d{7,9}$")]
     private static partial Regex ImdbIdPattern();
 
     // ---- Our catalog (Firestore) ----
+    // NOTE: the OMDb lookups (api/films/omdb/...) now live in OmdbController, so they don't need these services.
 
     /// Cursor-paged list. Pass the id of the last film you received as lastDocId to get the next page.
     [HttpGet]
@@ -86,66 +85,6 @@ public sealed partial class FilmsController(
         catch (HttpRequestException ex)
         {
             return StatusCode(StatusCodes.Status502BadGateway, new { message = "Could not reach OMDb.", detail = ex.Message });
-        }
-    }
-
-    // ---- OMDb lookups (previously api/films/search and api/films/{imdbId}) ----
-
-    [HttpGet("omdb/search")]
-    public async Task<IActionResult> Search(
-        [FromQuery] string query,
-        [FromQuery] int page = 1,
-        CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(query))
-            return BadRequest(new { message = "The query parameter is required." });
-
-        try
-        {
-            var result = await omdbService.SearchAsync(query, page, cancellationToken);
-            if (string.Equals(result.Response, "False", StringComparison.OrdinalIgnoreCase))
-                return NotFound(new { message = result.Error ?? "No results found." });
-
-            return Ok(result);
-        }
-        catch (HttpRequestException ex)
-        {
-            return StatusCode(StatusCodes.Status502BadGateway, new { message = "Could not reach OMDb.", detail = ex.Message });
-        }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-        {
-            return StatusCode(StatusCodes.Status504GatewayTimeout, new { message = "OMDb took too long to respond." });
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "OMDb lookup failed.", detail = ex.Message });
-        }
-    }
-
-    [HttpGet("omdb/{imdbId}")]
-    public async Task<IActionResult> GetByImdbId(
-        string imdbId,
-        CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var result = await omdbService.GetByImdbIdAsync(imdbId, cancellationToken);
-            if (string.Equals(result.Response, "False", StringComparison.OrdinalIgnoreCase))
-                return NotFound(new { message = result.Error ?? "Film not found." });
-
-            return Ok(result);
-        }
-        catch (HttpRequestException ex)
-        {
-            return StatusCode(StatusCodes.Status502BadGateway, new { message = "Could not reach OMDb.", detail = ex.Message });
-        }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-        {
-            return StatusCode(StatusCodes.Status504GatewayTimeout, new { message = "OMDb took too long to respond." });
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "OMDb lookup failed.", detail = ex.Message });
         }
     }
 }
