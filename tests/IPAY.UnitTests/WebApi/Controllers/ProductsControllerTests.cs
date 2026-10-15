@@ -1,5 +1,6 @@
 using IPAY.Application.DTOs.Shop;
 using IPAY.Application.Interfaces.Shop;
+using IPAY.UnitTests.Support;
 using IPAY.WebApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -17,7 +18,8 @@ namespace IPAY.UnitTests.WebApi.Controllers
         public void SetUp()
         {
             _serviceMock = new Mock<IProductService>();
-            _sut = new ProductsController(_serviceMock.Object);
+            // Delete reads User.IsInRole(...), so the controller needs a signed-in user (admin by default).
+            _sut = new ProductsController(_serviceMock.Object).WithUser(1, "Admin");
         }
 
         [Test]
@@ -161,6 +163,93 @@ namespace IPAY.UnitTests.WebApi.Controllers
             await _sut.GetSorted(sortBy: "rating", sortDir: "desc", limit: 20, lastDocId: "cursor");
 
             _serviceMock.Verify(s => s.GetSortedAsync(20, "cursor", "rating", "desc"), Times.Once);
+        }
+
+        // ---------- seller ownership ----------
+
+        [Test]
+        public async Task Delete_BySellerOnTheirOwnProduct_ReturnsNoContent()
+        {
+            _sut.WithUser(7, "Seller");
+            _serviceMock.Setup(s => s.GetByIdAsync(1)).ReturnsAsync(new ProductDto { Id = 1, SellerId = "7" });
+
+            var result = await _sut.Delete(1);
+
+            Assert.That(result, Is.InstanceOf<NoContentResult>());
+            _serviceMock.Verify(s => s.DeleteAsync(1), Times.Once);
+        }
+
+        [Test]
+        public async Task Delete_BySellerOnSomeoneElsesProduct_IsForbiddenAndDeletesNothing()
+        {
+            _sut.WithUser(7, "Seller");
+            _serviceMock.Setup(s => s.GetByIdAsync(1)).ReturnsAsync(new ProductDto { Id = 1, SellerId = "99" });
+
+            var result = await _sut.Delete(1);
+
+            Assert.That(result, Is.InstanceOf<ForbidResult>());
+            _serviceMock.Verify(s => s.DeleteAsync(It.IsAny<int>()), Times.Never);
+        }
+
+        [Test]
+        public async Task CreateSeller_TakesSellerIdFromTheTokenNotTheRequest()
+        {
+            _sut.WithUser(7, "Seller");
+            var request = new CreateSellerProductDto { Name = "Mug" };
+            _serviceMock.Setup(s => s.CreateAsync(request, "7")).ReturnsAsync(new ProductDto { Id = 3, SellerId = "7" });
+
+            var result = await _sut.Create(request);
+
+            Assert.That(result.Result, Is.InstanceOf<CreatedAtActionResult>());
+            _serviceMock.Verify(s => s.CreateAsync(request, "7"), Times.Once);
+        }
+
+        [Test]
+        public async Task CreateSeller_WhenTokenHasNoUserId_ReturnsUnauthorized()
+        {
+            _sut.WithUser(id: null, "Seller");
+
+            var result = await _sut.Create(new CreateSellerProductDto { Name = "Mug" });
+
+            Assert.That(result.Result, Is.InstanceOf<UnauthorizedResult>());
+            _serviceMock.Verify(s => s.CreateAsync(It.IsAny<CreateSellerProductDto>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Test]
+        public async Task UpdateSeller_WhenProductIsSomeoneElses_ReturnsForbid()
+        {
+            _sut.WithUser(7, "Seller");
+            _serviceMock.Setup(s => s.GetByIdAsync(1)).ReturnsAsync(new ProductDto { Id = 1, SellerId = "99" });
+            _serviceMock.Setup(s => s.UpdateAsync(1, It.IsAny<UpdateSellerProductDto>(), "7"))
+                .ThrowsAsync(new UnauthorizedAccessException());
+
+            var result = await _sut.Update(1, new UpdateSellerProductDto { Name = "Hijack" });
+
+            Assert.That(result.Result, Is.InstanceOf<ForbidResult>());
+        }
+
+        [Test]
+        public async Task UpdateSeller_WhenProductExistsAndIsTheirs_ReturnsNoContent()
+        {
+            _sut.WithUser(7, "Seller");
+            _serviceMock.Setup(s => s.GetByIdAsync(1)).ReturnsAsync(new ProductDto { Id = 1, SellerId = "7" });
+
+            var result = await _sut.Update(1, new UpdateSellerProductDto { Name = "Renamed" });
+
+            Assert.That(result.Result, Is.InstanceOf<NoContentResult>());
+            _serviceMock.Verify(s => s.UpdateAsync(1, It.IsAny<UpdateSellerProductDto>(), "7"), Times.Once);
+        }
+
+        [Test]
+        public async Task GetMine_ListsOnlyTheTokenSellersProducts()
+        {
+            _sut.WithUser(7, "Seller");
+            _serviceMock.Setup(s => s.GetBySellerAsync("7")).ReturnsAsync(new List<ProductDto> { new() { Id = 1, SellerId = "7" } });
+
+            var result = await _sut.GetMine();
+
+            Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+            _serviceMock.Verify(s => s.GetBySellerAsync("7"), Times.Once);
         }
     }
 }

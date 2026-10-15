@@ -25,28 +25,32 @@ namespace IPAY.UnitTests.Infrastructure.Cloudinary
             return fileMock;
         }
 
-        [Test]
-        public void Constructor_WithMissingCloudName_ThrowsInvalidOperationException()
+        // The constructor deliberately never throws on missing settings (a throw while an upload request is
+        // running kills the response before CORS headers are added). The failure surfaces from UploadImageAsync.
+        [TestCase("", "k", "s")]
+        [TestCase("c", "", "s")]
+        [TestCase("c", "k", "")]
+        [TestCase("  ", "k", "s")]
+        public void Constructor_WithMissingSettings_DoesNotThrow(string cloudName, string apiKey, string apiSecret)
         {
-            var options = Options.Create(new CloudinaryOptions { CloudName = "", ApiKey = "k", ApiSecret = "s" });
+            var options = Options.Create(new CloudinaryOptions { CloudName = cloudName, ApiKey = apiKey, ApiSecret = apiSecret });
 
-            Assert.Throws<InvalidOperationException>(() => new CloudinaryImageService(options));
+            Assert.DoesNotThrow(() => new CloudinaryImageService(options));
         }
 
-        [Test]
-        public void Constructor_WithMissingApiKey_ThrowsInvalidOperationException()
+        [TestCase("", "k", "s")]
+        [TestCase("c", "", "s")]
+        [TestCase("c", "k", "")]
+        public void UploadImageAsync_WhenNotConfigured_ThrowsInvalidOperationExceptionNamingTheSettings(
+            string cloudName, string apiKey, string apiSecret)
         {
-            var options = Options.Create(new CloudinaryOptions { CloudName = "c", ApiKey = "", ApiSecret = "s" });
+            var sut = new CloudinaryImageService(
+                Options.Create(new CloudinaryOptions { CloudName = cloudName, ApiKey = apiKey, ApiSecret = apiSecret }));
+            var file = CreateFormFileMock(length: 1024, contentType: "image/png");
 
-            Assert.Throws<InvalidOperationException>(() => new CloudinaryImageService(options));
-        }
-
-        [Test]
-        public void Constructor_WithMissingApiSecret_ThrowsInvalidOperationException()
-        {
-            var options = Options.Create(new CloudinaryOptions { CloudName = "c", ApiKey = "k", ApiSecret = "" });
-
-            Assert.Throws<InvalidOperationException>(() => new CloudinaryImageService(options));
+            var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await sut.UploadImageAsync(file.Object, CancellationToken.None));
+            Assert.That(ex!.Message, Does.Contain("Cloudinary:CloudName"));
         }
 
         [Test]

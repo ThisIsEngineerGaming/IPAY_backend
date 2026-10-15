@@ -153,5 +153,98 @@ namespace IPAY.UnitTests.Application.Services.Auth
             Assert.That(result, Is.Null);
             _passwordHasherMock.Verify(p => p.Verify(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
+
+        // ---------- email verification (Firebase) and emailed codes (2FA) ----------
+
+        private Mock<IFirebaseAuthService> _firebaseMock = null!;
+        private Mock<ITwoFactorService> _twoFactorMock = null!;
+
+        private LoginDtoService BuildWithFirebaseAndTwoFactor(bool requireVerification, bool twoFactorEnabled)
+        {
+            _firebaseMock = new Mock<IFirebaseAuthService>();
+            _firebaseMock.SetupGet(f => f.RequireEmailVerification).Returns(requireVerification);
+            _twoFactorMock = new Mock<ITwoFactorService>();
+            _twoFactorMock.SetupGet(t => t.IsEnabled).Returns(twoFactorEnabled);
+
+            SetupValidation(isValid: true);
+            _passwordHasherMock.Setup(p => p.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            _jwtMock.Setup(j => j.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRole>())).Returns("jwt-token");
+
+            return new LoginDtoService(
+                _validatorMock.Object, _jwtMock.Object, _customerMock.Object, _passwordHasherMock.Object,
+                _firebaseMock.Object, _twoFactorMock.Object);
+        }
+
+        private static LoginDto Credentials() => new() { Email = "a@test.com", Password = "password1" };
+
+        [Test]
+        public void LoginAsync_PendingAccountWhoseEmailIsNotVerifiedYet_ThrowsEmailNotVerified()
+        {
+            var sut = BuildWithFirebaseAndTwoFactor(requireVerification: true, twoFactorEnabled: false);
+            var pending = new Customer { Id = 1, Email = "a@test.com", Password = "hashed", EmailVerified = false };
+            _customerMock.Setup(s => s.GetByEmail("a@test.com")).ReturnsAsync(pending);
+            _firebaseMock.Setup(f => f.IsEmailVerifiedAsync("a@test.com")).ReturnsAsync(false);
+
+            Assert.ThrowsAsync<EmailNotVerifiedException>(() => sut.LoginAsync(Credentials()));
+        }
+
+        [Test]
+        public async Task LoginAsync_PendingAccountThatVerifiedInFirebase_IsMarkedVerifiedOnceAndSavedAndLogsIn()
+        {
+            var sut = BuildWithFirebaseAndTwoFactor(requireVerification: true, twoFactorEnabled: false);
+            var pending = new Customer { Id = 1, Email = "a@test.com", Password = "hashed", EmailVerified = false };
+            _customerMock.Setup(s => s.GetByEmail("a@test.com")).ReturnsAsync(pending);
+            _firebaseMock.Setup(f => f.IsEmailVerifiedAsync("a@test.com")).ReturnsAsync(true);
+
+            var result = await sut.LoginAsync(Credentials());
+
+            Assert.That(result!.AccessToken, Is.EqualTo("jwt-token"));
+            _customerMock.Verify(s => s.UpdateAsync(1, It.Is<Customer>(c => c.EmailVerified == true)), Times.Once);
+        }
+
+        [Test]
+        public async Task LoginAsync_OldAccountWithNoVerificationFlag_IsNeverBlockedOrAskedForACode()
+        {
+            // EmailVerified == null: created before verification existed (grandfathered).
+            var sut = BuildWithFirebaseAndTwoFactor(requireVerification: true, twoFactorEnabled: true);
+            var old = new Customer { Id = 1, Email = "a@test.com", Password = "hashed", EmailVerified = null };
+            _customerMock.Setup(s => s.GetByEmail("a@test.com")).ReturnsAsync(old);
+
+            var result = await sut.LoginAsync(Credentials());
+
+            Assert.That(result!.AccessToken, Is.EqualTo("jwt-token"));
+            _firebaseMock.Verify(f => f.IsEmailVerifiedAsync(It.IsAny<string>()), Times.Never);
+            _twoFactorMock.Verify(t => t.BeginAsync(It.IsAny<Customer>()), Times.Never);
+        }
+
+        [Test]
+        public async Task LoginAsync_VerifiedAccountWithTwoFactorOn_ReturnsTheCodeStepInsteadOfAToken()
+        {
+            var sut = BuildWithFirebaseAndTwoFactor(requireVerification: true, twoFactorEnabled: true);
+            var verified = new Customer { Id = 1, Email = "a@test.com", Password = "hashed", EmailVerified = true };
+            _customerMock.Setup(s => s.GetByEmail("a@test.com")).ReturnsAsync(verified);
+            _twoFactorMock.Setup(t => t.BeginAsync(verified))
+                .ReturnsAsync(new AuthResponse { TwoFactorRequired = true, ChallengeId = "chal" });
+
+            var result = await sut.LoginAsync(Credentials());
+
+            Assert.That(result!.TwoFactorRequired, Is.True);
+            Assert.That(result.AccessToken, Is.Empty);
+            _jwtMock.Verify(j => j.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRole>()), Times.Never);
+        }
+
+        [Test]
+        public async Task LoginAsync_WrongPassword_NeverReachesFirebase_SoEmailsCannotBeProbed()
+        {
+            var sut = BuildWithFirebaseAndTwoFactor(requireVerification: true, twoFactorEnabled: false);
+            _passwordHasherMock.Setup(p => p.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            _customerMock.Setup(s => s.GetByEmail("a@test.com"))
+                .ReturnsAsync(new Customer { Id = 1, Email = "a@test.com", Password = "hashed", EmailVerified = false });
+
+            var result = await sut.LoginAsync(Credentials());
+
+            Assert.That(result, Is.Null);
+            _firebaseMock.Verify(f => f.IsEmailVerifiedAsync(It.IsAny<string>()), Times.Never);
+        }
     }
 }

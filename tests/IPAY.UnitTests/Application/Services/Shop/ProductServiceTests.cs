@@ -1,4 +1,6 @@
 using AutoMapper;
+using FluentValidation;
+using FluentValidation.Results;
 using IPAY.Application.DTOs.Shop;
 using IPAY.Application.Mappings.Shop;
 using IPAY.Application.Services.Shop;
@@ -22,7 +24,25 @@ namespace IPAY.UnitTests.Application.Services.Shop
             _repositoryMock = new Mock<IProductRepo>();
             _mapper = new MapperConfiguration(cfg => cfg.AddProfile<ProductMapping>())
                 .CreateMapper();
-            _sut = new ProductService(_repositoryMock.Object, _mapper);
+
+            // The update paths validate first; a loose mock would return null and blow up in ValidateAndThrowAsync,
+            // so these report "valid" (the real rules are covered by the validator tests).
+            var adminValidator = new Mock<IValidator<UpdateAdminProductDto>>();
+            adminValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<IValidationContext>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+            adminValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<UpdateAdminProductDto>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+            var sellerValidator = new Mock<IValidator<UpdateSellerProductDto>>();
+            sellerValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<IValidationContext>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+            sellerValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<UpdateSellerProductDto>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _sut = new ProductService(_repositoryMock.Object, _mapper, adminValidator.Object, sellerValidator.Object);
         }
 
         private static Product SampleProduct(int id = 1, double price = 100, double discounted = 75) => new()
@@ -168,6 +188,76 @@ namespace IPAY.UnitTests.Application.Services.Shop
             await _sut.GetSortedAsync(5, "cursor", "rating", "desc");
 
             _repositoryMock.Verify(r => r.GetSortedAsync(5, "cursor", "rating", "desc"), Times.Once);
+        }
+
+        // ---------- seller ----------
+
+        [Test]
+        public async Task CreateAsync_Seller_StampsSellerIdFromCallerAndStartsWithZeroRating()
+        {
+            var request = new CreateSellerProductDto { Name = "Mug", Price = 10, DiscountedPrice = 8, Manufacturer = "Acme", CategoryId = 1 };
+            Product? captured = null;
+            _repositoryMock
+                .Setup(r => r.AddProductAsync(It.IsAny<Product>()))
+                .ReturnsAsync((Product p) => { captured = p; p.Id = 5; return p; });
+
+            var result = await _sut.CreateAsync(request, "seller-7");
+
+            Assert.That(captured!.SellerId, Is.EqualTo("seller-7"));
+            Assert.That(captured.Rating, Is.EqualTo(0));
+            Assert.That(result!.SellerId, Is.EqualTo("seller-7"));
+        }
+
+        [Test]
+        public void UpdateAsync_Seller_OnSomeoneElsesProduct_ThrowsUnauthorizedAndWritesNothing()
+        {
+            var theirs = SampleProduct(1);
+            theirs.SellerId = "other-seller";
+            _repositoryMock.Setup(r => r.GetProductByIdAsync(1)).ReturnsAsync(theirs);
+
+            Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+                _sut.UpdateAsync(1, new UpdateSellerProductDto { Name = "Hijack" }, "seller-7"));
+
+            _repositoryMock.Verify(r => r.UpdateProductAsync(It.IsAny<int>(), It.IsAny<Product>()), Times.Never);
+        }
+
+        [Test]
+        public async Task UpdateAsync_Seller_OnOwnProduct_KeepsRatingAndOwnership()
+        {
+            var mine = SampleProduct(1);
+            mine.SellerId = "seller-7";
+            mine.Rating = 4.5;
+            mine.RatingCount = 12;
+            _repositoryMock.Setup(r => r.GetProductByIdAsync(1)).ReturnsAsync(mine);
+
+            await _sut.UpdateAsync(1, new UpdateSellerProductDto { Name = "Renamed", Price = 50, DiscountedPrice = 40 }, "seller-7");
+
+            _repositoryMock.Verify(r => r.UpdateProductAsync(1, It.Is<Product>(p =>
+                p.Name == "Renamed" && p.SellerId == "seller-7" && p.Rating == 4.5 && p.RatingCount == 12)), Times.Once);
+        }
+
+        [Test]
+        public async Task UpdateAsync_Admin_DoesNotResetRatingsOrSeller()
+        {
+            var existing = SampleProduct(1);
+            existing.SellerId = "seller-7";
+            existing.RatingCount = 3;
+            _repositoryMock.Setup(r => r.GetProductByIdAsync(1)).ReturnsAsync(existing);
+
+            await _sut.UpdateAsync(1, new UpdateAdminProductDto { Name = "Admin edit", Price = 100, DiscountedPrice = 90 });
+
+            _repositoryMock.Verify(r => r.UpdateProductAsync(1, It.Is<Product>(p =>
+                p.SellerId == "seller-7" && p.RatingCount == 3 && p.Rating == 4.5)), Times.Once);
+        }
+
+        [Test]
+        public async Task GetBySellerAsync_MapsOnlyWhatTheRepositoryReturns()
+        {
+            _repositoryMock.Setup(r => r.GetBySellerAsync("seller-7")).ReturnsAsync(new List<Product> { SampleProduct(1) });
+
+            var result = await _sut.GetBySellerAsync("seller-7");
+
+            Assert.That(result, Has.Count.EqualTo(1));
         }
     }
 }

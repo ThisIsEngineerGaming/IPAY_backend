@@ -1,3 +1,8 @@
+// FilmService / FilmImportService (and their DI registrations in Program.cs and DependencyInjection.cs) are
+// commented out in src, so these tests cannot compile. They are kept, not deleted: when the film backend is
+// switched back on, add <DefineConstants>$(DefineConstants);FILM_BACKEND</DefineConstants> to
+// IPAY.UnitTests.csproj and they run again.
+#if FILM_BACKEND
 using AutoMapper;
 using IPAY.Application.DTOs.Media;
 using IPAY.Application.Mappings.Media;
@@ -97,3 +102,4 @@ namespace IPAY.UnitTests.Application.Services.Media
         }
     }
 }
+#endif
