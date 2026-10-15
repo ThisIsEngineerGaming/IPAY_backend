@@ -24,7 +24,16 @@ namespace IPAY.WebApi.Controllers
 
 
 
-        public AuthController(IAuthDto<RegisterDto> register, ILogin login, IUser<Customer> customer, IGoogleLogin googleLogin, ITwoFactorService twoFactor, ILogger<AuthController>? logger = null)
+
+
+
+
+
+
+
+        public AuthController(IAuthDto<RegisterDto> register, ILogin login, IUser<Customer> customer, IGuestService guest, IRefreshTokenService refreshTokenService, IGoogleLogin googleLogin, ITwoFactorService twoFactor, ILogger<AuthController>? logger = null)
+
+
         {
             _logger = logger;
             _register = register;

@@ -5,6 +5,7 @@ using IPAY.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using IPAY.Domain.Entities.Auth;
 
 namespace IPAY.WebApi.Controllers
 {
@@ -14,55 +15,29 @@ namespace IPAY.WebApi.Controllers
     public class AdminController:ControllerBase
     {
         private readonly IUser<Customer> _customer;
-        private readonly ILogger<AdminController>? _logger;
+
 
         private readonly IGuestService _guest;
 
         private readonly IPasswordHashingService _passwordHasher;
 
-        private readonly IJWT _jwt;
+
+
+
 
         public AdminController(
             IUser<Customer> customer,
             IGuestService guest,
-            IPasswordHashingService passwordHasher,
-            IJWT jwt,
-            ILogger<AdminController>? logger = null)
+            IPasswordHashingService passwordHasher)
         {
             _customer = customer;
             _guest = guest;
             _passwordHasher = passwordHasher;
-            _jwt = jwt;
-            _logger = logger;
+
+
         }
 
-        [HttpPost("guests/session")]
-        public async Task<IActionResult> EnsureGuestSession([FromBody] GuestSessionDto? dto)
-        {
-            var guest = await _guest.GetOrCreateAsync(dto?.SessionKey, dto?.Name);
 
-            if (guest.IsBanned)
-                return StatusCode(403, "Заблоковано");
-
-            // email у гостя нет — в claim кладём заглушку
-            var token = _jwt.GenerateToken(
-                guest.Id.ToString(),
-                $"guest-{guest.Id}@guest.local",
-                UserRole.Guest);
-
-            return Ok(new
-            {
-                guest.Id,
-                guest.Name,
-                guest.Role,
-                guest.IsBanned,
-                guest.SessionKey,
-                guest.CreatedAt,
-                accessToken = token,
-                tokenType = "Bearer",
-                expiresAt = DateTime.UtcNow.AddHours(4)
-            });
-        }
 
         [Authorize(Policy = "AdminOnly")]
         [HttpPatch("{id}/ban")]
@@ -448,6 +423,10 @@ namespace IPAY.WebApi.Controllers
 
             return Ok("Видалено");
         }
+
+
+
+
 
 
 

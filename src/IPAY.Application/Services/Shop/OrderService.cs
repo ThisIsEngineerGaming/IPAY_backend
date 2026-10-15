@@ -23,6 +23,8 @@ namespace IPAY.Application.Services.Shop
 
         private readonly IProductRepo _productRepository;
 
+        private readonly IOrderStatusHistoryRepository _orderStatusHistoryRepository;
+
         public OrderService(
             IOrderRepository orderRepository,
             IOrderItemRepository orderItemRepository,
@@ -30,7 +32,8 @@ namespace IPAY.Application.Services.Shop
             IMapper mapper,
             IValidator<CreateOrderDto> createOrderValidator,
             IValidator<CreateOrderItemDto> createOrderItemValidator,
-            IValidator<UpdateOrderStatusDto> updateStatusValidator, IProductRepo productRepository)
+            IValidator<UpdateOrderStatusDto> updateStatusValidator, IProductRepo productRepository,
+            IOrderStatusHistoryRepository orderStatusHistoryRepository)
         {
             _orderRepository = orderRepository;
             _orderItemRepository = orderItemRepository;
@@ -40,6 +43,7 @@ namespace IPAY.Application.Services.Shop
             _createOrderItemValidator = createOrderItemValidator;
             _updateStatusValidator = updateStatusValidator;
             _productRepository = productRepository;
+            _orderStatusHistoryRepository = orderStatusHistoryRepository;
         }
 
         // ==================== ORDER ====================
@@ -133,8 +137,25 @@ namespace IPAY.Application.Services.Shop
             var order = await _orderRepository.GetByIdAsync(id)
                 ?? throw new KeyNotFoundException($"Order with id {id} not found");
 
+            var oldStatus = order.Status;
+
+            if (oldStatus == dto.Status)
+                return; // статус не изменился — историю не пишем
+
             order.Status = dto.Status;
             await _orderRepository.UpdateAsync(id, order);
+
+            // Записываем историю
+            var history = new OrderStatusHistory
+            {
+                OrderId = id,
+                OldStatus = oldStatus,
+                NewStatus = dto.Status,
+                ChangedAt = DateTime.UtcNow,
+                // ChangedByUserId = ... можно взять из токена позже
+            };
+
+            await _orderStatusHistoryRepository.AddAsync(history);
         }
 
         public async Task<CancelOrderOutcome> CancelAsync(int orderId, int userId)
@@ -169,6 +190,22 @@ namespace IPAY.Application.Services.Shop
 
             await _orderRepository.DeleteAsync(id);
         }
+
+        public async Task<IReadOnlyList<OrderStatusHistoryDto>> GetStatusHistoryAsync(int orderId)
+        {
+            var history = await _orderStatusHistoryRepository.GetByOrderIdAsync(orderId);
+            return history.Select(h => new OrderStatusHistoryDto
+            {
+                Id = h.Id,
+                OrderId = h.OrderId,
+                OldStatus = h.OldStatus.ToString(),
+                NewStatus = h.NewStatus.ToString(),
+                ChangedAt = h.ChangedAt,
+                ChangedByUserId = h.ChangedByUserId,
+                Comment = h.Comment
+            }).ToList();
+        }
+
 
         // ==================== ORDER ITEMS ====================
 

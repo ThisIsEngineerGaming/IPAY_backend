@@ -11,11 +11,14 @@ namespace IPAY.Application.Services.Auth
         private readonly IUser<Customer> _customers;
         private readonly IJWT _jwt;
 
-        public GoogleLoginService(IFirebaseAuthService firebase, IUser<Customer> customers, IJWT jwt)
+        private readonly IRefreshTokenService _refreshTokenService;
+
+        public GoogleLoginService(IFirebaseAuthService firebase, IUser<Customer> customers, IJWT jwt, IRefreshTokenService refreshTokenService)
         {
             _firebase = firebase;
             _customers = customers;
             _jwt = jwt;
+            _refreshTokenService = refreshTokenService;
         }
 
         public async Task<AuthResponse?> LoginWithGoogleAsync(string idToken)
@@ -65,15 +68,11 @@ namespace IPAY.Application.Services.Auth
             if (user is null || user.Id is null || string.IsNullOrWhiteSpace(user.Email) || user.IsBanned)
                 return null;
 
-            var token = _jwt.GenerateToken(user.Id.Value.ToString(), user.Email, user.Role);
-
-            return new AuthResponse
-            {
-                AccessToken = token,
-                TokenType = "Bearer",
-                ExpiresAt = DateTime.UtcNow.AddHours(2),
-                User = new LoginDto { Email = user.Email, Name = user.Name }
-            };
+            return await _refreshTokenService.CreateAuthResponseAsync(
+                user.Id.Value,
+                user.Email!,
+                user.Name,
+                user.Role);
         }
     }
 }

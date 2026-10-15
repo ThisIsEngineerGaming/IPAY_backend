@@ -26,6 +26,8 @@ namespace IPAY.Application.Services.Auth
         private readonly IValidator<StartEmailChangeDto> _startEmailValidator;
         private readonly IValidator<ConfirmEmailChangeDto> _confirmEmailValidator;
 
+        private readonly IRefreshTokenService? _refreshTokenService;
+
         public ProfileService(
             IUser<Customer> customers,
             IPasswordHashingService passwordHasher,
@@ -36,7 +38,8 @@ namespace IPAY.Application.Services.Auth
             IValidator<ChangePasswordDto> passwordValidator,
             IValidator<ConfirmPasswordChangeDto> confirmPasswordValidator,
             IValidator<StartEmailChangeDto> startEmailValidator,
-            IValidator<ConfirmEmailChangeDto> confirmEmailValidator)
+            IValidator<ConfirmEmailChangeDto> confirmEmailValidator,
+            IRefreshTokenService refreshTokenService)
         {
             _customers = customers;
             _passwordHasher = passwordHasher;
@@ -48,6 +51,7 @@ namespace IPAY.Application.Services.Auth
             _confirmPasswordValidator = confirmPasswordValidator;
             _startEmailValidator = startEmailValidator;
             _confirmEmailValidator = confirmEmailValidator;
+            _refreshTokenService = refreshTokenService;
         }
 
         public async Task<ProfileResult<ProfileDto>> GetProfileAsync(int userId)
@@ -351,15 +355,16 @@ namespace IPAY.Application.Services.Auth
             catch (Exception) { /* best effort: the change itself is done */ }
 
             // The JWT carries the email claim, so the old token is stale: hand back a fresh session.
-            var token = _jwt.GenerateToken(userId.ToString(), newEmail, user.Role);
+            var token = _jwt.GenerateAccessToken(userId.ToString(), newEmail, user.Role);
 
-            return ProfileResult<AuthResponse>.Ok(new AuthResponse
-            {
-                AccessToken = token,
-                TokenType = "Bearer",
-                ExpiresAt = DateTime.UtcNow.AddHours(2),
-                User = new LoginDto { Email = newEmail, Name = user.Name }
-            });
+            // JWT содержит email — старая сессия невалидна, выдаём новую пару токенов
+            var auth = await _refreshTokenService.CreateAuthResponseAsync(
+                userId,
+                newEmail,
+                user.Name,
+                user.Role);
+
+            return ProfileResult<AuthResponse>.Ok(auth);
         }
 
         // ---- helpers --------------------------------------------------------------------------------

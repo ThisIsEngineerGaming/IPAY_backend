@@ -19,7 +19,7 @@ namespace IPAY.WebApi.Controllers
 
         // ==================== ORDER ====================
         [Authorize(Policy ="NotBanned")]
-        [Authorize(Roles ="Admin,Moderator,Customer,Seller")]
+        [Authorize(Roles ="Admin,Moderator")]
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetAll()
         {
@@ -45,13 +45,17 @@ namespace IPAY.WebApi.Controllers
             var orders = await _orderService.GetByUserIdAsync(userId);
             return Ok(orders);
         }
+        [HttpPost]
         [Authorize(Policy = "NotBanned")]
         [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
-        [HttpPost]
         public async Task<ActionResult<OrderDto>> Create([FromBody] CreateOrderDto dto)
         {
             // The order belongs to whoever is signed in (same claim the cart uses).
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("sub")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+                return Unauthorized("User id not found in token");
 
             var order = await _orderService.CreateAsync(dto, userId);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
@@ -92,6 +96,30 @@ namespace IPAY.WebApi.Controllers
             return NoContent();
         }
 
+        [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
+        [HttpGet("{id:int}/status-history")]
+        public async Task<ActionResult<IReadOnlyList<OrderStatusHistoryDto>>> GetStatusHistory(int id)
+        {
+            var history = await _orderService.GetStatusHistoryAsync(id);
+            return Ok(history);
+        }
+
+        [Authorize(Policy = "NotBanned")]
+        [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
+        [HttpGet("my")]
+        public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetMyOrders()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("sub")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+                return Unauthorized("User id not found in token");
+
+            var orders = await _orderService.GetByUserIdAsync(userId);
+            return Ok(orders);
+        }
+
         // ==================== ORDER ITEMS ====================
         [Authorize(Policy = "NotBanned")]
         [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
@@ -117,5 +145,7 @@ namespace IPAY.WebApi.Controllers
             await _orderService.DeleteItemAsync(orderId, itemId);
             return NoContent();
         }
+
+
     }
 }

@@ -74,10 +74,15 @@ builder.Services.AddScoped<IOrderService,OrderService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IManufacturerService, ManufacturerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
 builder.Services.AddScoped<IProductRatingService, ProductRatingService>();
 builder.Services.AddScoped<ISellerRequestService, SellerRequestService>();
+
+builder.Services.AddScoped<IReviewService, ReviewService>();
+
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
+
 
 
 // Media request validators; applied to controllers through ValidationFilter.
@@ -94,6 +99,7 @@ builder.Services.AddScoped<IValidator<UpdateAdminProductDto>, UpdateAdminProduct
 builder.Services.AddScoped<IValidator<UpdateSellerProductDto>, UpdateSellerProductDtoValidator>();
 builder.Services.AddScoped<ValidationFilter>();
 
+
 builder.Services.AddScoped<IValidator<ChangeUsernameDto>, ChangeUsernameValidator>();
 builder.Services.AddScoped<IValidator<ChangePhoneDto>, ChangePhoneValidator>();
 builder.Services.AddScoped<IValidator<ChangePasswordDto>, ChangePasswordValidator>();
@@ -107,6 +113,7 @@ builder.Services.AddScoped<IGuestService, GuestService>();
 builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartItemService, CartItemService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 
 // Реєструємо сервіси

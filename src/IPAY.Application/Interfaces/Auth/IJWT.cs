@@ -4,10 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+
+
 namespace IPAY.Application.Interfaces.Auth
 {
-    public  interface IJWT
+    public interface IJWT
     {
-        string GenerateToken(string userId, string email, UserRole role);
+        string GenerateAccessToken(string userId, string email, UserRole role);
+        string GenerateRefreshToken(); 
+        string HashToken(string rawToken); 
     }
 }

@@ -1,17 +1,21 @@
-using IPAY.Domain.Entities.Users;
-using IPAY.Domain.Entities.Media;
-using IPAY.Domain.Entities.Shop;
-using IPAY.Domain.Interfaces.ForRepos.Media;
-using IPAY.Domain.Interfaces.ForRepos;
-using IPAY.Domain.Interfaces.ForRepos.Shop;
-
-using IPAY.Infrastructure.Cloudinary;
-using IPAY.Infrastructure.Persistence;
-using IPAY.Infrastructure.Persistence.Documents;
-using IPAY.Infrastructure.Repositories.Shop;
-using IPAY.Infrastructure.Repositories.Media;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
+using IPAY.Application.Interfaces.Payments;
+using IPAY.Application.Services.Payments;
+using IPAY.Domain.Entities.Media;
+using IPAY.Domain.Entities.Shop;
+using IPAY.Domain.Entities.Users;
+using IPAY.Domain.Interfaces.ForRepos;
+using IPAY.Domain.Interfaces.ForRepos.Auth;
+using IPAY.Domain.Interfaces.ForRepos.Media;
+using IPAY.Domain.Interfaces.ForRepos.Shop;
+using IPAY.Infrastructure.Cloudinary;
+using IPAY.Infrastructure.Payments;
+using IPAY.Infrastructure.Persistence;
+using IPAY.Infrastructure.Persistence.Documents;
+using IPAY.Infrastructure.Repositories.Auth;
+using IPAY.Infrastructure.Repositories.Media;
+using IPAY.Infrastructure.Repositories.Shop;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -92,6 +96,11 @@ namespace IPAY.Infrastructure
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IOrderItemRepository, OrderItemRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<IOrderStatusHistoryRepository, OrderStatusHistoryRepository>();
+            services.AddScoped<IPaymentProvider, MockPaymentProvider>();
+            services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IReviewRepository, ReviewRepository>();
 
             // Users' star ratings of products (document id = "{productId}_{userId}", so one rating per user per product).
             services.AddScoped<IProductRatingRepo>(sp =>
