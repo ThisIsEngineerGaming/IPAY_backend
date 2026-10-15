@@ -1,5 +1,6 @@
 using IPAY.Domain.Entities.Shop;
 using IPAY.Domain.Interfaces.ForRepos.Shop;
+using IPAY.Infrastructure.Persistence;
 using IPAY.Infrastructure.Persistence.Documents;
 using Google.Cloud.Firestore;
 
@@ -48,10 +49,14 @@ namespace IPAY.Infrastructure.Repositories.Shop
                 .ToList();
         }
 
-        private async Task<int> GetNextIdAsync()
+        // One counter document instead of reading every product for each insert.
+        private Task<int> GetNextIdAsync() =>
+            FirestoreIdGenerator.NextIdAsync(database, collectionName, GetMaxExistingIdAsync);
+
+        private async Task<int> GetMaxExistingIdAsync()
         {
             var all = await GetAllProductsAsync();
-            return all.Count == 0 ? 1 : all.Max(product => product.Id) + 1;
+            return all.Count == 0 ? 0 : all.Max(product => product.Id);
         }
 
         public async Task<IReadOnlyList<Product>> GetLimitedProduct(int limit, string? lastDocId)

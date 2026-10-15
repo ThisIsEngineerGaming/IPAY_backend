@@ -54,11 +54,16 @@ public class FirestoreRepository<TEntity, TDocument>(
 
     public Task DeleteAsync(int id) => _collection.Document(id.ToString()).DeleteAsync();
 
-    private async Task<int> GetNextIdAsync()
+    // One counter document per collection instead of reading the whole collection for every insert.
+    private Task<int> GetNextIdAsync() =>
+        FirestoreIdGenerator.NextIdAsync(database, collectionName, GetMaxExistingIdAsync);
+
+    // Only runs once per collection, to seed its counter from data that already exists.
+    private async Task<int> GetMaxExistingIdAsync()
     {
         var all = await GetAllAsync();
         return all.Count == 0
-            ? 1
-            : all.Max(entity => Convert.ToInt32(IdProperty.GetValue(entity) ?? 0)) + 1;
+            ? 0
+            : all.Max(entity => Convert.ToInt32(IdProperty.GetValue(entity) ?? 0));
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Google.Cloud.Firestore;
 using IPAY.Domain.Entities.Shop;
 using IPAY.Domain.Interfaces.ForRepos.Shop;
+using IPAY.Infrastructure.Persistence;
 using IPAY.Infrastructure.Persistence.Documents;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,16 @@ namespace IPAY.Infrastructure.Repositories.Shop
 {
     public class OrderRepository : IOrderRepository
     {
+        private const string CollectionName = "orders";
+
+        private readonly FirestoreDb _database;
         private readonly CollectionReference _collection;
         private readonly PropertyInfo IdProperty;
 
         public OrderRepository(FirestoreDb firestoreDb)
         {
-            _collection = firestoreDb.Collection("orders");
+            _database = firestoreDb;
+            _collection = firestoreDb.Collection(CollectionName);
             IdProperty = typeof(Order).GetProperty(nameof(Order.Id))!;
         }
 
@@ -80,10 +85,14 @@ namespace IPAY.Infrastructure.Repositories.Shop
         public Task DeleteAsync(int id) =>
             _collection.Document(id.ToString()).DeleteAsync();
 
-        private async Task<int> GetNextIdAsync()
+        // One counter document instead of reading every order for each insert.
+        private Task<int> GetNextIdAsync() =>
+            FirestoreIdGenerator.NextIdAsync(_database, CollectionName, GetMaxExistingIdAsync);
+
+        private async Task<int> GetMaxExistingIdAsync()
         {
             var all = await GetAllAsync();
-            return all.Count == 0 ? 1 : all.Max(x => x.Id) + 1;
+            return all.Count == 0 ? 0 : all.Max(x => x.Id);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Google.Cloud.Firestore;
 using IPAY.Domain.Entities.Shop;
 using IPAY.Domain.Interfaces.ForRepos.Shop;
+using IPAY.Infrastructure.Persistence;
 using IPAY.Infrastructure.Persistence.Documents;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,16 @@ namespace IPAY.Infrastructure.Repositories.Shop
 {
     public class AddressRepository : IAddressRepository
     {
+        private const string CollectionName = "addresses";
+
+        private readonly FirestoreDb _database;
         private readonly CollectionReference _collection;
         private readonly PropertyInfo IdProperty;
 
         public AddressRepository(FirestoreDb firestoreDb)
         {
-            _collection = firestoreDb.Collection("addresses");
+            _database = firestoreDb;
+            _collection = firestoreDb.Collection(CollectionName);
             IdProperty = typeof(Address).GetProperty(nameof(Address.Id))!;
         }
 
@@ -71,12 +76,16 @@ namespace IPAY.Infrastructure.Repositories.Shop
         public Task DeleteAsync(int id) =>
             _collection.Document(id.ToString()).DeleteAsync();
 
-        private async Task<int> GetNextIdAsync()
+        // One counter document instead of reading every address for each insert.
+        private Task<int> GetNextIdAsync() =>
+            FirestoreIdGenerator.NextIdAsync(_database, CollectionName, GetMaxExistingIdAsync);
+
+        private async Task<int> GetMaxExistingIdAsync()
         {
             var all = await GetAllAsync();
             return all.Count == 0
-                ? 1
-                : all.Max(entity => entity.Id) + 1;
+                ? 0
+                : all.Max(entity => entity.Id);
         }
 
         // ===== Маппинг =====
