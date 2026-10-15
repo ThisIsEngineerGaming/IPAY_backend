@@ -50,16 +50,12 @@ namespace IPAY.WebApi.Controllers
         [Authorize(Roles = "Admin,Moderator,Customer,Seller")]
         public async Task<ActionResult<OrderDto>> Create([FromBody] CreateOrderDto dto)
         {
-
             // The order belongs to whoever is signed in (same claim the cart uses).
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                 ?? User.FindFirst("sub")?.Value;
 
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
                 return Unauthorized("User id not found in token");
-
 
             var order = await _orderService.CreateAsync(dto, userId);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);

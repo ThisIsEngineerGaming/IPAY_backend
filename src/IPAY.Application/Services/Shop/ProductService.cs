@@ -164,7 +164,7 @@ namespace IPAY.Application.Services.Shop
             return createdProducts;
         }
 
-        //----------------------------------------
-        public Task DeleteAllAsync() => _repository.DeleteAllProductsAsync();
+    
+
     }
 }

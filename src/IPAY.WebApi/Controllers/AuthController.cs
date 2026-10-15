@@ -22,21 +22,18 @@ namespace IPAY.WebApi.Controllers
         private readonly IUser<Customer> _customer;
         private readonly ILogger<AuthController>? _logger;
 
-<<<<<<< HEAD
 
 
-        public AuthController(IAuthDto<RegisterDto> register, ILogin login, IUser<Customer> customer, IGoogleLogin googleLogin, ITwoFactorService twoFactor, ILogger<AuthController>? logger = null)
-=======
 
-        private readonly IRefreshTokenService _refreshTokenService;
 
-        private readonly IGuestService _guest;
+
+
 
 
 
         public AuthController(IAuthDto<RegisterDto> register, ILogin login, IUser<Customer> customer, IGuestService guest, IRefreshTokenService refreshTokenService, IGoogleLogin googleLogin, ITwoFactorService twoFactor, ILogger<AuthController>? logger = null)
 
->>>>>>> 59aa836 (OrderHistory+Payment+fixed_merge)
+
         {
             _logger = logger;
             _register = register;

@@ -79,7 +79,7 @@ builder.Services.AddScoped<IProductRatingService, ProductRatingService>();
 builder.Services.AddScoped<ISellerRequestService, SellerRequestService>();
 
 builder.Services.AddScoped<IReviewService, ReviewService>();
->>>>>>> 3550ed6 (Reviews+History)
+
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
 
@@ -113,6 +113,7 @@ builder.Services.AddScoped<IGuestService, GuestService>();
 builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartItemService, CartItemService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 
 // Реєструємо сервіси
