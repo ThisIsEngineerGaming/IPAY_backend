@@ -14,5 +14,6 @@ namespace IPAY.Domain.Entities.Media
         public string PosterUrl { get; set; } = string.Empty;
         public List<int> EpisodeIds { get; set; } = new();
         public List<int> GenreIds { get; set; } = new();
+        public DateTime CreatedAt { get; set; }
     }
 }

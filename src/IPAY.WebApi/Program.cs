@@ -1,4 +1,7 @@
+using FluentValidation;
 using IPAY.Application.DTOs.Auth;
+using IPAY.Application.DTOs.Media;
+using IPAY.Application.DTOs.Shop;
 using IPAY.Application.Interfaces.Auth;
 using IPAY.Application.Interfaces.Media;
 using IPAY.Application.Interfaces.Shop;
@@ -7,13 +10,21 @@ using IPAY.Application.Options;
 using IPAY.Application.Services.Auth;
 using IPAY.Application.Services.Media;
 using IPAY.Application.Services.Shop;
+using IPAY.Application.Services.Shop.IPAY.Application.Services.Shop;
 using IPAY.Application.Validators.Auth;
+using IPAY.Application.Validators.Media;
+using IPAY.Application.Validators.Shop;
 using IPAY.Domain.Entities.Users;
+using IPAY.Domain.Interfaces.ForRepos.Shop;
 using IPAY.Infrastructure;
-using FluentValidation;
+using IPAY.Infrastructure.Authorization;
+using IPAY.Infrastructure.Repositories.Shop;
+using IPAY.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,18 +68,45 @@ builder.Services.AddFirebaseInfrastructure(builder.Configuration);
 builder.Services.AddScoped<ISeriesService, SeriesService>();
 builder.Services.AddScoped<IEpisodeService, EpisodeService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
-builder.Services.AddScoped<IFilmService, FilmService>();
+//builder.Services.AddScoped<IFilmService, FilmService>();
+//builder.Services.AddScoped<IFilmImportService, FilmImportService>();
+builder.Services.AddScoped<IOrderService,OrderService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IManufacturerService, ManufacturerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductRatingService, ProductRatingService>();
+builder.Services.AddScoped<ISellerRequestService, SellerRequestService>();
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
+
+
+// Media request validators; applied to controllers through ValidationFilter.
+builder.Services.AddScoped<IValidator<SaveFilmDto>, SaveFilmDtoValidator>();
+builder.Services.AddScoped<IValidator<SaveSeriesDto>, SaveSeriesDtoValidator>();
+builder.Services.AddScoped<IValidator<SaveEpisodeDto>, SaveEpisodeDtoValidator>();
+builder.Services.AddScoped<IValidator<SaveGenreDto>, SaveGenreDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateOrderDto>, CreateOrderDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateOrderItemDto>, CreateOrderItemDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateOrderStatusDto>, UpdateOrderStatusDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateAdminProductDto>, CreateAdminProductDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateSellerProductDto>, CreateSellerProductDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateAdminProductDto>, UpdateAdminProductDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateSellerProductDto>, UpdateSellerProductDtoValidator>();
+builder.Services.AddScoped<ValidationFilter>();
+
 builder.Services.AddScoped<IValidator<ChangeUsernameDto>, ChangeUsernameValidator>();
+builder.Services.AddScoped<IValidator<ChangePhoneDto>, ChangePhoneValidator>();
 builder.Services.AddScoped<IValidator<ChangePasswordDto>, ChangePasswordValidator>();
+// Step 2 of the emailed reset (profile page and "forgot password"): no current password, the link is the proof.
+builder.Services.AddScoped<IValidator<ConfirmPasswordChangeDto>, ResetForgottenPasswordValidator>();
 builder.Services.AddScoped<IValidator<StartEmailChangeDto>, StartEmailChangeValidator>();
 builder.Services.AddScoped<IValidator<ConfirmEmailChangeDto>, ConfirmEmailChangeValidator>();
+
 builder.Services.AddScoped<IUser<Customer>, CustomerService>();
+builder.Services.AddScoped<IGuestService, GuestService>();
 builder.Services.AddSingleton<IPasswordHashingService, PasswordHashingService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<ICartItemService, CartItemService>();
 
 
 // Реєструємо сервіси
@@ -79,16 +117,25 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddSingleton(
     builder.Configuration.GetSection(TwoFactorOptions.SectionName).Get<TwoFactorOptions>() ?? new TwoFactorOptions());
 builder.Services.AddScoped<ITwoFactorService, TwoFactorService>();
-builder.Services.AddScoped<IJWT,JwtService>();
+builder.Services.AddScoped<IJWT, JwtService>();
 builder.Services.Configure<OmdbOptions>(
     builder.Configuration.GetSection(OmdbOptions.SectionName));
 
-builder.Services.AddHttpClient<IOmdbService, OmdbService>((sp, client) =>
-{
-    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<OmdbOptions>>().Value;
 
-    client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
-});
+
+// OmdbService takes (HttpClient, apiKey, baseUrl); plain strings can't be resolved by DI,
+// so the typed client is built with a factory instead of AddHttpClient<IOmdbService, OmdbService>().
+builder.Services
+    .AddHttpClient("omdb", (sp, client) =>
+    {
+        var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<OmdbOptions>>().Value;
+        client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
+    })
+    .AddTypedClient<IOmdbService>((http, sp) =>
+    {
+        var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<OmdbOptions>>().Value;
+        return new OmdbService(http, options.ApiKey, options.BaseUrl);
+    });
 //Mappers
 builder.Services.AddAutoMapper(typeof(ProductMapping));
 // JWT
@@ -110,24 +157,90 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
+
+    // The role lives inside the token, so after an admin changes someone's role the old token would keep
+    // working. Compare it with the user's current role on every request and reject it (401) when they differ;
+    // the client reacts to a 401 by logging the person out, so they have to sign in again to get the new role.
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async ctx =>
+        {
+            var tokenRole = ctx.Principal?.FindFirstValue(ClaimTypes.Role);
+            var userId = ctx.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Guests aren't stored as customers, and tokens without these claims are handled elsewhere.
+            if (tokenRole is null || userId is null || tokenRole == "Guest" || !int.TryParse(userId, out var id))
+                return;
+
+            var customers = ctx.HttpContext.RequestServices.GetRequiredService<IUser<Customer>>();
+            var customer = await customers.GetByIdAsync(id);
+
+            if (customer is null || customer.Role.ToString() != tokenRole)
+                ctx.Fail("Role changed. Please sign in again.");
+        }
+    };
 });
 
 builder.Services.AddAuthorization();
 //-Policy
+// 1. Зареєструвати Handler (поза AddAuthorization)
+builder.Services.AddScoped<IAuthorizationHandler, NotBannedHandler>();
+
+//-Policy
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
+    
         policy.RequireRole("Admin"));
 
+    options.AddPolicy("ModeratorOnly", policy =>
+    {
+        policy.RequireRole("Moderator");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
+
+    // For things both staff roles may do (e.g. listing users and making someone a seller).
+    options.AddPolicy("ModeratorOrAdmin", policy =>
+    {
+        policy.RequireRole("Moderator", "Admin");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
+
+    // Anyone with a real account (not a guest) who isn't banned - e.g. allowed to rate products.
+    options.AddPolicy("RegisteredUser", policy =>
+    {
+        policy.RequireRole("Customer", "Seller", "Moderator", "Admin");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
+
     options.AddPolicy("SellerOnly", policy =>
-        policy.RequireRole("Seller"));
+    {
+        policy.RequireRole("Seller");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
 
     options.AddPolicy("CustomerOnly", policy =>
-    policy.RequireRole("Customer"));
+    {
+        policy.RequireRole("Customer");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
 
     // если нужно Seller или Admin:
     options.AddPolicy("SellerOrAdmin", policy =>
-        policy.RequireRole("Seller", "Admin"));
+    {
+        policy.RequireRole("Seller", "Admin");
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
+
+    // окрема policy тільки для перевірки бану (можна використовувати самостійно)
+    options.AddPolicy("NotBanned", policy =>
+        policy.Requirements.Add(new NotBannedRequirement()));
+
+    options.AddPolicy("AnyAuthenticated", policy =>
+    {
+        policy.RequireAuthenticatedUser(); // просто перевірка, що юзер залогінений, без вимоги ролі
+        policy.Requirements.Add(new NotBannedRequirement());
+    });
 });
 
 
@@ -142,6 +255,12 @@ using (var scope = app.Services.CreateScope())
             "Emailed two-factor codes are OFF (TwoFactor:Enabled is false or the \"Email\" section is not configured). " +
             "Password logins will NOT ask for a code.");
     }
+}
+if (string.IsNullOrWhiteSpace(builder.Configuration[$"{OmdbOptions.SectionName}:ApiKey"]))
+{
+    app.Logger.LogWarning(
+        "Omdb:ApiKey is not set. OMDb lookups (the movies page) will fail. " +
+        "On Render, add the environment variable Omdb__ApiKey (two underscores).");
 }
 if (app.Environment.IsDevelopment())
 {

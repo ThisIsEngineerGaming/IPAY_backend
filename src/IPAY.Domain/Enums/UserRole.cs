@@ -7,6 +7,7 @@ namespace IPAY.Domain.Enums
         Guest = 0,
         Customer = 1,
         Seller = 2,
-        Admin = 3
+        Admin = 3,
+        Moderator=4
     }
 }

@@ -7,6 +7,7 @@ namespace IPAY.WebApi.Controllers;
 
 [ApiController]
 [Route("api/genres")]
+[ServiceFilter(typeof(IPAY.WebApi.Filters.ValidationFilter))]
 public class GenresController(IGenreService service) : ControllerBase
 {
     [HttpGet]
@@ -15,14 +16,14 @@ public class GenresController(IGenreService service) : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<GenreDto>> GetById(int id) =>
         await service.GetByIdAsync(id) is { } genre ? Ok(genre) : NotFound();
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpPost]
     public async Task<ActionResult<GenreDto>> Create(SaveGenreDto genre)
     {
         var created = await service.CreateAsync(genre);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, SaveGenreDto genre)
     {
@@ -30,7 +31,7 @@ public class GenresController(IGenreService service) : ControllerBase
         await service.UpdateAsync(id, genre);
         return NoContent();
     }
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -38,7 +39,7 @@ public class GenresController(IGenreService service) : ControllerBase
         await service.DeleteAsync(id);
         return NoContent();
     }
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpPut("{id:int}/series/{seriesId:int}")]
     public async Task<IActionResult> AddSeries(int id, int seriesId)
     {
@@ -46,7 +47,7 @@ public class GenresController(IGenreService service) : ControllerBase
         await service.AddSeriesToGenreAsync(id, seriesId);
         return NoContent();
     }
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpDelete("{id:int}/series/{seriesId:int}")]
     public async Task<IActionResult> RemoveSeries(int id, int seriesId)
     {
@@ -54,7 +55,7 @@ public class GenresController(IGenreService service) : ControllerBase
         await service.RemoveSeriesFromGenreAsync(id, seriesId);
         return NoContent();
     }
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpPut("{id:int}/films/{filmId:int}")]
     public async Task<IActionResult> AddFilm(int id, int filmId)
     {
@@ -62,7 +63,7 @@ public class GenresController(IGenreService service) : ControllerBase
         await service.AddFilmToGenreAsync(id, filmId);
         return NoContent();
     }
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
     [HttpDelete("{id:int}/films/{filmId:int}")]
     public async Task<IActionResult> RemoveFilm(int id, int filmId)
     {

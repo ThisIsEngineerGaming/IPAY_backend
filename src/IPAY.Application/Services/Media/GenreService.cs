@@ -4,16 +4,16 @@ using AutoMapper;
 using IPAY.Application.DTOs.Media;
 using IPAY.Application.Interfaces.Media;
 using IPAY.Domain.Entities.Media;
-using IPAY.Domain.Interfaces.ForRepos;
+using IPAY.Domain.Interfaces.ForRepos.Media;
 
 namespace IPAY.Application.Services.Media
 {
     public class GenreService : IGenreService
     {
-        private readonly IRepository<Genre> _repository;
+        private readonly IGenreRepo _repository;
         private readonly IMapper _mapper;
 
-        public GenreService(IRepository<Genre> repository, IMapper mapper)
+        public GenreService(IGenreRepo repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
@@ -42,45 +42,15 @@ namespace IPAY.Application.Services.Media
 
         public Task DeleteAsync(int id) => _repository.DeleteAsync(id);
 
-        public async Task AddSeriesToGenreAsync(int genreId, int seriesId)
-        {
-            var genre = await _repository.GetByIdAsync(genreId);
-            if (genre is null) return;
-            if (!genre.SerialIds.Contains(seriesId)) genre.SerialIds.Add(seriesId);
-            await _repository.UpdateAsync(genreId, genre);
-        }
+        // Atomic array updates in the repo: no read-modify-write, and a missing genre is a no-op.
+        public Task AddSeriesToGenreAsync(int genreId, int seriesId) => _repository.AddSeriesAsync(genreId, seriesId);
 
-        public async Task AddFilmToGenreAsync(int genreId, int filmId)
-        {
-            var genre = await _repository.GetByIdAsync(genreId);
-            if (genre is null) return;
-            if (!genre.FilmIds.Contains(filmId)) genre.FilmIds.Add(filmId);
-            await _repository.UpdateAsync(genreId, genre);
-        }
+        public Task AddFilmToGenreAsync(int genreId, int filmId) => _repository.AddFilmAsync(genreId, filmId);
 
-        public async Task RemoveSeriesFromGenreAsync(int genreId, int seriesId)
-        {
-            var genre = await _repository.GetByIdAsync(genreId);
-            if (genre is null) return;
-            genre.SerialIds.Remove(seriesId);
-            await _repository.UpdateAsync(genreId, genre);
-        }
+        public Task RemoveSeriesFromGenreAsync(int genreId, int seriesId) => _repository.RemoveSeriesAsync(genreId, seriesId);
 
-        public async Task RemoveFilmFromGenreAsync(int genreId, int filmId)
-        {
-            var genre = await _repository.GetByIdAsync(genreId);
-            if (genre is null) return;
-            genre.FilmIds.Remove(filmId);
-            await _repository.UpdateAsync(genreId, genre);
-        }
+        public Task RemoveFilmFromGenreAsync(int genreId, int filmId) => _repository.RemoveFilmAsync(genreId, filmId);
 
-        public async Task ClearGenreAsync(int genreId)
-        {
-            var genre = await _repository.GetByIdAsync(genreId);
-            if (genre is null) return;
-            genre.FilmIds.Clear();
-            genre.SerialIds.Clear();
-            await _repository.UpdateAsync(genreId, genre);
-        }
+        public Task ClearGenreAsync(int genreId) => _repository.ClearAsync(genreId);
     }
 }

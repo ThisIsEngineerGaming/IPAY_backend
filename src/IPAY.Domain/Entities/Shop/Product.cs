@@ -9,6 +9,9 @@ namespace IPAY.Domain.Entities.Shop
         // without a custom converter - same as Rating below.
         public double Price { get; set; }
         public double Rating { get; set; }
+
+        /// <summary>How many registered users have rated this product. Rating is the average of their ratings.</summary>
+        public int RatingCount { get; set; }
         public double DiscountedPrice { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
         public string Manufacturer { get; set; } = string.Empty;
@@ -18,6 +21,12 @@ namespace IPAY.Domain.Entities.Shop
         public int CategoryId { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public string SellerId { get; set; } = string.Empty;
+
+        /// <summary>The price a customer actually pays: the discounted price when a valid discount exists, otherwise the list price.</summary>
+        public double GetFinalPrice() =>
+            DiscountedPrice > 0 && DiscountedPrice < Price ? DiscountedPrice : Price;
 
         /// <summary>Percentage discount off the original price, e.g. 25 for 25% off.</summary>
         public double GetDiscountPercent()

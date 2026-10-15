@@ -13,6 +13,9 @@ namespace IPAY.Domain.Entities.Media
         public string AgeRating { get; set; } = string.Empty;
         public string PosterUrl { get; set; } = string.Empty;
         public string VideoUrl { get; set; } = string.Empty;
+        /// IMDb id (e.g. tt0133093) when the film was imported from OMDb; empty otherwise. Used to block duplicate imports.
+        public string ImdbId { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
         public List<int> GenreIds { get; set; } = new();
     }
 }

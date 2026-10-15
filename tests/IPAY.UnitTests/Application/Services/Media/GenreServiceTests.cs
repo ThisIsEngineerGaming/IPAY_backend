@@ -3,7 +3,7 @@ using IPAY.Application.DTOs.Media;
 using IPAY.Application.Mappings.Media;
 using IPAY.Application.Services.Media;
 using IPAY.Domain.Entities.Media;
-using IPAY.Domain.Interfaces.ForRepos;
+using IPAY.Domain.Interfaces.ForRepos.Media;
 using Moq;
 using NUnit.Framework;
 
@@ -12,14 +12,14 @@ namespace IPAY.UnitTests.Application.Services.Media
     [TestFixture]
     public class GenreServiceTests
     {
-        private Mock<IRepository<Genre>> _repositoryMock = null!;
+        private Mock<IGenreRepo> _repositoryMock = null!;
         private IMapper _mapper = null!;
         private GenreService _sut = null!;
 
         [SetUp]
         public void SetUp()
         {
-            _repositoryMock = new Mock<IRepository<Genre>>();
+            _repositoryMock = new Mock<IGenreRepo>();
             _mapper = new MapperConfiguration(cfg => cfg.AddProfile<MediaMapping>())
                 .CreateMapper();
             _sut = new GenreService(_repositoryMock.Object, _mapper);
@@ -95,120 +95,43 @@ namespace IPAY.UnitTests.Application.Services.Media
         }
 
         [Test]
-        public async Task AddSeriesToGenreAsync_AddsSeriesIdWhenNotPresent()
+        public async Task AddSeriesToGenreAsync_DelegatesToRepository()
         {
-            var genre = new Genre { Id = 1, SerialIds = new List<int> { 10 } };
-            _repositoryMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(genre);
-
             await _sut.AddSeriesToGenreAsync(1, 20);
 
-            _repositoryMock.Verify(r => r.UpdateAsync(1, It.Is<Genre>(g => g.SerialIds.Contains(20))), Times.Once);
+            _repositoryMock.Verify(r => r.AddSeriesAsync(1, 20), Times.Once);
         }
 
         [Test]
-        public async Task AddSeriesToGenreAsync_WhenAlreadyPresent_DoesNotDuplicate()
+        public async Task AddFilmToGenreAsync_DelegatesToRepository()
         {
-            var genre = new Genre { Id = 1, SerialIds = new List<int> { 10, 20 } };
-            _repositoryMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(genre);
-
-            await _sut.AddSeriesToGenreAsync(1, 20);
-
-            _repositoryMock.Verify(r => r.UpdateAsync(1, It.Is<Genre>(g => g.SerialIds.Count == 2)), Times.Once);
-        }
-
-        [Test]
-        public async Task AddSeriesToGenreAsync_WhenGenreMissing_DoesNothing()
-        {
-            _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Genre?)null);
-
-            await _sut.AddSeriesToGenreAsync(99, 1);
-
-            _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<int>(), It.IsAny<Genre>()), Times.Never);
-        }
-
-        [Test]
-        public async Task AddFilmToGenreAsync_AddsFilmIdWhenNotPresent()
-        {
-            var genre = new Genre { Id = 1, FilmIds = new List<int>() };
-            _repositoryMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(genre);
-
             await _sut.AddFilmToGenreAsync(1, 7);
 
-            _repositoryMock.Verify(r => r.UpdateAsync(1, It.Is<Genre>(g => g.FilmIds.Contains(7))), Times.Once);
+            _repositoryMock.Verify(r => r.AddFilmAsync(1, 7), Times.Once);
         }
 
         [Test]
-        public async Task AddFilmToGenreAsync_WhenGenreMissing_DoesNothing()
+        public async Task RemoveSeriesFromGenreAsync_DelegatesToRepository()
         {
-            _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Genre?)null);
+            await _sut.RemoveSeriesFromGenreAsync(1, 20);
 
-            await _sut.AddFilmToGenreAsync(99, 1);
-
-            _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<int>(), It.IsAny<Genre>()), Times.Never);
+            _repositoryMock.Verify(r => r.RemoveSeriesAsync(1, 20), Times.Once);
         }
 
         [Test]
-        public async Task RemoveSeriesFromGenreAsync_RemovesSeriesId()
+        public async Task RemoveFilmFromGenreAsync_DelegatesToRepository()
         {
-            var genre = new Genre { Id = 1, SerialIds = new List<int> { 10, 20 } };
-            _repositoryMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(genre);
-
-            await _sut.RemoveSeriesFromGenreAsync(1, 10);
-
-            _repositoryMock.Verify(r => r.UpdateAsync(1, It.Is<Genre>(g => !g.SerialIds.Contains(10))), Times.Once);
-        }
-
-        [Test]
-        public async Task RemoveSeriesFromGenreAsync_WhenGenreMissing_DoesNothing()
-        {
-            _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Genre?)null);
-
-            await _sut.RemoveSeriesFromGenreAsync(99, 1);
-
-            _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<int>(), It.IsAny<Genre>()), Times.Never);
-        }
-
-        [Test]
-        public async Task RemoveFilmFromGenreAsync_RemovesFilmId()
-        {
-            var genre = new Genre { Id = 1, FilmIds = new List<int> { 7, 8 } };
-            _repositoryMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(genre);
-
             await _sut.RemoveFilmFromGenreAsync(1, 7);
 
-            _repositoryMock.Verify(r => r.UpdateAsync(1, It.Is<Genre>(g => !g.FilmIds.Contains(7))), Times.Once);
+            _repositoryMock.Verify(r => r.RemoveFilmAsync(1, 7), Times.Once);
         }
 
         [Test]
-        public async Task RemoveFilmFromGenreAsync_WhenGenreMissing_DoesNothing()
+        public async Task ClearGenreAsync_DelegatesToRepository()
         {
-            _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Genre?)null);
-
-            await _sut.RemoveFilmFromGenreAsync(99, 1);
-
-            _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<int>(), It.IsAny<Genre>()), Times.Never);
-        }
-
-        [Test]
-        public async Task ClearGenreAsync_ClearsBothFilmAndSeriesIds()
-        {
-            var genre = new Genre { Id = 1, FilmIds = new List<int> { 1, 2 }, SerialIds = new List<int> { 3, 4 } };
-            _repositoryMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(genre);
-
             await _sut.ClearGenreAsync(1);
 
-            _repositoryMock.Verify(r => r.UpdateAsync(1, It.Is<Genre>(
-                g => g.FilmIds.Count == 0 && g.SerialIds.Count == 0)), Times.Once);
-        }
-
-        [Test]
-        public async Task ClearGenreAsync_WhenGenreMissing_DoesNothing()
-        {
-            _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Genre?)null);
-
-            await _sut.ClearGenreAsync(99);
-
-            _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<int>(), It.IsAny<Genre>()), Times.Never);
+            _repositoryMock.Verify(r => r.ClearAsync(1), Times.Once);
         }
     }
 }

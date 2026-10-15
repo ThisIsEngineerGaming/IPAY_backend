@@ -1,4 +1,4 @@
-﻿using IPAY.Domain.Entities.Shop;
+using IPAY.Domain.Entities.Shop;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +14,9 @@ namespace IPAY.Domain.Interfaces.ForRepos.Shop
         Task<Product> AddProductAsync(Product entity);
         Task UpdateProductAsync(int id, Product entity);
         Task DeleteProductAsync(int id);
+
+        /// <summary>Every product whose SellerId matches, newest first.</summary>
+        Task<IReadOnlyList<Product>> GetBySellerAsync(string sellerId);
 
         Task<IReadOnlyList<Product>> GetLimitedProduct(int limit, string? lastDocId);
 

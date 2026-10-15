@@ -14,16 +14,21 @@ public class CloudinaryImageService
         "image/jpeg", "image/png", "image/gif", "image/webp"
     };
 
-    private readonly CloudinaryDotNet.Cloudinary _cloudinary;
+    private readonly CloudinaryDotNet.Cloudinary? _cloudinary;
 
     public CloudinaryImageService(IOptions<CloudinaryOptions> options)
     {
         var settings = options.Value;
+
+        // Deliberately NOT thrown from the constructor: this is a singleton resolved while an upload request
+        // is running, and an exception there kills the response before CORS headers are added - the browser then
+        // reports a misleading "blocked by CORS policy". Fail inside UploadImageAsync instead, where
+        // ImagesController turns it into a readable JSON error.
         if (string.IsNullOrWhiteSpace(settings.CloudName) ||
             string.IsNullOrWhiteSpace(settings.ApiKey) ||
             string.IsNullOrWhiteSpace(settings.ApiSecret))
         {
-            throw new InvalidOperationException("Cloudinary:CloudName, ApiKey and ApiSecret must be configured.");
+            return;
         }
 
         var account = new Account(settings.CloudName, settings.ApiKey, settings.ApiSecret);
@@ -37,6 +42,13 @@ public class CloudinaryImageService
     /// </summary>
     public async Task<string> UploadImageAsync(IFormFile file, CancellationToken cancellationToken)
     {
+        if (_cloudinary is null)
+        {
+            throw new InvalidOperationException(
+                "Image hosting is not configured on the server: set Cloudinary:CloudName, Cloudinary:ApiKey and " +
+                "Cloudinary:ApiSecret (on Render: Cloudinary__CloudName, Cloudinary__ApiKey, Cloudinary__ApiSecret).");
+        }
+
         if (file.Length == 0) throw new ArgumentException("Choose an image file.");
         if (file.Length > MaxImageSizeBytes) throw new ArgumentException("Images must be 5 MB or smaller.");
         if (!AllowedContentTypes.Contains(file.ContentType))

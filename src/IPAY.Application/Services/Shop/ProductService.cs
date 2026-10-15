@@ -144,5 +144,27 @@ namespace IPAY.Application.Services.Shop
             var products = await _repository.GetSortedAsync(limit, lastDocId, sortBy, sortDir);
             return _productMapper.Map<List<ProductDto>>(products);
         }
+
+        //-----------------------
+        // src/IPAY.Application/Services/Shop/ProductService.cs
+
+        public async Task<IReadOnlyList<ProductDto>> CreateManyAsync(IEnumerable<CreateAdminProductDto> dtos)
+        {
+            var createdProducts = new List<ProductDto>();
+
+            foreach (var dto in dtos)
+            {
+                var product = _productMapper.Map<Product>(dto);
+                product.CreatedAt = DateTime.UtcNow;
+
+                var created = await _repository.AddProductAsync(product);
+                createdProducts.Add(_productMapper.Map<ProductDto>(created));
+            }
+
+            return createdProducts;
+        }
+
+        //----------------------------------------
+        public Task DeleteAllAsync() => _repository.DeleteAllProductsAsync();
     }
 }

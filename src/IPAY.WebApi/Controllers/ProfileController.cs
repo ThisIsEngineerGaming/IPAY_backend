@@ -19,7 +19,7 @@ namespace IPAY.WebApi.Controllers
             _profile = profile;
         }
 
-        // -> { name, email, hasPassword }
+        // -> { name, email, phone, hasPassword }
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -27,7 +27,7 @@ namespace IPAY.WebApi.Controllers
             return ToResponse(await _profile.GetProfileAsync(id));
         }
 
-        // Body: { newName, password } -> { name, email, hasPassword }
+        // Body: { newName, password } -> { name, email, phone, hasPassword }
         [HttpPut("username")]
         public async Task<IActionResult> ChangeUsername([FromBody] ChangeUsernameDto dto)
         {
@@ -35,7 +35,15 @@ namespace IPAY.WebApi.Controllers
             return ToResponse(await _profile.ChangeUsernameAsync(id, dto));
         }
 
-        // Body: { currentPassword, newPassword } -> { name, email, hasPassword }
+        // Body: { newPhone, password } -> { name, email, phone, hasPassword }
+        [HttpPut("phone")]
+        public async Task<IActionResult> ChangePhone([FromBody] ChangePhoneDto dto)
+        {
+            if (CurrentUserId() is not int id) return Unauthorized();
+            return ToResponse(await _profile.ChangePhoneAsync(id, dto));
+        }
+
+        // Password change, option 1 (direct). Body: { currentPassword, newPassword } -> { name, email, phone, hasPassword }
         [HttpPut("password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
         {
@@ -43,7 +51,26 @@ namespace IPAY.WebApi.Controllers
             return ToResponse(await _profile.ChangePasswordAsync(id, dto));
         }
 
-        // Email change, step 1. Body: { newEmail, password } -> { name, email, hasPassword }
+        // Password change, option 2 (emailed reset), step 1. No body -> { name, email, phone, hasPassword }
+        // The client then asks Firebase to email the reset link.
+        [HttpPost("password/start")]
+        public async Task<IActionResult> StartPasswordChange()
+        {
+            if (CurrentUserId() is not int id) return Unauthorized();
+            return ToResponse(await _profile.StartPasswordChangeAsync(id));
+        }
+
+        // Password change, option 2, step 2. Body: { idToken, newPassword } -> { name, email, phone, hasPassword }
+        // idToken comes from signing in to Firebase with the new password chosen through the emailed link.
+        [HttpPost("password/confirm")]
+        public async Task<IActionResult> ConfirmPasswordChange([FromBody] ConfirmPasswordChangeDto dto)
+        {
+            if (CurrentUserId() is not int id) return Unauthorized();
+            return ToResponse(await _profile.ConfirmPasswordChangeAsync(id, dto));
+        }
+
+        // Email change, step 1 (email only - no password). Body: { newEmail } -> { firebaseToken }
+        // The client signs in to Firebase with the token once and has Firebase email the confirmation link.
         [HttpPost("email/start")]
         public async Task<IActionResult> StartEmailChange([FromBody] StartEmailChangeDto dto)
         {
@@ -51,7 +78,8 @@ namespace IPAY.WebApi.Controllers
             return ToResponse(await _profile.StartEmailChangeAsync(id, dto));
         }
 
-        // Email change, step 2. Body: { idToken, password } -> AuthResponse (fresh JWT carrying the new email)
+        // Email change, step 2. Body: { newEmail } -> AuthResponse (fresh JWT carrying the new email)
+        // Succeeds only once Firebase reports the new address verified for the change this account started.
         [HttpPost("email/confirm")]
         public async Task<IActionResult> ConfirmEmailChange([FromBody] ConfirmEmailChangeDto dto)
         {

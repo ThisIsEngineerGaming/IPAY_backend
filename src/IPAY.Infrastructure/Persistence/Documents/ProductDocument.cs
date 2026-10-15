@@ -12,12 +12,16 @@ public class ProductDocument
     [FirestoreProperty] public string Name { get; set; } = string.Empty;
     [FirestoreProperty] public double Price { get; set; }
     [FirestoreProperty] public double Rating { get; set; }
+    // Missing in documents created before user ratings existed -> reads back as 0.
+    [FirestoreProperty] public int RatingCount { get; set; }
     [FirestoreProperty] public double DiscountedPrice { get; set; }
     [FirestoreProperty] public string ImageUrl { get; set; } = string.Empty;
     [FirestoreProperty] public string Manufacturer { get; set; } = string.Empty;
     [FirestoreProperty] public int CategoryId { get; set; }
     [FirestoreProperty]public string NameLower { get; set; } = string.Empty;
     [FirestoreProperty] public DateTime CreatedAt { get; set; }
+
+    [FirestoreProperty] public string SellerId { get; set; } = string.Empty;
 
     public static ProductDocument FromEntity(Product entity) => new()
     {
@@ -26,10 +30,12 @@ public class ProductDocument
         NameLower = entity.Name.Trim().ToLowerInvariant(),
         Price = entity.Price,
         Rating = entity.Rating,
+        RatingCount = entity.RatingCount,
         DiscountedPrice = entity.DiscountedPrice,
         ImageUrl = entity.ImageUrl,
         Manufacturer = entity.Manufacturer,
         CategoryId = entity.CategoryId,
+        SellerId = entity.SellerId,
         CreatedAt = entity.CreatedAt == default
          ? DateTime.UtcNow
          : entity.CreatedAt,
@@ -41,10 +47,12 @@ public class ProductDocument
         Name = Name,
         Price = Price,
         Rating = Rating,
+        RatingCount = RatingCount,
         DiscountedPrice = DiscountedPrice,
         ImageUrl = ImageUrl,
         Manufacturer = Manufacturer,
         CategoryId = CategoryId,
+        SellerId = SellerId,
         CreatedAt = CreatedAt
     };
 }
