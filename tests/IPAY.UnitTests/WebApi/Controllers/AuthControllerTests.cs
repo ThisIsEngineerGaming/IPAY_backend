@@ -35,7 +35,7 @@ namespace IPAY.UnitTests.WebApi.Controllers
                 _googleMock.Object, _twoFactorMock.Object);
         }
 
-        // ---------- register / login ----------
+        // --------- register / login ----------
 
         [Test]
         public async Task Registration_WhenRegisterSucceeds_ReturnsOk()
