@@ -55,10 +55,13 @@ namespace IPAY.UnitTests.Integration
             var mapper = new MapperConfiguration(cfg => cfg.AddProfile<AuthMapping>()).CreateMapper();
 
             var register = new RegisterDtoService(new RegisterValidator(), _customers, hasher, mapper);
-            var login = new LoginDtoService(new LoginValidator(), new JwtService(config), _customers, hasher);
+            var jwt = new JwtService(config);
+            var guests = new Mock<IGuestService>().Object;
+            var refreshTokens = new RefreshTokenService(jwt, new InMemoryRefreshTokenRepository(), _customers, guests, config);
+            var login = new LoginDtoService(new LoginValidator(), jwt, _customers, hasher, refreshTokens);
 
             _auth = new AuthController(
-                register, login, _customers,
+                register, login, _customers, guests, refreshTokens,
                 new Mock<IGoogleLogin>().Object, new Mock<ITwoFactorService>().Object);
         }
 

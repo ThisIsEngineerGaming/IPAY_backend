@@ -17,6 +17,7 @@ namespace IPAY.UnitTests.Application.Services.Auth
         private Mock<IJWT> _jwtMock = null!;
         private Mock<IUser<Customer>> _customerMock = null!;
         private Mock<IPasswordHashingService> _passwordHasherMock = null!;
+        private Mock<IRefreshTokenService> _refreshMock = null!;
         private LoginDtoService _sut = null!;
 
         [SetUp]
@@ -26,8 +27,23 @@ namespace IPAY.UnitTests.Application.Services.Auth
             _jwtMock = new Mock<IJWT>();
             _customerMock = new Mock<IUser<Customer>>();
             _passwordHasherMock = new Mock<IPasswordHashingService>();
+            _refreshMock = new Mock<IRefreshTokenService>();
 
-            _sut = new LoginDtoService(_validatorMock.Object, _jwtMock.Object, _customerMock.Object, _passwordHasherMock.Object);
+            // The session (access + refresh token) is now issued by IRefreshTokenService.
+            _refreshMock
+                .Setup(r => r.CreateAuthResponseAsync(
+                    It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<UserRole>(), It.IsAny<string?>()))
+                .ReturnsAsync((int id, string email, string? name, UserRole role, string? ip) => new AuthResponse
+                {
+                    AccessToken = "jwt-token",
+                    RefreshToken = "refresh-token",
+                    TokenType = "Bearer",
+                    User = new LoginDto { Email = email, Name = name }
+                });
+
+            _sut = new LoginDtoService(
+                _validatorMock.Object, _jwtMock.Object, _customerMock.Object, _passwordHasherMock.Object,
+                _refreshMock.Object);
         }
 
         private void SetupValidation(bool isValid)
@@ -105,6 +121,8 @@ namespace IPAY.UnitTests.Application.Services.Auth
             var result = await _sut.LoginAsync(new LoginDto { Email = "a@test.com", Password = "password1" });
 
             Assert.That(result, Is.Null);
+            _refreshMock.Verify(r => r.CreateAuthResponseAsync(
+                It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<UserRole>(), It.IsAny<string?>()), Times.Never);
         }
 
         [Test]
@@ -114,7 +132,6 @@ namespace IPAY.UnitTests.Application.Services.Auth
             var customer = new Customer { Id = 1, Email = "a@test.com", Password = "hashed", Name = "Alice", Role = UserRole.Customer };
             _customerMock.Setup(s => s.GetByEmail("a@test.com")).ReturnsAsync(customer);
             _passwordHasherMock.Setup(p => p.Verify("password1", "hashed")).Returns(true);
-            _jwtMock.Setup(j => j.GenerateToken("1", "a@test.com", UserRole.Customer)).Returns("jwt-token");
 
             var result = await _sut.LoginAsync(new LoginDto { Email = "a@test.com", Password = "password1" });
 
@@ -123,22 +140,23 @@ namespace IPAY.UnitTests.Application.Services.Auth
             Assert.That(result.TokenType, Is.EqualTo("Bearer"));
             Assert.That(result.User.Email, Is.EqualTo("a@test.com"));
             Assert.That(result.User.Name, Is.EqualTo("Alice"));
+            _refreshMock.Verify(r => r.CreateAuthResponseAsync(1, "a@test.com", "Alice", UserRole.Customer, null), Times.Once);
         }
 
         [TestCase(UserRole.Customer)]
         [TestCase(UserRole.Seller)]
         [TestCase(UserRole.Admin)]
-        public async Task LoginAsync_PassesUserRoleToJwt(UserRole role)
+        public async Task LoginAsync_PassesUserRoleToTheSessionIssuer(UserRole role)
         {
             SetupValidation(isValid: true);
             var customer = new Customer { Id = 7, Email = "r@test.com", Password = "hashed", Role = role };
             _customerMock.Setup(s => s.GetByEmail("r@test.com")).ReturnsAsync(customer);
             _passwordHasherMock.Setup(p => p.Verify("password1", "hashed")).Returns(true);
-            _jwtMock.Setup(j => j.GenerateToken("7", "r@test.com", role)).Returns("jwt-" + role);
 
             var result = await _sut.LoginAsync(new LoginDto { Email = "r@test.com", Password = "password1" });
 
-            Assert.That(result!.AccessToken, Is.EqualTo("jwt-" + role));
+            Assert.That(result, Is.Not.Null);
+            _refreshMock.Verify(r => r.CreateAuthResponseAsync(7, "r@test.com", It.IsAny<string?>(), role, It.IsAny<string?>()), Times.Once);
         }
 
         [Test]
@@ -168,11 +186,10 @@ namespace IPAY.UnitTests.Application.Services.Auth
 
             SetupValidation(isValid: true);
             _passwordHasherMock.Setup(p => p.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-            _jwtMock.Setup(j => j.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRole>())).Returns("jwt-token");
 
             return new LoginDtoService(
                 _validatorMock.Object, _jwtMock.Object, _customerMock.Object, _passwordHasherMock.Object,
-                _firebaseMock.Object, _twoFactorMock.Object);
+                _refreshMock.Object, _firebaseMock.Object, _twoFactorMock.Object);
         }
 
         private static LoginDto Credentials() => new() { Email = "a@test.com", Password = "password1" };
@@ -230,7 +247,8 @@ namespace IPAY.UnitTests.Application.Services.Auth
 
             Assert.That(result!.TwoFactorRequired, Is.True);
             Assert.That(result.AccessToken, Is.Empty);
-            _jwtMock.Verify(j => j.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRole>()), Times.Never);
+            _refreshMock.Verify(r => r.CreateAuthResponseAsync(
+                It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<UserRole>(), It.IsAny<string?>()), Times.Never);
         }
 
         [Test]

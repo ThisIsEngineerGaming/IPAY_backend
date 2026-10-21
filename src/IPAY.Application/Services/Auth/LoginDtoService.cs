@@ -21,7 +21,7 @@ namespace IPAY.Application.Services.Auth
         private readonly IFirebaseAuthService? _firebase;
         private readonly ITwoFactorService? _twoFactor;
 
-        private readonly IRefreshTokenService? _refreshTokenService;
+        private readonly IRefreshTokenService _refreshTokenService;
 
         public LoginDtoService(
             IValidator<LoginDto> validator,
@@ -72,17 +72,6 @@ namespace IPAY.Application.Services.Auth
                     !_passwordHasher.Verify(loginDto.Password, user.Password))
                     return null;
 
-
-                // 3b. Password is right - now make sure the email address was verified through Firebase.
-                // Checked AFTER the password so nobody can probe which emails are registered/unverified.
-                if (_firebase is { RequireEmailVerification: true } &&
-                    !await _firebase.IsEmailVerifiedAsync(user.Email))
-                {
-                    throw new EmailNotVerifiedException();
-                }
-
-                // 3c. Password (and email) are fine - ask for the emailed code before handing out a session.
-                if (_twoFactor is { IsEnabled: true })
 
                 // 3b. Email confirmation is a ONE-TIME step stored on the account (Customer.EmailVerified).
                 // Only accounts still marked pending (false) are checked against Firebase; once confirmed

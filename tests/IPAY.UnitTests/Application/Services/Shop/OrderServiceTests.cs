@@ -33,7 +33,7 @@ namespace IPAY.UnitTests.Application.Services.Shop
             _sut = new OrderService(
                 _orders, _orderItems, new InMemoryAddressRepository(), mapper,
                 new CreateOrderDtoValidator(), new CreateOrderItemDtoValidator(), new UpdateOrderStatusDtoValidator(),
-                _products);
+                _products, new InMemoryOrderStatusHistoryRepository());
 
             _phoneId = (await _products.AddProductAsync(new Product { Name = "Phone", Price = 100, DiscountedPrice = 75 })).Id;
             _caseId = (await _products.AddProductAsync(new Product { Name = "Case", Price = 10 })).Id;

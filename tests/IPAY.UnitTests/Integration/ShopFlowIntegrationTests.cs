@@ -54,7 +54,7 @@ namespace IPAY.UnitTests.Integration
             _orderService = new OrderService(
                 _orderRepo, new InMemoryOrderItemRepository(), new InMemoryAddressRepository(), mapper,
                 new CreateOrderDtoValidator(), new CreateOrderItemDtoValidator(), new UpdateOrderStatusDtoValidator(),
-                _productRepo);
+                _productRepo, new InMemoryOrderStatusHistoryRepository());
         }
 
         private ProductsController Products(int userId, string role) =>

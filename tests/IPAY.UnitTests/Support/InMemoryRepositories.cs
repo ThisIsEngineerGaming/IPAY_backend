@@ -1,6 +1,8 @@
 using System.Text.Json;
 using IPAY.Domain.Entities.Shop;
+using IPAY.Domain.Entities.Auth;
 using IPAY.Domain.Interfaces.ForRepos;
+using IPAY.Domain.Interfaces.ForRepos.Auth;
 using IPAY.Domain.Interfaces.ForRepos.Shop;
 
 namespace IPAY.UnitTests.Support
@@ -104,6 +106,49 @@ namespace IPAY.UnitTests.Support
 
         public async Task<IReadOnlyList<OrderItem>> GetByOrderIdAsync(int orderId) =>
             (await GetAllAsync()).Where(i => i.OrderId == orderId).ToList();
+    }
+
+    public class InMemoryOrderStatusHistoryRepository : IOrderStatusHistoryRepository
+    {
+        private readonly List<OrderStatusHistory> _rows = new();
+        private int _nextId = 1;
+
+        public Task<OrderStatusHistory> AddAsync(OrderStatusHistory entity)
+        {
+            entity.Id = _nextId++;
+            _rows.Add(entity);
+            return Task.FromResult(entity);
+        }
+
+        public Task<IReadOnlyList<OrderStatusHistory>> GetByOrderIdAsync(int orderId) =>
+            Task.FromResult<IReadOnlyList<OrderStatusHistory>>(_rows.Where(h => h.OrderId == orderId).ToList());
+    }
+
+    public class InMemoryRefreshTokenRepository : IRefreshTokenRepository
+    {
+        private readonly Dictionary<string, RefreshToken> _rows = new();
+
+        public Task AddAsync(RefreshToken token)
+        {
+            _rows[token.Id] = token;
+            return Task.CompletedTask;
+        }
+
+        public Task<RefreshToken?> GetByIdAsync(string id) =>
+            Task.FromResult<RefreshToken?>(_rows.TryGetValue(id, out var token) ? token : null);
+
+        public Task UpdateAsync(RefreshToken token)
+        {
+            _rows[token.Id] = token;
+            return Task.CompletedTask;
+        }
+
+        public Task RevokeAllForUserAsync(int userId)
+        {
+            foreach (var token in _rows.Values.Where(t => t.UserId == userId))
+                token.IsRevoked = true;
+            return Task.CompletedTask;
+        }
     }
 
     public class InMemoryAddressRepository : InMemoryRepository<Address>, IAddressRepository

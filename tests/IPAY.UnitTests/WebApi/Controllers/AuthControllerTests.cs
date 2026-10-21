@@ -18,6 +18,8 @@ namespace IPAY.UnitTests.WebApi.Controllers
         private Mock<IAuthDto<RegisterDto>> _registerMock = null!;
         private Mock<ILogin> _loginMock = null!;
         private Mock<IUser<Customer>> _customerMock = null!;
+        private Mock<IGuestService> _guestMock = null!;
+        private Mock<IRefreshTokenService> _refreshMock = null!;
         private Mock<IGoogleLogin> _googleMock = null!;
         private Mock<ITwoFactorService> _twoFactorMock = null!;
         private AuthController _sut = null!;
@@ -28,10 +30,13 @@ namespace IPAY.UnitTests.WebApi.Controllers
             _registerMock = new Mock<IAuthDto<RegisterDto>>();
             _loginMock = new Mock<ILogin>();
             _customerMock = new Mock<IUser<Customer>>();
+            _guestMock = new Mock<IGuestService>();
+            _refreshMock = new Mock<IRefreshTokenService>();
             _googleMock = new Mock<IGoogleLogin>();
             _twoFactorMock = new Mock<ITwoFactorService>();
             _sut = new AuthController(
                 _registerMock.Object, _loginMock.Object, _customerMock.Object,
+                _guestMock.Object, _refreshMock.Object,
                 _googleMock.Object, _twoFactorMock.Object);
         }
 

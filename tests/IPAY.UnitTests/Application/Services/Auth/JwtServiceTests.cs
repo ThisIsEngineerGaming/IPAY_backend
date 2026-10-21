@@ -26,17 +26,17 @@ namespace IPAY.UnitTests.Application.Services.Auth
         }
 
         [Test]
-        public void GenerateToken_ReturnsNonEmptyToken()
+        public void GenerateAccessToken_ReturnsNonEmptyToken()
         {
-            var token = _sut.GenerateToken("42", "user@example.com", UserRole.Customer);
+            var token = _sut.GenerateAccessToken("42", "user@example.com", UserRole.Customer);
 
             Assert.That(token, Is.Not.Null.And.Not.Empty);
         }
 
         [Test]
-        public void GenerateToken_EmbedsUserIdAndEmailClaims()
+        public void GenerateAccessToken_EmbedsUserIdAndEmailClaims()
         {
-            var token = _sut.GenerateToken("42", "user@example.com", UserRole.Customer);
+            var token = _sut.GenerateAccessToken("42", "user@example.com", UserRole.Customer);
 
             var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
 
@@ -47,9 +47,9 @@ namespace IPAY.UnitTests.Application.Services.Auth
         [TestCase(UserRole.Customer)]
         [TestCase(UserRole.Seller)]
         [TestCase(UserRole.Admin)]
-        public void GenerateToken_EmbedsRoleClaim(UserRole role)
+        public void GenerateAccessToken_EmbedsRoleClaim(UserRole role)
         {
-            var token = _sut.GenerateToken("42", "user@example.com", role);
+            var token = _sut.GenerateAccessToken("42", "user@example.com", role);
 
             var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
 
@@ -57,9 +57,9 @@ namespace IPAY.UnitTests.Application.Services.Auth
         }
 
         [Test]
-        public void GenerateToken_SetsConfiguredIssuerAndAudience()
+        public void GenerateAccessToken_SetsConfiguredIssuerAndAudience()
         {
-            var token = _sut.GenerateToken("42", "user@example.com", UserRole.Customer);
+            var token = _sut.GenerateAccessToken("42", "user@example.com", UserRole.Customer);
 
             var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
 
@@ -68,13 +68,34 @@ namespace IPAY.UnitTests.Application.Services.Auth
         }
 
         [Test]
-        public void GenerateToken_SetsAnExpiryInTheFuture()
+        public void GenerateAccessToken_SetsAnExpiryInTheFuture()
         {
-            var token = _sut.GenerateToken("42", "user@example.com", UserRole.Customer);
+            var token = _sut.GenerateAccessToken("42", "user@example.com", UserRole.Customer);
 
             var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
 
             Assert.That(jwt.ValidTo, Is.GreaterThan(DateTime.UtcNow));
+        }
+
+        [Test]
+        public void GenerateRefreshToken_ReturnsADifferentNonEmptyValueEachTime()
+        {
+            var first = _sut.GenerateRefreshToken();
+            var second = _sut.GenerateRefreshToken();
+
+            Assert.That(first, Is.Not.Null.And.Not.Empty);
+            Assert.That(first, Is.Not.EqualTo(second));
+        }
+
+        [Test]
+        public void HashToken_IsDeterministic_AndDoesNotReturnTheRawToken()
+        {
+            var raw = _sut.GenerateRefreshToken();
+            var firstHash = _sut.HashToken(raw);
+            var secondHash = _sut.HashToken(raw);
+
+            Assert.That(secondHash, Is.EqualTo(firstHash));
+            Assert.That(firstHash, Is.Not.EqualTo(raw));
         }
     }
 }
