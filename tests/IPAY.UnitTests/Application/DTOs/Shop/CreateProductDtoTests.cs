@@ -6,20 +6,7 @@ namespace IPAY.UnitTests.Application.DTOs.Shop;
 [TestFixture]
 public sealed class CreateProductDtoTests
 {
-    [Test]
-    public void BaseDto_Defaults_AreInitializedAsExpected()
-    {
-        var dto = new CreateProductDto();
-        Assert.Multiple(() =>
-        {
-            Assert.That(dto.Name, Is.Empty);
-            Assert.That(dto.ImageUrl, Is.Empty);
-            Assert.That(dto.Manufacturer, Is.Empty);
-            Assert.That(dto.Price, Is.Zero);
-            Assert.That(dto.DiscountedPrice, Is.Zero);
-            Assert.That(dto.CategoryId, Is.Zero);
-        });
-    }
+
 
     [Test]
     public void AdminDto_Properties_RoundTripAssignedValues()

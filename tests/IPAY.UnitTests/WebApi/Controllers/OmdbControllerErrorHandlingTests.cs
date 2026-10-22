@@ -1,4 +1,5 @@
 using IPAY.Application.DTOs.Media;
+using IPAY.Application.Interfaces.Media;
 using IPAY.Application.Services.Media;
 using IPAY.WebApi.Controllers;
 using Microsoft.AspNetCore.Http;

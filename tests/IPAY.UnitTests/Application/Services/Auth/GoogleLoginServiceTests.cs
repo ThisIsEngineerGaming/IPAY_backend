@@ -26,7 +26,7 @@ namespace IPAY.UnitTests.Application.Services.Auth
             _refresh = new Mock<IRefreshTokenService>();
             _refresh.Setup(r => r.CreateAuthResponseAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<UserRole>(), It.IsAny<string?>()))
                 .ReturnsAsync(new AuthResponse { AccessToken = "access" });
-            _sut = new GoogleLoginService(_firebase.Object, _customers.Object, _jwt.Object, _refresh.Object);
+            _sut = new GoogleLoginService(_firebase.Object, _customers.Object,  _refresh.Object);
         }
 
         private void GivenIdentity(string email = "Alice@Test.com", string? name = "Alice", bool verified = true) =>
