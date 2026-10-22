@@ -12,13 +12,11 @@ namespace IPAY.Infrastructure.Repositories.Shop
 {
     public class OrderItemRepository : IOrderItemRepository
     {
-<<<<<<< Updated upstream
+
         private const string CollectionName = "orderItems";
 
         private readonly FirestoreDb _database;
-=======
-        
->>>>>>> Stashed changes
+
         private readonly CollectionReference _collection;
         private readonly PropertyInfo IdProperty;
 
@@ -76,17 +74,14 @@ namespace IPAY.Infrastructure.Repositories.Shop
         //delete
         public Task DeleteAsync(int id) =>
             _collection.Document(id.ToString()).DeleteAsync();
-<<<<<<< Updated upstream
+
 
         // One counter document instead of reading every order item for each insert.
         private Task<int> GetNextIdAsync() =>
             FirestoreIdGenerator.NextIdAsync(_database, CollectionName, GetMaxExistingIdAsync);
 
         private async Task<int> GetMaxExistingIdAsync()
-=======
-        //get next id
-        private async Task<int> GetNextIdAsync()
->>>>>>> Stashed changes
+
         {
             var all = await GetAllAsync();
             return all.Count == 0 ? 0 : all.Max(x => x.Id);

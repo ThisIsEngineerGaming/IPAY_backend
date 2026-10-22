@@ -13,13 +13,11 @@ namespace IPAY.Infrastructure.Repositories.Shop
     //adress repository
     public class AddressRepository : IAddressRepository
     {
-<<<<<<< Updated upstream
+
         private const string CollectionName = "addresses";
 
         private readonly FirestoreDb _database;
-=======
 
->>>>>>> Stashed changes
         private readonly CollectionReference _collection;
  
         private readonly PropertyInfo IdProperty;
@@ -81,17 +79,14 @@ namespace IPAY.Infrastructure.Repositories.Shop
         //delete async
         public Task DeleteAsync(int id) =>
             _collection.Document(id.ToString()).DeleteAsync();
-<<<<<<< Updated upstream
+
 
         // One counter document instead of reading every address for each insert.
         private Task<int> GetNextIdAsync() =>
             FirestoreIdGenerator.NextIdAsync(_database, CollectionName, GetMaxExistingIdAsync);
 
         private async Task<int> GetMaxExistingIdAsync()
-=======
-        //get next
-        private async Task<int> GetNextIdAsync()
->>>>>>> Stashed changes
+
         {
             var all = await GetAllAsync();
             return all.Count == 0

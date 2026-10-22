@@ -84,17 +84,14 @@ namespace IPAY.Infrastructure.Repositories.Shop
         //delete
         public Task DeleteAsync(int id) =>
             _collection.Document(id.ToString()).DeleteAsync();
-<<<<<<< Updated upstream
+
 
         // One counter document instead of reading every order for each insert.
         private Task<int> GetNextIdAsync() =>
             FirestoreIdGenerator.NextIdAsync(_database, CollectionName, GetMaxExistingIdAsync);
 
         private async Task<int> GetMaxExistingIdAsync()
-=======
-        //get next id
-        private async Task<int> GetNextIdAsync()
->>>>>>> Stashed changes
+
         {
             var all = await GetAllAsync();
             return all.Count == 0 ? 0 : all.Max(x => x.Id);
