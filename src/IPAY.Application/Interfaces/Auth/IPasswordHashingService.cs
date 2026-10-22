@@ -1,5 +1,6 @@
 namespace IPAY.Application.Interfaces.Auth
 {
+    //interface realted with password-hashing
     public interface IPasswordHashingService
     {
         string Hash(string password);

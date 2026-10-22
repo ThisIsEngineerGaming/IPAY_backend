@@ -7,10 +7,11 @@ using  IPAY.Domain.Interfaces.ForRepos.Shop;
 
 namespace IPAY.Application.Services.Shop
 {
+    //here we separated the items and cart into two services but they are working in sync
     public class CartItemService : ICartItemService
     {
         private readonly IRepository<CartItem> _cartItemRepository;
-        private readonly IRepository<Cart> _cartRepository;
+        private readonly IRepository<Cart> _cartRepository;//using cart in order to creat it (if we called item service but didn't create a cart, it will make itself)
         private readonly IProductRepo _productRepository;
         private readonly IMapper _mapper;
 
@@ -25,19 +26,19 @@ namespace IPAY.Application.Services.Shop
             _productRepository = productRepository;
             _mapper = mapper;
         }
-
+        //get cart
         private async Task<Cart?> GetUserCartAsync(int userId)
         {
             var carts = await _cartRepository.GetAllAsync();
             return carts.FirstOrDefault(c => c.UserId == userId);
         }
-
+        //which items belong to user
         private async Task<bool> ItemBelongsToUserAsync(int userId, int itemId)
         {
             var cart = await GetUserCartAsync(userId);
             return cart is not null && cart.Items.Any(i => i.Id == itemId);
         }
-
+        //a "converting" method so that we don't have to making a mapping inside a each function
         private async Task<CartItemDto> BuildItemDtoAsync(CartItem item)
         {
             var dto = _mapper.Map<CartItemDto>(item);
@@ -52,7 +53,7 @@ namespace IPAY.Application.Services.Shop
 
             return dto;
         }
-
+        //get by id(item)
         public async Task<CartItemDto?> GetByIdAsync(int userId, int id)
         {
             if (!await ItemBelongsToUserAsync(userId, id))
@@ -61,17 +62,19 @@ namespace IPAY.Application.Services.Shop
             var item = await _cartItemRepository.GetByIdAsync(id);
             return item is null ? null : await BuildItemDtoAsync(item);
         }
-
+        //adding an item
         public async Task<CartItemDto> AddAsync(int userId, CreateCartItemDto dto)
         {
             var cart = await GetUserCartAsync(userId);
+            //if we haven't a cart
             if (cart is null)
             {
                 cart = new Cart { UserId = userId, Items = new List<CartItem>() };
                 cart = await _cartRepository.AddAsync(cart);
             }
-
+            
             var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == dto.ProductId);
+            //if users "clicks on product again" it will count as adding one more
             if (existingItem is not null)
             {
                 existingItem.Quantity += dto.Quantity;
@@ -93,7 +96,7 @@ namespace IPAY.Application.Services.Shop
 
             return await BuildItemDtoAsync(created);
         }
-
+        //update an item
         public async Task<CartItemDto?> UpdateAsync(int userId, int id, CreateCartItemDto dto)
         {
             if (!await ItemBelongsToUserAsync(userId, id))
@@ -107,7 +110,7 @@ namespace IPAY.Application.Services.Shop
             await _cartItemRepository.UpdateAsync(id, existing);
             return await BuildItemDtoAsync(existing);
         }
-
+        //delete an item
         public async Task<bool> DeleteAsync(int userId, int id)
         {
             if (!await ItemBelongsToUserAsync(userId, id))

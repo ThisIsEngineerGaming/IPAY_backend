@@ -3,6 +3,7 @@ using IPAY.Domain.Enums;
 
 namespace IPAY.Application.Interfaces.Auth
 {
+    //interface, which shows you how to refresh JWT token
     public interface IRefreshTokenService
     {
         Task<(string rawRefresh, DateTime accessExpires)> IssuePairAsync(

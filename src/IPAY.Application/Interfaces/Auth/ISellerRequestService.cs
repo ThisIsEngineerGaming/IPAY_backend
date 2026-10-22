@@ -3,6 +3,7 @@ using IPAY.Application.DTOs.Auth;
 namespace IPAY.Application.Interfaces.Auth
 {
     /// <summary>Outcome of a seller-request operation: the request, or why it didn't work.</summary>
+    //interface related with requests made by seller
     public record SellerRequestResult(SellerRequestDto? Request, string? Error = null, bool NotFound = false);
 
     public interface ISellerRequestService

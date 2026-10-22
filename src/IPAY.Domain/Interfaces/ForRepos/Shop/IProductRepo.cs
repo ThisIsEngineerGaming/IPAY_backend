@@ -7,6 +7,7 @@ using System.Text;
 
 namespace IPAY.Domain.Interfaces.ForRepos.Shop
 {
+    //product repository
     public  interface IProductRepo
     {
         Task<IReadOnlyList<Product>> GetAllProductsAsync();

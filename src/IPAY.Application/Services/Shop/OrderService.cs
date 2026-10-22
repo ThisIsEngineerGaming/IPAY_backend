@@ -11,6 +11,7 @@ using System.Text;
 
 namespace IPAY.Application.Services.Shop
 {
+    //in this way we created service with order and their items
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
@@ -47,7 +48,7 @@ namespace IPAY.Application.Services.Shop
         }
 
         // ==================== ORDER ====================
-
+        //get all
         public async Task<IReadOnlyList<OrderDto>> GetAllAsync()
         {
             var orders = await _orderRepository.GetAllAsync();
@@ -59,7 +60,7 @@ namespace IPAY.Application.Services.Shop
 
             return _mapper.Map<IReadOnlyList<OrderDto>>(orders);
         }
-
+        //get by id
         public async Task<OrderDto?> GetByIdAsync(int id)
         {
             var order = await _orderRepository.GetByIdAsync(id);
@@ -68,7 +69,7 @@ namespace IPAY.Application.Services.Shop
             order.Items = (await _orderItemRepository.GetByOrderIdAsync(id)).ToList();
             return _mapper.Map<OrderDto>(order);
         }
-
+        //get user by user
         public async Task<IReadOnlyList<OrderDto>> GetByUserIdAsync(int userId)
         {
             var orders = await _orderRepository.GetByUserIdAsync(userId);
@@ -80,12 +81,12 @@ namespace IPAY.Application.Services.Shop
 
             return _mapper.Map<IReadOnlyList<OrderDto>>(orders);
         }
-
+        //creating
         public async Task<OrderDto> CreateAsync(CreateOrderDto dto, int userId)
         {
             await _createOrderValidator.ValidateAndThrowAsync(dto);
 
-            // 1. Создаём адрес
+            // 1. Creating address
             var address = new Address
             {
                 Country = dto.Address.Country,
@@ -95,7 +96,7 @@ namespace IPAY.Application.Services.Shop
             };
             address = await _addressRepository.AddAsync(address);
 
-            // 2. Создаём заказ
+            // 2. Making an order
             var order = new Order
             {
                 UserId = userId,
@@ -106,7 +107,7 @@ namespace IPAY.Application.Services.Shop
             };
             order = await _orderRepository.AddAsync(order);
 
-            // 3. Создаём айтемы + берём цену из продукта
+            // 3. Creating an item 
             foreach (var itemDto in dto.Items)
             {
                 var product = await _productRepository.GetProductByIdAsync(itemDto.ProductId)
@@ -129,7 +130,7 @@ namespace IPAY.Application.Services.Shop
 
             return _mapper.Map<OrderDto>(order);
         }
-
+        //updating a status of it
         public async Task UpdateStatusAsync(int id, UpdateOrderStatusDto dto)
         {
             await _updateStatusValidator.ValidateAndThrowAsync(dto);
@@ -140,24 +141,24 @@ namespace IPAY.Application.Services.Shop
             var oldStatus = order.Status;
 
             if (oldStatus == dto.Status)
-                return; // статус не изменился — историю не пишем
+                return; // if status is not changed
 
             order.Status = dto.Status;
             await _orderRepository.UpdateAsync(id, order);
 
-            // Записываем историю
+            // Writing history
             var history = new OrderStatusHistory
             {
                 OrderId = id,
                 OldStatus = oldStatus,
                 NewStatus = dto.Status,
                 ChangedAt = DateTime.UtcNow,
-                // ChangedByUserId = ... можно взять из токена позже
+               
             };
 
             await _orderStatusHistoryRepository.AddAsync(history);
         }
-
+        //cancelling
         public async Task<CancelOrderOutcome> CancelAsync(int orderId, int userId)
         {
             var order = await _orderRepository.GetByIdAsync(orderId);
@@ -179,7 +180,7 @@ namespace IPAY.Application.Services.Shop
             order.Items = (await _orderItemRepository.GetByOrderIdAsync(orderId)).ToList();
             return new CancelOrderOutcome(CancelOrderResult.Cancelled, _mapper.Map<OrderDto>(order));
         }
-
+        //delete
         public async Task DeleteAsync(int id)
         {
             var items = await _orderItemRepository.GetByOrderIdAsync(id);
@@ -190,7 +191,7 @@ namespace IPAY.Application.Services.Shop
 
             await _orderRepository.DeleteAsync(id);
         }
-
+        //get a history of changing a status
         public async Task<IReadOnlyList<OrderStatusHistoryDto>> GetStatusHistoryAsync(int orderId)
         {
             var history = await _orderStatusHistoryRepository.GetByOrderIdAsync(orderId);
@@ -208,7 +209,7 @@ namespace IPAY.Application.Services.Shop
 
 
         // ==================== ORDER ITEMS ====================
-
+        //adding an item
         public async Task<OrderItemDto> AddItemAsync(int orderId, CreateOrderItemDto dto)
         {
             await _createOrderItemValidator.ValidateAndThrowAsync(dto);
@@ -235,7 +236,7 @@ namespace IPAY.Application.Services.Shop
 
             return _mapper.Map<OrderItemDto>(orderItem);
         }
-
+        //updating an item
         public async Task UpdateItemAsync(int orderId, int itemId, CreateOrderItemDto dto)
         {
             await _createOrderItemValidator.ValidateAndThrowAsync(dto);
@@ -252,7 +253,7 @@ namespace IPAY.Application.Services.Shop
             await _orderItemRepository.UpdateAsync(itemId, item);
             await _orderRepository.UpdateAsync(orderId, order);
         }
-
+        //deleting an item
         public async Task DeleteItemAsync(int orderId, int itemId)
         {
             var order = await _orderRepository.GetByIdAsync(orderId)

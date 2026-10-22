@@ -7,6 +7,7 @@ namespace IPAY.Domain.Interfaces.ForRepos
     /// Generic CRUD contract. Implemented by IPAY.Infrastructure against Firebase
     /// (or any other store later) without the Domain/Application layers knowing the difference.
     /// </summary>
+    //the basic CRUD repository(is taken over by another repos)
     public interface IRepository<T> where T : class
     {
         Task<IReadOnlyList<T>> GetAllAsync();

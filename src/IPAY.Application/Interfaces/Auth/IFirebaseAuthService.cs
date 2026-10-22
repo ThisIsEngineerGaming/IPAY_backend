@@ -10,6 +10,7 @@ namespace IPAY.Application.Interfaces.Auth
     /// Thin wrapper around the Firebase Admin SDK (Firebase Authentication only - user data
     /// itself still lives in our own Firestore "customers" collection).
     /// </summary>
+    //firebase interface related with firebase account(verify,update,delete)
     public interface IFirebaseAuthService
     {
         /// <summary>When false, password login does not require a verified email (see Firebase:RequireEmailVerification).</summary>

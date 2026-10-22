@@ -4,10 +4,10 @@ namespace IPAY.Domain.Enums
     // Matches the Guest -> Customer -> Seller hierarchy (Admin is a separate role).
     public enum UserRole
     {
-        Guest = 0,
-        Customer = 1,
-        Seller = 2,
-        Admin = 3,
-        Moderator=4
+        Guest = 0,//unathorized
+        Customer = 1,//authorized
+        Seller = 2,//have permission to post product(and edit only his)!!!
+        Admin = 3,//has all rights
+        Moderator=4//limited rights(for istance, can't delete ban or make moderators/admins)
     }
 }

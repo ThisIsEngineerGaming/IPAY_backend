@@ -4,9 +4,10 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Shop
 {
+    //created product by admin(requires id)
     public class CreateAdminProductDto
     {
-        public int? Id { get; set; }              // null = сгенерирует сервер
+        public int? Id { get; set; }            
         public string Name { get; set; } = string.Empty;
         public double Price { get; set; }
         // Rating is not part of the request: it is the average of users' ratings (see ProductRatingService).

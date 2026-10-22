@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 
 namespace IPAY.Application.Services.Auth
 {
+    //password service
     public sealed class PasswordHashingService : IPasswordHashingService
     {
         private const int SaltSize = 16;
@@ -10,6 +11,7 @@ namespace IPAY.Application.Services.Auth
         private const int Iterations = 210_000;
         private const string Algorithm = "PBKDF2-SHA256";
 
+        //making a hash
         public string Hash(string password)
         {
             var salt = RandomNumberGenerator.GetBytes(SaltSize);
@@ -20,9 +22,9 @@ namespace IPAY.Application.Services.Auth
                 HashAlgorithmName.SHA256,
                 HashSize);
 
-            return $"{Algorithm}${Iterations}${Convert.ToBase64String(salt)}${Convert.ToBase64String(hash)}";
+            return $"{Algorithm}${Iterations}${Convert.ToBase64String(salt)}${Convert.ToBase64String(hash)}";//returning a hashed service
         }
-
+        //checking if password suits hash template
         public bool Verify(string password, string passwordHash)
         {
             var parts = passwordHash.Split('$');
@@ -31,7 +33,7 @@ namespace IPAY.Application.Services.Auth
             {
                 return false;
             }
-
+            
             try
             {
                 var salt = Convert.FromBase64String(parts[2]);
@@ -45,7 +47,7 @@ namespace IPAY.Application.Services.Auth
 
                 return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
             }
-            catch (FormatException)
+            catch (FormatException)//if it's false throwing a error related with format
             {
                 return false;
             }

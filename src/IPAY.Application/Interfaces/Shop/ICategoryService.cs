@@ -4,6 +4,7 @@ using IPAY.Application.DTOs.Shop;
 
 namespace IPAY.Application.Interfaces.Shop
 {
+    //category interface (CRUD + opportunity to add  products)
     public interface ICategoryService
     {
         Task<IReadOnlyList<CategoryDto>> GetAllAsync();

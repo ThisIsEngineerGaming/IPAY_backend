@@ -7,6 +7,7 @@ namespace IPAY.Application.Interfaces.Shop
 {
     public interface IProductService
     {
+        //product interface(product CRUD + filter and sorting and pagination(get limit))
         Task<IReadOnlyList<ProductDto>> GetAllAsync();
         Task<ProductDto?> GetByIdAsync(int id);
         Task<ProductDto> CreateAsync(CreateAdminProductDto adminProduct);

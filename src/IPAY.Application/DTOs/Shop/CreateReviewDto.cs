@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Shop
 {
-
+      //dto related with writing a review
 
         public class CreateReviewDto
         {

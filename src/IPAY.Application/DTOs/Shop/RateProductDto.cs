@@ -1,5 +1,6 @@
 namespace IPAY.Application.DTOs.Shop
 {
+    //rating dto
     public class RateProductDto
     {
         /// <summary>Stars, 1 to 5.</summary>

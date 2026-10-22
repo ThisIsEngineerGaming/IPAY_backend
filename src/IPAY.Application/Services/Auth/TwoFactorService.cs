@@ -8,6 +8,7 @@ using IPAY.Domain.Entities.Users;
 
 namespace IPAY.Application.Services.Auth
 {
+    //twofactor service
     /// <summary>The code could not be emailed (SMTP down, wrong credentials...). AuthController returns 503.</summary>
     public class TwoFactorDeliveryException : Exception
     {
@@ -49,7 +50,7 @@ namespace IPAY.Application.Services.Auth
         public bool IsEnabled => _options.Enabled && _email.IsConfigured;
 
         private TimeSpan Lifetime => TimeSpan.FromMinutes(Math.Max(1, _options.CodeLifetimeMinutes));
-
+        //login or registration
         public async Task<AuthResponse> BeginAsync(Customer user)
         {
             var challenge = new TwoFactorChallenge
@@ -73,9 +74,10 @@ namespace IPAY.Application.Services.Auth
                 MaskedEmail = Mask(challenge.Email)
             };
         }
-
+        //verifyng email
         public async Task<TwoFactorResult<AuthResponse>> VerifyAsync(string challengeId, string code)
         {
+            //validation
             const string expired = "This code has expired. Please sign in again.";
 
             var challenge = string.IsNullOrWhiteSpace(challengeId) ? null : _store.Get(challengeId);
@@ -127,6 +129,7 @@ namespace IPAY.Application.Services.Auth
             return TwoFactorResult<AuthResponse>.Ok(auth);
         }
 
+        //resending a message
         public async Task<TwoFactorResult<string>> ResendAsync(string challengeId)
         {
             var challenge = string.IsNullOrWhiteSpace(challengeId) ? null : _store.Get(challengeId);
@@ -182,7 +185,7 @@ namespace IPAY.Application.Services.Auth
 
         // Cryptographically random, uniformly distributed 000000-999999.
         private static string NewCode() => RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
-
+        //hashing 
         private static string Hash(string challengeId, string code) =>
             Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"{challengeId}:{code}")));
 

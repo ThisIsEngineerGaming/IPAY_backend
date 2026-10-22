@@ -9,6 +9,7 @@ using IPAY.Domain.Interfaces.ForRepos.Shop;
 
 namespace IPAY.Application.Services.Shop
 {
+    //a review service
     public class ReviewService : IReviewService
     {
         private readonly IReviewRepository _reviewRepository;
@@ -26,7 +27,7 @@ namespace IPAY.Application.Services.Shop
             _mapper = mapper;
   
         }
-
+        //creating an review
         public async Task<ReviewDto> CreateAsync(CreateReviewDto dto, int userId)
         {
    
@@ -46,19 +47,19 @@ namespace IPAY.Application.Services.Shop
             review = await _reviewRepository.AddAsync(review);
             return _mapper.Map<ReviewDto>(review);
         }
-
+        //getting by id
         public async Task<ReviewDto?> GetByIdAsync(int id)
         {
             var review = await _reviewRepository.GetByIdAsync(id);
             return review is null ? null : _mapper.Map<ReviewDto>(review);
         }
-
+        //geting by a product reviews
         public async Task<IReadOnlyList<ReviewDto>> GetByProductIdAsync(int productId)
         {
             var reviews = await _reviewRepository.GetByProductIdAsync(productId);
             return _mapper.Map<IReadOnlyList<ReviewDto>>(reviews);
         }
-
+        //deleting
         public async Task DeleteAsync(int id, int userId, bool isAdmin = false)
         {
             var review = await _reviewRepository.GetByIdAsync(id)

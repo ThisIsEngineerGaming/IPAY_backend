@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace IPAY.Domain.Entities.Media
 {
+    //series class
     public class Series
     {
         public int Id { get; set; }
@@ -12,8 +13,8 @@ namespace IPAY.Domain.Entities.Media
         public string Director { get; set; } = string.Empty;
         public string AgeRating { get; set; } = string.Empty;
         public string PosterUrl { get; set; } = string.Empty;
-        public List<int> EpisodeIds { get; set; } = new();
-        public List<int> GenreIds { get; set; } = new();
+        public List<int> EpisodeIds { get; set; } = new();//can have several episodes
+        public List<int> GenreIds { get; set; } = new();//also genres
         public DateTime CreatedAt { get; set; }
     }
 }

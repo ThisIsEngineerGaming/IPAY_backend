@@ -24,7 +24,7 @@ namespace IPAY.Infrastructure.Repositories.Shop
             _collection = firestoreDb.Collection(CollectionName);
             IdProperty = typeof(Order).GetProperty(nameof(Order.Id))!;
         }
-
+        //get all
         public async Task<IReadOnlyList<Order>> GetAllAsync()
         {
             var snapshot = await _collection.GetSnapshotAsync();
@@ -32,7 +32,7 @@ namespace IPAY.Infrastructure.Repositories.Shop
                 .Select(doc => doc.ConvertTo<OrderDocument>().ToEntity())
                 .ToList();
         }
-
+        //get by id
         public async Task<Order?> GetByIdAsync(int id)
         {
             var snapshot = await _collection.Document(id.ToString()).GetSnapshotAsync();
@@ -40,13 +40,13 @@ namespace IPAY.Infrastructure.Repositories.Shop
                 ? snapshot.ConvertTo<OrderDocument>().ToEntity()
                 : null;
         }
-
+        //get by id with
         public async Task<Order?> GetByIdWithItemsAsync(int id)
         {
             // В Firestore всё уже лежит вместе, так что просто GetById
             return await GetByIdAsync(id);
         }
-
+        //get by user id 
         public async Task<IReadOnlyList<Order>> GetByUserIdAsync(int userId)
         {
             var snapshot = await _collection
@@ -57,7 +57,7 @@ namespace IPAY.Infrastructure.Repositories.Shop
                 .Select(doc => doc.ConvertTo<OrderDocument>().ToEntity())
                 .ToList();
         }
-
+        //add async
         public async Task<Order> AddAsync(Order entity)
         {
             var nextId = await GetNextIdAsync();
@@ -74,22 +74,27 @@ namespace IPAY.Infrastructure.Repositories.Shop
 
             return entity;
         }
-
+        //update async
         public async Task UpdateAsync(int id, Order entity)
         {
             IdProperty.SetValue(entity, id);
             await _collection.Document(id.ToString())
                 .SetAsync(OrderDocument.FromEntity(entity));
         }
-
+        //delete
         public Task DeleteAsync(int id) =>
             _collection.Document(id.ToString()).DeleteAsync();
+<<<<<<< Updated upstream
 
         // One counter document instead of reading every order for each insert.
         private Task<int> GetNextIdAsync() =>
             FirestoreIdGenerator.NextIdAsync(_database, CollectionName, GetMaxExistingIdAsync);
 
         private async Task<int> GetMaxExistingIdAsync()
+=======
+        //get next id
+        private async Task<int> GetNextIdAsync()
+>>>>>>> Stashed changes
         {
             var all = await GetAllAsync();
             return all.Count == 0 ? 0 : all.Max(x => x.Id);

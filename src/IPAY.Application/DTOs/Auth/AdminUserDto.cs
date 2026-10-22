@@ -4,6 +4,7 @@ namespace IPAY.Application.DTOs.Auth
     /// One row of the admin page's "Users" list. Deliberately has no password hash - the list is also
     /// shown to moderators, who must not be able to read credentials.
     /// </summary>
+    //a dto which gives admin information about users
     public class AdminUserDto
     {
         public int Id { get; set; }

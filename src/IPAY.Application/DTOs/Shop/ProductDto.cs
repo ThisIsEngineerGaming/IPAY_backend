@@ -1,5 +1,6 @@
 namespace IPAY.Application.DTOs.Shop
 {
+    //product dto (if we want to show in frontend)
     public class ProductDto
     {
         public int Id { get; set; }

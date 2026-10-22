@@ -6,6 +6,7 @@ using IPAY.Domain.Entities.Users;
 
 namespace IPAY.Application.Services.Auth
 {
+    //a profile service 
     public class ProfileService : IProfileService
     {
         // How long a Firebase sign-in / password reset stays good enough to finish an emailed reset.
@@ -53,7 +54,7 @@ namespace IPAY.Application.Services.Auth
             _confirmEmailValidator = confirmEmailValidator;
             _refreshTokenService = refreshTokenService;
         }
-
+        //getting account ifo
         public async Task<ProfileResult<ProfileDto>> GetProfileAsync(int userId)
         {
             var user = await GetActiveUserAsync(userId);
@@ -61,7 +62,7 @@ namespace IPAY.Application.Services.Auth
                 ? ProfileResult<ProfileDto>.NotFound()
                 : ProfileResult<ProfileDto>.Ok(ToProfile(user));
         }
-
+        //update username
         public async Task<ProfileResult<ProfileDto>> ChangeUsernameAsync(int userId, ChangeUsernameDto dto)
         {
             var validation = await _usernameValidator.ValidateAsync(dto);
@@ -80,7 +81,7 @@ namespace IPAY.Application.Services.Auth
 
             return ProfileResult<ProfileDto>.Ok(ToProfile(user));
         }
-
+        //update phone
         public async Task<ProfileResult<ProfileDto>> ChangePhoneAsync(int userId, ChangePhoneDto dto)
         {
             var validation = await _phoneValidator.ValidateAsync(dto);
@@ -307,7 +308,7 @@ namespace IPAY.Application.Services.Auth
                     "We could not start the email change right now. Please try again.");
             }
         }
-
+        //confirm an email
         public async Task<ProfileResult<AuthResponse>> ConfirmEmailChangeAsync(int userId, ConfirmEmailChangeDto dto)
         {
             var validation = await _confirmEmailValidator.ValidateAsync(dto);

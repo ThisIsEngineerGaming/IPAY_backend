@@ -5,6 +5,7 @@ using System.Text;
 
 namespace IPAY.Domain.Interfaces.ForRepos.Shop
 {
+    //reviews repo(review made by customers)
     public interface IReviewRepository
     {
         Task<Review> AddAsync(Review entity);

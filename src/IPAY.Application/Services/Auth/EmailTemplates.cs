@@ -6,8 +6,10 @@ namespace IPAY.Application.Services.Auth
     /// HTML for the emails we send. Email clients ignore stylesheets, so everything is inline and
     /// laid out with tables. Colors match the site (navy #232F3E, yellow #FFD814).
     /// </summary>
+    //a templates of email, which can be sent to customer
     public static class EmailTemplates
     {
+        //if you want to change your password in IPAY, you must to check your mailbox
         public static string SignInCode(string code, int minutesValid) =>
             Layout(
                 "Your sign-in code",
@@ -16,6 +18,8 @@ namespace IPAY.Application.Services.Auth
                 $"font-size:30px;font-weight:bold;letter-spacing:8px;color:#111\">{Encode(code)}</p>" +
                 $"<p style=\"margin:0\">It expires in {minutesValid} minutes. Never share this code with anyone.</p>",
                 "If you didn't try to sign in, you can ignore this email - but consider changing your password.");
+
+        //css
 
         private static string Layout(string title, string bodyHtml, string footer) =>
             "<div style=\"background:#f3f4f6;padding:24px 12px;font-family:Arial,Helvetica,sans-serif\">" +
@@ -26,6 +30,7 @@ namespace IPAY.Application.Services.Auth
             $"<tr><td style=\"font-size:14px;color:#444;line-height:1.5\">{bodyHtml}</td></tr>" +
             $"<tr><td style=\"font-size:12px;color:#999;padding-top:24px;line-height:1.5\">{Encode(footer)}</td></tr>" +
             "</table></div>";
+        //method sends a message with "html and css"
 
         private static string Encode(string value) => WebUtility.HtmlEncode(value);
     }

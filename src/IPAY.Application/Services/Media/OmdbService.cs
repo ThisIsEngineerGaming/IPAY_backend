@@ -1,10 +1,12 @@
 using System.Net.Http.Json;
 using IPAY.Application.DTOs.Media;
+using IPAY.Application.Interfaces.Media;
 
 namespace IPAY.Application.Services.Media;
-
+//service to requests
 public sealed class OmdbService : IOmdbService
 {
+    
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
     private readonly string _baseUrl;
@@ -15,28 +17,28 @@ public sealed class OmdbService : IOmdbService
         _apiKey = apiKey;
         _baseUrl = baseUrl.TrimEnd('/');
     }
-
+    //searching a films
     public async Task<OmdbSearchResponseDto> SearchAsync(
         string query,
         int page = 1,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(query))
-            throw new ArgumentException("A search query is required.", nameof(query));
-
+            throw new ArgumentException("A search query is required.", nameof(query));//if it valid
+        
         page = Math.Clamp(page, 1, 100);
-
+        //making url
         var url = BuildUrl(new Dictionary<string, string>
         {
             ["apikey"] = _apiKey,
             ["s"] = query.Trim(),
             ["page"] = page.ToString()
         });
-
+        //json-response
         return await _httpClient.GetFromJsonAsync<OmdbSearchResponseDto>(url, cancellationToken)
             ?? new OmdbSearchResponseDto { Response = "False", Error = "OMDb returned an empty response." };
     }
-
+    //getting a film
     public async Task<OmdbFilmDto> GetByImdbIdAsync(
         string imdbId,
         CancellationToken cancellationToken = default)
@@ -54,7 +56,7 @@ public sealed class OmdbService : IOmdbService
         return await _httpClient.GetFromJsonAsync<OmdbFilmDto>(url, cancellationToken)
             ?? new OmdbFilmDto { Response = "False", Error = "OMDb returned an empty response." };
     }
-
+    //building an url for request
     private string BuildUrl(Dictionary<string, string> parameters)
     {
         var query = string.Join("&", parameters.Select(x =>

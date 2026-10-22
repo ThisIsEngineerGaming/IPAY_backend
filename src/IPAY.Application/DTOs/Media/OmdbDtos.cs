@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 
 namespace IPAY.Application.DTOs.Media;
-
+//dto's related with omdb(allows you making api responses in order to take serials/films)
 public sealed class OmdbSearchResponseDto
 {
     [JsonPropertyName("Search")]

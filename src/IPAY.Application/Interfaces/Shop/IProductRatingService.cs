@@ -2,6 +2,7 @@ using IPAY.Domain.Interfaces.ForRepos.Shop;
 
 namespace IPAY.Application.Interfaces.Shop
 {
+    //product rating interface(rates by customer)
     public interface IProductRatingService
     {
         /// <summary>Rates a product 1-5 as this user. Each user can rate each product once.</summary>

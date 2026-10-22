@@ -6,13 +6,15 @@ using IPAY.Domain.Interfaces.ForRepos;
 
 namespace IPAY.Application.Services.Auth
 {
+    //sellers request service
     public class SellerRequestService(IRepository<SellerRequest> requests, IUser<Customer> customers)
         : ISellerRequestService
     {
         private const int MaxMessageLength = 500;
-
+        //creating an request
         public async Task<SellerRequestResult> CreateAsync(int userId, string? message)
         {
+            //validation
             message = message?.Trim() ?? string.Empty;
             if (message.Length > MaxMessageLength)
                 return new SellerRequestResult(null, $"The message can be at most {MaxMessageLength} characters.");
@@ -31,7 +33,7 @@ namespace IPAY.Application.Services.Auth
             var all = await requests.GetAllAsync();
             if (all.Any(r => r.UserId == userId && r.Status == SellerRequestStatus.Pending))
                 return new SellerRequestResult(null, "You already have a request waiting for review.");
-
+            //if it's okay - sending it
             var created = await requests.AddAsync(new SellerRequest
             {
                 UserId = userId,
@@ -44,7 +46,7 @@ namespace IPAY.Application.Services.Auth
 
             return new SellerRequestResult(ToDto(created));
         }
-
+        //get the latest
         public async Task<SellerRequestDto?> GetLatestForUserAsync(int userId)
         {
             var all = await requests.GetAllAsync();
@@ -55,7 +57,7 @@ namespace IPAY.Application.Services.Auth
 
             return latest is null ? null : ToDto(latest);
         }
-
+        //get all
         public async Task<IReadOnlyList<SellerRequestDto>> GetAllAsync()
         {
             var all = await requests.GetAllAsync();
@@ -65,15 +67,16 @@ namespace IPAY.Application.Services.Auth
                 .Select(ToDto)
                 .ToList();
         }
-
+        //accept
         public Task<SellerRequestResult> ApproveAsync(int requestId, string reviewer) =>
             ReviewAsync(requestId, reviewer, approve: true);
-
+        //reject
         public Task<SellerRequestResult> RejectAsync(int requestId, string reviewer) =>
             ReviewAsync(requestId, reviewer, approve: false);
-
+        //making a seller
         private async Task<SellerRequestResult> ReviewAsync(int requestId, string reviewer, bool approve)
         {
+            //validation
             var request = await requests.GetByIdAsync(requestId);
             if (request is null)
                 return new SellerRequestResult(null, "Request not found.", NotFound: true);
@@ -98,7 +101,7 @@ namespace IPAY.Application.Services.Auth
                     await customers.UpdateAsync(request.UserId, user);
                 }
             }
-
+            //making a seller
             request.Status = approve ? SellerRequestStatus.Approved : SellerRequestStatus.Rejected;
             request.ReviewedAt = DateTime.UtcNow;
             request.ReviewedBy = reviewer;
@@ -106,7 +109,7 @@ namespace IPAY.Application.Services.Auth
 
             return new SellerRequestResult(ToDto(request));
         }
-
+        //request dto
         private static SellerRequestDto ToDto(SellerRequest r) => new()
         {
             Id = r.Id,

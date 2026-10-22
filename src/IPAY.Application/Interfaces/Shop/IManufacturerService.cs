@@ -4,6 +4,7 @@ using IPAY.Application.DTOs.Shop;
 
 namespace IPAY.Application.Interfaces.Shop
 {
+    //inteface for manufacturer(product0 describes only CRUD
     public interface IManufacturerService
     {
         Task<IReadOnlyList<ManufacturerDto>> GetAllAsync();

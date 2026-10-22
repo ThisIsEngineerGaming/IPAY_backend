@@ -4,6 +4,7 @@ namespace IPAY.Application.Services.Auth
     /// Thrown by password login when the credentials are right but the email address has not
     /// been verified yet. AuthController turns it into a 403 with code EMAIL_NOT_VERIFIED.
     /// </summary>
+    // making an error related with verifycation
     public class EmailNotVerifiedException : Exception
     {
         public EmailNotVerifiedException()

@@ -4,6 +4,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Auth
 {
+    //banning/unbanning guest
     public class UpdateGuestDto
     {
         public string? Name { get; set; }

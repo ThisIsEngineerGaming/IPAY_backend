@@ -1,6 +1,7 @@
 namespace IPAY.Application.DTOs.Shop
 {
     /// <summary>Category as returned by the API.</summary>
+    //category dto's
     public class CategoryDto
     {
         public int Id { get; set; }

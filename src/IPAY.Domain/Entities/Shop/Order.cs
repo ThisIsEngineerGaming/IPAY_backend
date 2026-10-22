@@ -2,6 +2,7 @@ using IPAY.Domain.Enums;
 
 namespace IPAY.Domain.Entities.Shop
 {
+    //order class, saves in db
     public class Order
     {
         public int Id { get; set; }

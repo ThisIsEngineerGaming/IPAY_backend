@@ -3,6 +3,7 @@ using IPAY.Domain.Entities.Media;
 namespace IPAY.Domain.Interfaces.ForRepos.Media
 {
     /// Series persistence: generic CRUD plus paging, filtering and sorting (same rules as IFilmRepo)
+    // series repo took over basic repo
     public interface ISeriesRepo : IRepository<Series>
     {
         Task<IReadOnlyList<Series>> GetPageAsync(

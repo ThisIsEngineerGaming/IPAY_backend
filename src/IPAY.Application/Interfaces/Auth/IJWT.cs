@@ -8,6 +8,7 @@ using System.Text;
 
 namespace IPAY.Application.Interfaces.Auth
 {
+    //JWT service interface (generation + hashing password)
     public interface IJWT
     {
         string GenerateAccessToken(string userId, string email, UserRole role);

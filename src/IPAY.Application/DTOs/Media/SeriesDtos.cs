@@ -1,6 +1,7 @@
 namespace IPAY.Application.DTOs.Media;
 
 /// Series as returned by the API.
+//series dto's
 public class SeriesDto
 {
     public int Id { get; set; }

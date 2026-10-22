@@ -1,6 +1,7 @@
 ﻿
 namespace IPAY.Application.Interfaces.Payments
 {
+    //payment interface(allowing you to add the card to pay)
     public interface IPaymentProvider
     {
         string Name { get; } // "MockPay"

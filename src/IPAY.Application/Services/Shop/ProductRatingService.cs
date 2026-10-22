@@ -3,8 +3,10 @@ using IPAY.Domain.Interfaces.ForRepos.Shop;
 
 namespace IPAY.Application.Services.Shop
 {
+    //rating service
     public class ProductRatingService(IProductRatingRepo repository) : IProductRatingService
     {
+        //giving a rating
         public Task<RateOutcome> RateAsync(int productId, string userId, int value)
         {
             if (value is < 1 or > 5)

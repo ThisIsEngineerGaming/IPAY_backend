@@ -4,6 +4,7 @@ using IPAY.Application.DTOs.Media;
 
 namespace IPAY.Application.Interfaces.Media
 {
+    //gebre interface
     public interface IGenreService
     {
         Task<IReadOnlyList<GenreDto>> GetAllAsync();

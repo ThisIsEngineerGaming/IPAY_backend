@@ -4,6 +4,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Shop
 {
+    //adress dto
     public class AddressDto
     {
         public int Id { get; set; }

@@ -11,13 +11,13 @@ namespace IPAY.Application.Services.Auth
 {
     public class RegisterDtoService : IAuthDto<RegisterDto>
     {
-        private readonly IValidator<RegisterDto> _validator;
+        private readonly IValidator<RegisterDto> _validator;//additional check for backend
         private readonly IUser<Customer> _customerService;
         private readonly IPasswordHashingService _passwordHasher;
 
         
 
-        private readonly IMapper _mapper;
+        private readonly IMapper _mapper;//dto->object or object->dto
 
         public RegisterDtoService(
             IValidator<RegisterDto> validator,
@@ -30,7 +30,7 @@ namespace IPAY.Application.Services.Auth
             _passwordHasher = passwordHasher;
             _mapper = mapper;
         }
-
+        //registry
         public async Task<bool> Register(RegisterDto registerDto)
         {
             var result = await _validator.ValidateAsync(registerDto);

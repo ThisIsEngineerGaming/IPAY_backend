@@ -6,6 +6,7 @@ using System.Text;
 
 namespace IPAY.Application.Interfaces.Shop
     {
+        //cart interface(items)
         public interface ICartItemService
         {
             Task<CartItemDto?> GetByIdAsync(int userId, int id);

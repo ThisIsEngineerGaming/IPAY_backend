@@ -5,6 +5,7 @@ using System.Text;
 
 namespace IPAY.Domain.Interfaces.ForRepos.Shop
 {
+    //order repository took over base repo
     public interface IOrderRepository : IRepository<Order>
     {
         Task<IReadOnlyList<Order>> GetByUserIdAsync(int userId);

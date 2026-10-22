@@ -9,7 +9,7 @@ using System.Text;
 
 namespace IPAY.Application.Services.Payments
 {
-    // Application/Services/Shop/PaymentService.cs
+  
     public class PaymentService :IPaymentService
     {
         private readonly IPaymentProvider _provider;
@@ -48,7 +48,7 @@ namespace IPAY.Application.Services.Payments
 
             if (result.Success)
             {
-                // Меняем статус заказа на Paid (у тебя уже есть UpdateStatusAsync + история)
+                // Changes to paid
                 await _orderService.UpdateStatusAsync(orderId, new UpdateOrderStatusDto
                 {
                     Status = OrderStatus.Paid

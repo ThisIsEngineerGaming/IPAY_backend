@@ -4,6 +4,7 @@ using IPAY.Domain.Entities.Users;
 namespace IPAY.Application.Interfaces.Auth
 {
     /// <summary>A pending "type the code we emailed you" step between password and session.</summary>
+    //interface describes a profile actions(verify email,resend code)
     public class TwoFactorChallenge
     {
         public string Id { get; set; } = string.Empty;

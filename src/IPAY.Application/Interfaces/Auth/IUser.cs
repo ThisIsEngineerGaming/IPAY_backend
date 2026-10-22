@@ -6,6 +6,7 @@ using System.Text;
 
 namespace IPAY.Application.Interfaces.Auth
 {
+    //basic interface for users
    public interface IUser<T> where T : class
     {
         Task<IReadOnlyList<T>> GetAllAsync();

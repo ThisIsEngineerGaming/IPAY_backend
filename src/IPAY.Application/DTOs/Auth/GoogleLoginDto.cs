@@ -1,5 +1,6 @@
 namespace IPAY.Application.DTOs.Auth
 {
+    //registration by google account
     public class GoogleLoginDto
     {
         /// <summary>Firebase ID token obtained on the client after signing in with Google.</summary>

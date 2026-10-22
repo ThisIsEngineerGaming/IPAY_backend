@@ -4,6 +4,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Auth
 {
+    //loging dto(shorter than registration)
     public  class LoginDto
     {
         public string Email { get; set; } = string.Empty;

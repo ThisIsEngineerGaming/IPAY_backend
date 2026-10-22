@@ -4,6 +4,7 @@ using IPAY.Application.DTOs.Shop;
 
 namespace IPAY.Application.Interfaces.Shop
 {
+    //review interface(message about product)
     public interface IReviewService
     {
         Task<ReviewDto> CreateAsync(CreateReviewDto dto, int userId);

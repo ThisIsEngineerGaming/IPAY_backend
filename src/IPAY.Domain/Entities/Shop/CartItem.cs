@@ -1,5 +1,6 @@
 namespace IPAY.Domain.Entities.Shop
 {
+    //the items in the cart(product but with additionall fields 
     public class CartItem
     {
         public int Id { get; set; }

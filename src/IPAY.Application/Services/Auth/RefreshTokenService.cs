@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace IPAY.Application.Services.Auth
 {
+    //refreshing token service
     public class RefreshTokenService : IRefreshTokenService
     {
         private readonly IJWT _jwt;
@@ -29,13 +30,13 @@ namespace IPAY.Application.Services.Auth
             _guests = guests;
             _config = config;
         }
-
+        //lambda's for calculating the time
         private int AccessMinutes =>
             int.TryParse(_config["Jwt:AccessTokenMinutes"], out var m) ? m : 20;
 
         private int RefreshDays =>
             int.TryParse(_config["Jwt:RefreshTokenDays"], out var d) ? d : 14;
-
+        
         public async Task<(string rawRefresh, DateTime accessExpires)> IssuePairAsync(
             int userId, string email, UserRole role, string? ip = null)
         {
@@ -53,7 +54,7 @@ namespace IPAY.Application.Services.Auth
 
             return (raw, DateTime.UtcNow.AddMinutes(AccessMinutes));
         }
-
+        //refreshing token
         public async Task<AuthResponse?> RefreshAsync(string rawRefreshToken, string? ip = null)
         {
             if (string.IsNullOrWhiteSpace(rawRefreshToken))
@@ -120,19 +121,19 @@ namespace IPAY.Application.Services.Auth
                 User = new LoginDto { Email = email, Name = name }
             };
         }
-
+        //revoking a token
         public async Task RevokeAsync(string rawRefreshToken)
         {
-            if (string.IsNullOrWhiteSpace(rawRefreshToken)) return;
-            var existing = await _repo.GetByIdAsync(_jwt.HashToken(rawRefreshToken));
+            if (string.IsNullOrWhiteSpace(rawRefreshToken)) return;//if null
+            var existing = await _repo.GetByIdAsync(_jwt.HashToken(rawRefreshToken));//taking
             if (existing is null || existing.IsRevoked) return;
-            existing.IsRevoked = true;
+            existing.IsRevoked = true;//making revoke
             await _repo.UpdateAsync(existing);
         }
-
+        //revoking for all users
         public Task RevokeAllForUserAsync(int userId) =>
             _repo.RevokeAllForUserAsync(userId);
-
+        //creating a new token
         public async Task<AuthResponse> CreateAuthResponseAsync(
                int userId,
                string email,

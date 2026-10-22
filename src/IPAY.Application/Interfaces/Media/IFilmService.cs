@@ -4,6 +4,7 @@ using IPAY.Application.DTOs.Media;
 
 namespace IPAY.Application.Interfaces.Media
 {
+    //film interface service
     public interface IFilmService
     {
         Task<IReadOnlyList<FilmDto>> GetAllAsync();

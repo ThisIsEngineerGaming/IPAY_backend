@@ -5,6 +5,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Shop
 {
+    //order dto(has a list of items
     public class OrderDto
     {
         public int Id { get; set; }

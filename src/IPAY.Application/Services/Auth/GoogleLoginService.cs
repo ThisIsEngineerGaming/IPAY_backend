@@ -5,22 +5,23 @@ using IPAY.Domain.Enums;
 
 namespace IPAY.Application.Services.Auth
 {
+    //google registry
     public class GoogleLoginService : IGoogleLogin
     {
-        private readonly IFirebaseAuthService _firebase;
-        private readonly IUser<Customer> _customers;
-        private readonly IJWT _jwt;
+        private readonly IFirebaseAuthService _firebase;//firebase gives opportunity for verifying email, that's why we using it
+        private readonly IUser<Customer> _customers;//took over a basic user interface
+     
 
-        private readonly IRefreshTokenService _refreshTokenService;
+        private readonly IRefreshTokenService _refreshTokenService;//refreshing JWT (for example password)
 
-        public GoogleLoginService(IFirebaseAuthService firebase, IUser<Customer> customers, IJWT jwt, IRefreshTokenService refreshTokenService)
+        public GoogleLoginService(IFirebaseAuthService firebase, IUser<Customer> customers,  IRefreshTokenService refreshTokenService)
         {
             _firebase = firebase;
             _customers = customers;
-            _jwt = jwt;
+   
             _refreshTokenService = refreshTokenService;
         }
-
+        //method let us to login by google account
         public async Task<AuthResponse?> LoginWithGoogleAsync(string idToken)
         {
             if (string.IsNullOrWhiteSpace(idToken))

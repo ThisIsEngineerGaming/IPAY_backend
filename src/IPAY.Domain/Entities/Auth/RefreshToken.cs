@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IPAY.Domain.Entities.Auth
 {
-
+        
         public class RefreshToken
         {
             /// <summary>Document id = SHA256 hash of the raw token (we never store the raw value).</summary>

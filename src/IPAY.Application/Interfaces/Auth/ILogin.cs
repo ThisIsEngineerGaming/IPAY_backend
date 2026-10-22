@@ -5,6 +5,7 @@ using System.Text;
 
 namespace IPAY.Application.Interfaces.Auth
 {
+    //login service
     public interface ILogin
     {
         Task<AuthResponse?> LoginAsync(LoginDto dto);

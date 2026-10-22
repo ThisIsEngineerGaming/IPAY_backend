@@ -1,6 +1,7 @@
 namespace IPAY.Application.DTOs.Media;
 
 /// <summary>Episode as returned by the API.</summary>
+//episode dto's
 public class EpisodeDto
 {
     public int Id { get; set; }

@@ -1,5 +1,6 @@
 namespace IPAY.Domain.Entities.Media
 {
+    //episodes(media part)
     public class Episode
     {
         public int Id { get; set; }

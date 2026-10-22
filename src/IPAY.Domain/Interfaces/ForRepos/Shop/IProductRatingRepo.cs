@@ -1,5 +1,6 @@
 namespace IPAY.Domain.Interfaces.ForRepos.Shop
 {
+    //enumerator related with rating a product by customers
     public enum RateResult
     {
         Rated,
@@ -10,7 +11,7 @@ namespace IPAY.Domain.Interfaces.ForRepos.Shop
 
     /// <summary>What happened when someone tried to rate a product. Rating/RatingCount are the product's values afterwards.</summary>
     public record RateOutcome(RateResult Result, double Rating = 0, int RatingCount = 0);
-
+    //product ratings repo
     public interface IProductRatingRepo
     {
         /// <summary>

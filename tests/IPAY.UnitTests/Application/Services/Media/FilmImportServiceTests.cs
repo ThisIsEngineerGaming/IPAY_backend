@@ -5,6 +5,7 @@
 #if FILM_BACKEND
 using AutoMapper;
 using IPAY.Application.DTOs.Media;
+using IPAY.Application.Interfaces.Media;
 using IPAY.Application.Mappings.Media;
 using IPAY.Application.Services.Media;
 using IPAY.Domain.Entities.Media;

@@ -4,8 +4,10 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Payments
 {
+    //the info about payment
     public class PaymentResponseDto
     {
+
         public string TransactionId { get; set; } = string.Empty;
         public string? PaymentUrl { get; set; }
         public string Status { get; set; } = string.Empty;

@@ -1,6 +1,7 @@
 namespace IPAY.Application.DTOs.Media;
 
 /// <summary>Genre as returned by the API.</summary>
+//genre dto's
 public class GenreDto
 {
     public int Id { get; set; }

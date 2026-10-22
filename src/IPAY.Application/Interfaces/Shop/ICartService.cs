@@ -5,6 +5,7 @@ using System.Text;
 
 namespace IPAY.Application.Interfaces.Shop
 {
+        //cart interface
 
         public interface ICartService
         {

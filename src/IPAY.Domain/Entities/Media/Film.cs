@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace IPAY.Domain.Entities.Media
 {
+    //film class 
     public class Film
     {
         public int Id { get; set; }
@@ -16,6 +17,6 @@ namespace IPAY.Domain.Entities.Media
         /// IMDb id (e.g. tt0133093) when the film was imported from OMDb; empty otherwise. Used to block duplicate imports.
         public string ImdbId { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
-        public List<int> GenreIds { get; set; } = new();
+        public List<int> GenreIds { get; set; } = new();//may have several genres
     }
 }

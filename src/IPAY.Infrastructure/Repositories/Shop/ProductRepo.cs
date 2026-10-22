@@ -95,7 +95,7 @@ namespace IPAY.Infrastructure.Repositories.Shop
         {
             Query query = _collection;
 
-            // --- equality-фильтры ---
+            // --- equality-filters ---
             if (categoryId.HasValue)
                 query = query.WhereEqualTo("CategoryId", categoryId.Value);
 
@@ -105,8 +105,8 @@ namespace IPAY.Infrastructure.Repositories.Shop
             var hasSearch = !string.IsNullOrWhiteSpace(search);
             var hasPrice = minPrice.HasValue || maxPrice.HasValue;
 
-            // Firestore: range только по ОДНОМУ полю
-            // если есть search — фильтруем по NameLower (цену в этом запросе не мешаем)
+            // Firestore: range only for on field
+            // если есть search — filter for NameLower (цену в этом запросе не мешаем)
             if (hasSearch)
             {
                 var term = search!.Trim().ToLowerInvariant();

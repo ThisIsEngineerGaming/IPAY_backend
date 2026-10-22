@@ -5,6 +5,7 @@ using System.Text;
 
 namespace IPAY.Domain.Entities.Users
 {
+    //not only the customer class(the difference between roles is enumerator UserRole)
     public  class Customer:Guest
     {
         public string? Email { get; set; } = string.Empty;
@@ -13,7 +14,7 @@ namespace IPAY.Domain.Entities.Users
 
         
 
-        // IsBanned is inherited from Guest (redeclaring it here only hid the base member).
+    
 
         /// <summary>Optional contact number, stored normalised (digits with an optional leading +). null = never added.</summary>
         public string? Phone { get; set; }

@@ -5,6 +5,7 @@ using System.Text;
 
 namespace IPAY.Domain.Interfaces.ForRepos.Shop
 {
+    //order items repository(also inherited base repo)
     public interface IOrderItemRepository : IRepository<OrderItem>
     {
         Task<IReadOnlyList<OrderItem>> GetByOrderIdAsync(int orderId);

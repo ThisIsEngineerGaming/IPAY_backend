@@ -1,5 +1,6 @@
 namespace IPAY.Domain.Entities.Shop
 {
+    //items, which are included in order(because we can pay not only for 1 product)
     public class OrderItem
     {
         public int Id { get; set; }

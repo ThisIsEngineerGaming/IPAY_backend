@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Shop
 {
-
+    //product dto, which allows a seller to create a porduct(didn't need to write id)
         public class CreateSellerProductDto
         {
             public string Name { get; set; } = string.Empty;

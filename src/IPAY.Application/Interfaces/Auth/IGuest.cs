@@ -8,7 +8,7 @@ namespace IPAY.Application.Interfaces.Auth
 
 
 
-
+    //guest service with basic CRUD
         public interface IGuestService
         {
             Task<IReadOnlyList<GuestDto>> GetAllAsync();
@@ -18,7 +18,7 @@ namespace IPAY.Application.Interfaces.Auth
             /// <summary>
             /// Найти по SessionKey или создать нового.
             /// </summary>
-            Task<GuestDto> GetOrCreateAsync(string? sessionKey, string? name = null);
+            Task<GuestDto> GetOrCreateAsync(string? sessionKey, string? name = null);//if he isn't created, auto creates
 
             Task<GuestDto?> CreateAsync(GuestSessionDto dto);
 

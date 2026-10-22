@@ -4,6 +4,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Shop
 {
+    //cart item dto + calculating overall price
     public class CartItemDto
     {
         public int Id { get; set; }

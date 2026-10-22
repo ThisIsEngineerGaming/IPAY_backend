@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace IPAY.Domain.Entities.Media
 {
+    //genre for serials and films
     public class Genre
     {
         public int Id { get; set; }

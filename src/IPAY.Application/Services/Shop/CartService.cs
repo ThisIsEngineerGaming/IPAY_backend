@@ -13,11 +13,12 @@ namespace IPAY.Application.Services.Shop
 
     namespace IPAY.Application.Services.Shop
     {
+        //cart service
         public class CartService : ICartService
         {
             private readonly IRepository<Cart> _cartRepository;
             private readonly IProductRepo _productRepository;
-            private readonly IMapper _mapper;
+            private readonly IMapper _mapper;//dto->object object->dto
 
             public CartService(
                 IRepository<Cart> cartRepository,
@@ -28,13 +29,14 @@ namespace IPAY.Application.Services.Shop
                 _productRepository = productRepository;
                 _mapper = mapper;
             }
-
+            //get (by user id)
+            //searches by userId
             private async Task<Cart?> FindByUserIdAsync(int userId)
             {
                 var carts = await _cartRepository.GetAllAsync();
                 return carts.FirstOrDefault(c => c.UserId == userId);
             }
-
+            //a method, which converts object into dto (instead of using it in each method, we can call it)
             private async Task<CartDto> BuildCartDtoAsync(Cart cart)
             {
                 var dto = _mapper.Map<CartDto>(cart);
@@ -52,13 +54,13 @@ namespace IPAY.Application.Services.Shop
 
                 return dto;
             }
-
+            //get by user id (using method FindByUserIdAsync)
             public async Task<CartDto?> GetByUserIdAsync(int userId)
             {
                 var cart = await FindByUserIdAsync(userId);
                 return cart is null ? null : await BuildCartDtoAsync(cart);
             }
-
+            //add an item (also doesn't depend on if cart is null because it will authomaticly create)
             public async Task<CartDto> AddItemAsync(int userId, CreateCartItemDto dto)
             {
                 var cart = await FindByUserIdAsync(userId);
@@ -90,7 +92,7 @@ namespace IPAY.Application.Services.Shop
 
                 return await BuildCartDtoAsync(cart);
             }
-
+            //update(ussually quantity)
             public async Task<CartDto?> UpdateItemQuantityAsync(int userId, int itemId, CreateCartItemDto dto)
             {
                 var cart = await FindByUserIdAsync(userId);
@@ -108,7 +110,7 @@ namespace IPAY.Application.Services.Shop
 
                 return await BuildCartDtoAsync(cart);
             }
-
+            //deleting an item
             public async Task<CartDto?> RemoveItemAsync(int userId, int itemId)
             {
                 var cart = await FindByUserIdAsync(userId);
@@ -122,7 +124,7 @@ namespace IPAY.Application.Services.Shop
 
                 return await BuildCartDtoAsync(cart);
             }
-
+            //deletes all items
             public async Task ClearCartAsync(int userId)
             {
                 var cart = await FindByUserIdAsync(userId);

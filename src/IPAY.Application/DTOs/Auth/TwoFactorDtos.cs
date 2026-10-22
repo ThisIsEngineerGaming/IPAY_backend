@@ -1,5 +1,6 @@
 namespace IPAY.Application.DTOs.Auth
 {
+    //verification and resending dto
     public class VerifyCodeDto
     {
         public string ChallengeId { get; set; } = string.Empty;

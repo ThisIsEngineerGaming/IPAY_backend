@@ -1,4 +1,4 @@
-using IPAY.Application.Services.Media;
+using IPAY.Application.Interfaces.Media;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IPAY.WebApi.Controllers;

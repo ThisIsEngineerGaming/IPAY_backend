@@ -1,5 +1,6 @@
 namespace IPAY.Application.DTOs.Shop
 {
+    //manufacturer dto's
     /// <summary>Manufacturer as returned by the API.</summary>
     public class ManufacturerDto
     {

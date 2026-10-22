@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Shop
 {
-
+    //cart dto + calculating quantity/price
     public class CartDto
     {
         public int Id { get; set; }

@@ -2,6 +2,7 @@ using IPAY.Application.DTOs.Auth;
 
 namespace IPAY.Application.Interfaces.Auth
 {
+    //interface decribes a profile "CRUD"
     public enum ProfileFailure
     {
         None,

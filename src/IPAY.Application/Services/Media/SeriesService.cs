@@ -8,6 +8,7 @@ using IPAY.Domain.Interfaces.ForRepos.Media;
 
 namespace IPAY.Application.Services.Media
 {
+    //series service
     public class SeriesService : ISeriesService
     {
         private readonly ISeriesRepo _repository;
@@ -18,13 +19,13 @@ namespace IPAY.Application.Services.Media
             _repository = repository;
             _mapper = mapper;
         }
-
+        //get all async
         public async Task<IReadOnlyList<SeriesDto>> GetAllAsync()
         {
             var all = await _repository.GetAllAsync();
             return _mapper.Map<List<SeriesDto>>(all);
         }
-
+        //get page(with searching and sorting)
         public async Task<IReadOnlyList<SeriesDto>> GetPageAsync(
             int limit, string? lastDocId, int? genreId, string? search, string? sortBy, string? sortDir)
         {
@@ -32,19 +33,19 @@ namespace IPAY.Application.Services.Media
             var page = await _repository.GetPageAsync(limit, lastDocId, genreId, search, sortBy, sortDir);
             return _mapper.Map<List<SeriesDto>>(page);
         }
-
+        //get by id
         public async Task<SeriesDto?> GetByIdAsync(int id)
         {
             var series = await _repository.GetByIdAsync(id);
             return series is null ? null : _mapper.Map<SeriesDto>(series);
         }
-
+        //creating series
         public async Task<SeriesDto> CreateAsync(SaveSeriesDto series)
         {
             var created = await _repository.AddAsync(_mapper.Map<Series>(series));
             return _mapper.Map<SeriesDto>(created);
         }
-
+        //updating series
         public async Task UpdateAsync(int id, SaveSeriesDto series)
         {
             var entity = _mapper.Map<Series>(series);
@@ -53,7 +54,7 @@ namespace IPAY.Application.Services.Media
             if (existing is not null) entity.CreatedAt = existing.CreatedAt;
             await _repository.UpdateAsync(id, entity);
         }
-
+        //deleting 
         public Task DeleteAsync(int id) => _repository.DeleteAsync(id);
     }
 }

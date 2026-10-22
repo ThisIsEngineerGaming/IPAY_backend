@@ -1,5 +1,6 @@
 namespace IPAY.Application.Interfaces.Auth
 {
+    //interface,which describes google login
     public interface IGoogleLogin
     {
         /// <summary>
@@ -7,6 +8,6 @@ namespace IPAY.Application.Interfaces.Auth
         /// AuthResponse/JWT. Creates a Customer on first sign-in. Null when the token is invalid,
         /// the Google email is unverified, or the account is banned.
         /// </summary>
-        Task<IPAY.Application.DTOs.Auth.AuthResponse?> LoginWithGoogleAsync(string idToken);
+        Task<DTOs.Auth.AuthResponse?> LoginWithGoogleAsync(string idToken);
     }
 }

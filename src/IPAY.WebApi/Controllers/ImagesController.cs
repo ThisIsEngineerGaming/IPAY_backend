@@ -6,6 +6,11 @@ namespace IPAY.WebApi.Controllers;
 
 [ApiController]
 [Route("api/images")]
+
+public class UploadImagesRequest
+{
+    public List<IFormFile> Files { get; set; } = new();
+}
 public class ImagesController(CloudinaryImageService storage, ILogger<ImagesController> logger) : ControllerBase
 {
     [Authorize(Roles = "Seller,Admin,Moderator")]
@@ -34,4 +39,24 @@ public class ImagesController(CloudinaryImageService storage, ILogger<ImagesCont
             return StatusCode(500, new { error = exception.Message });
         }
     }
+    // Метод внутри вашего контроллера (подставьте свой сервис вместо _imageService)
+    [HttpPost("upload-many")]
+    [Consumes("multipart/form-data")]
+    [RequestSizeLimit(60_000_000)]
+    public async Task<IActionResult> UploadMany(
+        [FromForm] UploadImagesRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var urls = await storage.UploadImagesAsync(request.Files, cancellationToken);
+            return Ok(urls);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }
+
+

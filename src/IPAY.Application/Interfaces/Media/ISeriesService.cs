@@ -4,6 +4,7 @@ using IPAY.Application.DTOs.Media;
 
 namespace IPAY.Application.Interfaces.Media
 {
+    //series interface
     public interface ISeriesService
     {
         Task<IReadOnlyList<SeriesDto>> GetAllAsync();

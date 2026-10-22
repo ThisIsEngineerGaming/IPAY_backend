@@ -5,6 +5,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Auth
 {
+    //making a guset dto(ex. when he opens the cart, backend writes his id in db + his cart)
     public class GuestDto
     {
         public int Id { get; set; }

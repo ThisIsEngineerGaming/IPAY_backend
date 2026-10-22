@@ -8,6 +8,7 @@ using System.Reflection;
 
 namespace IPAY.Infrastructure.Repositories.Shop
 {
+    //review reposiotry
     public class ReviewRepository : IReviewRepository
     {
         private readonly CollectionReference _collection;
@@ -18,7 +19,7 @@ namespace IPAY.Infrastructure.Repositories.Shop
             _collection = firestoreDb.Collection("reviews");
             _idProperty = typeof(Review).GetProperty(nameof(Review.Id))!;
         }
-
+        //add async
         public async Task<Review> AddAsync(Review entity)
         {
             var nextId = await GetNextIdAsync();
@@ -32,7 +33,7 @@ namespace IPAY.Infrastructure.Repositories.Shop
 
             return entity;
         }
-
+        //get by id
         public async Task<Review?> GetByIdAsync(int id)
         {
             var snapshot = await _collection.Document(id.ToString()).GetSnapshotAsync();
@@ -40,7 +41,7 @@ namespace IPAY.Infrastructure.Repositories.Shop
                 ? snapshot.ConvertTo<ReviewDocument>().ToEntity()
                 : null;
         }
-
+        //get by product id
         public async Task<IReadOnlyList<Review>> GetByProductIdAsync(int productId)
         {
             var snapshot = await _collection
@@ -52,12 +53,12 @@ namespace IPAY.Infrastructure.Repositories.Shop
                 .OrderByDescending(r => r.CreatedAt)
                 .ToList();
         }
-
+        //delete 
         public async Task DeleteAsync(int id)
         {
             await _collection.Document(id.ToString()).DeleteAsync();
         }
-
+        //get next id
         private async Task<int> GetNextIdAsync()
         {
             var snapshot = await _collection.GetSnapshotAsync();

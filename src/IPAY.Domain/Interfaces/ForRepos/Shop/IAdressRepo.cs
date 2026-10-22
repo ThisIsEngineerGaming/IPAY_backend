@@ -5,6 +5,7 @@ using System.Text;
 
 namespace IPAY.Domain.Interfaces.ForRepos.Shop
 {
+    //adress repo(took over base repo)
     public interface IAddressRepository : IRepository<Address>
     {
         Task<IReadOnlyList<Address>> GetByUserIdAsync(int userId);

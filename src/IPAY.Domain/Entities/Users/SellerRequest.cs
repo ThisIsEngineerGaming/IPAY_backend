@@ -3,6 +3,7 @@ using IPAY.Domain.Enums;
 namespace IPAY.Domain.Entities.Users
 {
     /// <summary>A customer's request to become a seller, reviewed by an admin or moderator.</summary>
+    //to be a seller we made 2 options: 1 by admin panel, 2 seller makes a request by himself(but admin or moderator must admit that)
     public class SellerRequest
     {
         public int Id { get; set; }

@@ -1,5 +1,6 @@
 ﻿namespace IPAY.Application.DTOs.Shop
 {
+    //history of changing status
     public class OrderStatusHistoryDto
     {
         public int Id { get; set; }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Payments
 {
-
+    //payment dto(is used by making order)
     public class CreatePaymentDto
     {
         public int OrderId { get; set; }

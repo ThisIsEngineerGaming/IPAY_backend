@@ -5,12 +5,13 @@ using System.Text;
 
 namespace IPAY.Domain.Entities.Users
 {
+    //the unauthorized user(has basic settings)
     public  class Guest
     {
  
             public int? Id { get; set; }
             public string? Name { get; set; } = "Guest";
-            public UserRole Role { get; set; } = UserRole.Guest;
+            public UserRole Role { get; set; } = UserRole.Guest;//the basic role 
 
             public bool IsBanned { get; set; } = false;
 

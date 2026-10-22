@@ -5,6 +5,7 @@ using System.Text;
 
 namespace IPAY.Application.Interfaces.Shop
 {
+    //order interface(combination of  order CRUD and order items CRUD) + enum "reason why order is declined"
     public enum CancelOrderResult
     {
         Cancelled,

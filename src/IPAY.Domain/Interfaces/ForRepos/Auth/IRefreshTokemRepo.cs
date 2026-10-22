@@ -2,6 +2,7 @@
 
 namespace IPAY.Domain.Interfaces.ForRepos.Auth
 {
+    //interface for refreshing JWT token(because we made a limited time for KWT)
     public interface IRefreshTokenRepository
     {
         Task AddAsync(RefreshToken token);

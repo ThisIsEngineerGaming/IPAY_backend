@@ -2,6 +2,7 @@ using IPAY.Domain.Entities.Media;
 
 namespace IPAY.Domain.Interfaces.ForRepos.Media
 {
+    //genre repository(inerhited basic repo)
     public interface IGenreRepo : IRepository<Genre>
     {
         // Atomic array updates (Firestore ArrayUnion / ArrayRemove): no read-modify-write,

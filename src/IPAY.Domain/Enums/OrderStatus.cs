@@ -1,5 +1,6 @@
 namespace IPAY.Domain.Enums
 {
+    //a options of status
     public enum OrderStatus
     {
         Pending = 0,

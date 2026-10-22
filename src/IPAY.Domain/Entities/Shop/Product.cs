@@ -1,5 +1,6 @@
 namespace IPAY.Domain.Entities.Shop
 {
+    //the product class 
     public class Product
     {
         public int Id { get; set; }

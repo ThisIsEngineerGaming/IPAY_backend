@@ -10,12 +10,18 @@ using System.Text;
 
 namespace IPAY.Infrastructure.Repositories.Shop
 {
+    //adress repository
     public class AddressRepository : IAddressRepository
     {
+<<<<<<< Updated upstream
         private const string CollectionName = "addresses";
 
         private readonly FirestoreDb _database;
+=======
+
+>>>>>>> Stashed changes
         private readonly CollectionReference _collection;
+ 
         private readonly PropertyInfo IdProperty;
 
         public AddressRepository(FirestoreDb firestoreDb)
@@ -24,7 +30,7 @@ namespace IPAY.Infrastructure.Repositories.Shop
             _collection = firestoreDb.Collection(CollectionName);
             IdProperty = typeof(Address).GetProperty(nameof(Address.Id))!;
         }
-
+        //get all
         public async Task<IReadOnlyList<Address>> GetAllAsync()
         {
             var snapshot = await _collection.GetSnapshotAsync();
@@ -32,13 +38,13 @@ namespace IPAY.Infrastructure.Repositories.Shop
                 .Select(document => toEntity(document.ConvertTo<AddressDocument>()))
                 .ToList();
         }
-
+        //get by id
         public async Task<Address?> GetByIdAsync(int id)
         {
             var snapshot = await _collection.Document(id.ToString()).GetSnapshotAsync();
             return snapshot.Exists ? toEntity(snapshot.ConvertTo<AddressDocument>()) : null;
         }
-
+        //get user
         public async Task<IReadOnlyList<Address>> GetByUserIdAsync(int userId)
         {
             var snapshot = await _collection
@@ -49,7 +55,7 @@ namespace IPAY.Infrastructure.Repositories.Shop
                 .Select(document => toEntity(document.ConvertTo<AddressDocument>()))
                 .ToList();
         }
-
+        // get by user id
         public async Task<Address?> GetByUserIdAndIdAsync(int userId, int addressId)
         {
             var snapshot = await _collection.Document(addressId.ToString()).GetSnapshotAsync();
@@ -58,7 +64,7 @@ namespace IPAY.Infrastructure.Repositories.Shop
             var entity = toEntity(snapshot.ConvertTo<AddressDocument>());
             return entity.UserId == userId ? entity : null;
         }
-
+        //add async
         public async Task<Address> AddAsync(Address entity)
         {
             var nextId = await GetNextIdAsync();
@@ -66,21 +72,26 @@ namespace IPAY.Infrastructure.Repositories.Shop
             await _collection.Document(nextId.ToString()).SetAsync(toDocument(entity));
             return entity;
         }
-
+        //update async
         public async Task UpdateAsync(int id, Address entity)
         {
             IdProperty.SetValue(entity, id);
             await _collection.Document(id.ToString()).SetAsync(toDocument(entity));
         }
-
+        //delete async
         public Task DeleteAsync(int id) =>
             _collection.Document(id.ToString()).DeleteAsync();
+<<<<<<< Updated upstream
 
         // One counter document instead of reading every address for each insert.
         private Task<int> GetNextIdAsync() =>
             FirestoreIdGenerator.NextIdAsync(_database, CollectionName, GetMaxExistingIdAsync);
 
         private async Task<int> GetMaxExistingIdAsync()
+=======
+        //get next
+        private async Task<int> GetNextIdAsync()
+>>>>>>> Stashed changes
         {
             var all = await GetAllAsync();
             return all.Count == 0
@@ -88,7 +99,7 @@ namespace IPAY.Infrastructure.Repositories.Shop
                 : all.Max(entity => entity.Id);
         }
 
-        // ===== Маппинг =====
+        // ===== Mappings =====
         private Address toEntity(AddressDocument document)
         {
             return new Address

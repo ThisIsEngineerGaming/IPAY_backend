@@ -1,5 +1,6 @@
 namespace IPAY.Application.DTOs.Auth
 {
+    //sellers request dto's
     public class CreateSellerRequestDto
     {
         /// <summary>Optional note for the reviewer, up to 500 characters.</summary>

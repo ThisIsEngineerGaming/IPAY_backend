@@ -1,6 +1,7 @@
 namespace IPAY.Application.DTOs.Auth
 {
     /// <summary>What the profile page shows about the signed-in user.</summary>
+    //a dto's related info about account and actions(change password/email...)
     public class ProfileDto
     {
         public string Name { get; set; } = string.Empty;

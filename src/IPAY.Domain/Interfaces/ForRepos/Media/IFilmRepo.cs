@@ -3,6 +3,7 @@ using IPAY.Domain.Entities.Media;
 namespace IPAY.Domain.Interfaces.ForRepos.Media
 {
     /// Film persistence: generic CRUD plus paging, filtering and sorting.
+    //film repo took over a base repository
     public interface IFilmRepo : IRepository<Film>
     {
         /// Only films whose GenreIds contain this id.

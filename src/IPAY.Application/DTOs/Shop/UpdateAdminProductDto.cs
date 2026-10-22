@@ -4,6 +4,7 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Shop
 {
+    //updating product by admin
     public class UpdateAdminProductDto
     {
         public string Name { get; set; } = string.Empty;

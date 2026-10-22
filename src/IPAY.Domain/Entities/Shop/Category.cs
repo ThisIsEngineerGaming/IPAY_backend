@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace IPAY.Domain.Entities.Shop
 {
+    //product's category
     public class Category
     {
         public int Id { get; set; }

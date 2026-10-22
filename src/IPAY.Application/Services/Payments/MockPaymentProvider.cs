@@ -1,4 +1,4 @@
-﻿// Infrastructure/Payments/MockPaymentProvider.cs
+﻿
 using IPAY.Application.Interfaces.Payments;
 
 namespace IPAY.Infrastructure.Payments
@@ -9,10 +9,10 @@ namespace IPAY.Infrastructure.Payments
 
         public Task<PaymentResult> CreatePaymentAsync(int orderId, decimal amount, string currency = "UAH")
         {
-            // Генерируем фейковый id транзакции
+            // Fake id transaction
             var txId = $"MOCK-{orderId}-{Guid.NewGuid():N}"[..20].ToUpper();
 
-            // «Ссылка на оплату» — просто наш же endpoint подтверждения
+            // «Link to order» 
             var paymentUrl = $"/api/payments/mock/confirm?transactionId={txId}&orderId={orderId}";
 
             return Task.FromResult(new PaymentResult
@@ -26,8 +26,8 @@ namespace IPAY.Infrastructure.Payments
 
         public Task<PaymentResult> ConfirmPaymentAsync(string transactionId)
         {
-            // Всегда успех (или можно сделать 90% success / 10% fail для демо)
-            var success = !transactionId.Contains("FAIL"); // для теста можно передать FAIL в id
+            // Always succed
+            var success = !transactionId.Contains("FAIL"); 
 
             return Task.FromResult(new PaymentResult
             {

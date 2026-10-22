@@ -1,5 +1,6 @@
 using IPAY.Application.DTOs.Shop;
 using IPAY.Application.Interfaces.Shop;
+using IPAY.Application.Services.Shop;
 using IPAY.WebApi.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -136,4 +137,28 @@ public class ProductsController(IProductService service) : ControllerBase
         var result = await service.GetSortedAsync(limit, lastDocId, sortBy, sortDir);
         return Ok(result);
     }
+
+    //[HttpPost("batch")]
+    //public async Task<IActionResult> CreateMany([FromBody] List<CreateAdminProductDto> products)
+    //{
+    //    var result = new List<ProductDto>();
+    //    foreach (var dto in products)
+    //    {
+    //        var product = await service.CreateAsync(dto); // свой метод
+    //        result.Add(product);
+    //    }
+    //    return Ok(result);
+    //}
+
+    //[Authorize(Roles = "Admin")]
+    //[HttpDelete("all")]
+    //public async Task<IActionResult> DeleteAll()
+    //{
+    //    var products = await service.GetAllAsync(); // или репозиторий
+    //    foreach (var p in products)
+    //    {
+    //        await service.DeleteAsync(p.Id);
+    //    }
+    //    return NoContent();
+    //}
 }

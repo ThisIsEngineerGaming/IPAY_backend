@@ -5,6 +5,7 @@ using System.Text;
 
 namespace IPAY.Domain.Enums
 {
+    //options of payment
     public enum PaymentStatus
     {
         Pending = 0,

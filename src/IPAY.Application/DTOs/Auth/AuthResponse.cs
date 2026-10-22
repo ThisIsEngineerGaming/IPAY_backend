@@ -4,11 +4,12 @@ using System.Text;
 
 namespace IPAY.Application.DTOs.Auth
 {
+    //the dto, which gives frontend filtered info(JWT)
     public class AuthResponse
     {
         public string AccessToken { get; set; } = string.Empty;
         public string RefreshToken { get; set; } = string.Empty;
-        public DateTime ExpiresAt { get; set; }          // или int ExpiresIn (секунды)
+        public DateTime ExpiresAt { get; set; }         
         public string TokenType { get; set; } = "Bearer";
 
         // Информация о пользователе
