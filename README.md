@@ -11,6 +11,9 @@ ASP.NET Core Web API for **IPAY** ("Incredible Project Aspnet Yes"), an Amazon-s
 | API reference (Scalar registry) | https://registry.scalar.com/@default-team-wbd0w/apis/fat-api@v1#tag/admin |
 | Code documentation (Doxygen) | https://ipay-doxygen-documentation.onrender.com/ |
 | Requirements (SRS, in Ukrainian) | https://github.com/ysantonyance/IPAY_SRS |
+| Code Coverage (Tests) | https://ipay-code-coverage.onrender.com/ |
+
+
 
 ## Tech stack
 
